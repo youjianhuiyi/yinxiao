@@ -1,5 +1,4 @@
-define([], function () {
-    if ($('.kdniao').length > 0) {
+if ($('.kdniao').length > 0) {
 
     $('.kdniao').each(function () {
         var code = $(this).data('code');
@@ -22,4 +21,3 @@ define([], function () {
         }
     });
 }
-});
