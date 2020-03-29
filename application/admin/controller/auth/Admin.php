@@ -4,6 +4,7 @@ namespace app\admin\controller\auth;
 
 use app\admin\model\AuthGroup;
 use app\admin\model\AuthGroupAccess;
+use app\admin\model\team\Team;
 use app\common\controller\Backend;
 use fast\Random;
 use fast\Tree;
@@ -56,7 +57,12 @@ class Admin extends Backend
             $groupdata = $result;
         }
 
+        //团队数据
+        $teamData = collection(Team::select())->toArray();
+
+
         $this->view->assign('groupdata', $groupdata);
+        $this->view->assign('teamData', $teamData);
         $this->assignconfig("admin", ['id' => $this->auth->id]);
     }
 
