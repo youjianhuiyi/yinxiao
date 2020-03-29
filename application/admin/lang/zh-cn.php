@@ -182,4 +182,9 @@ return [
     'Rule tips'                                             => '规则通常对应一个控制器的方法,同时左侧的菜单栏数据也从规则中体现,通常建议通过命令行进行生成规则节点',
     'Access is allowed only to the super management group'  => '仅超级管理组能访问',
     'Local addon'                                           => '本地插件',
+    'team'                                                  => '团队管理',
+    'production'                                            => '产品管理',
+    'order'                                                 => '订单管理',
+    'express'                                               => '快递管理',
+
 ];
