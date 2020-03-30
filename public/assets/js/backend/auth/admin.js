@@ -30,12 +30,13 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                 columns: [
                     [
                         {field: 'state', checkbox: true, },
-                        {field: 'id', title: 'ID'},
-                        {field: 'username', title: __('Username')},
-                        {field: 'nickname', title: __('Nickname')},
+                        {field: 'id', title: 'ID',operate:false},
+                        {field: 'username', title: __('Username'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
+                        {field: 'nickname', title: __('Nickname'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
                         {field: 'groups_text', title: __('Group'), operate:false, formatter: Table.api.formatter.label},
-                        {field: 'email', title: __('Email')},
-                        {field: 'status', title: __("Status"), formatter: Table.api.formatter.status},
+                        {field: 'phone', title: __('phone'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
+                        {field: 'team_name', title: '所属团队',operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
+                        {field: 'status', title: __("Status"), formatter: Table.api.formatter.status,operate:false},
                         {field: 'logintime', title: __('Login time'), formatter: Table.api.formatter.datetime, operate: 'RANGE', addclass: 'datetimerange', sortable: true},
                         {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate, formatter: function (value, row, index) {
                                 if(row.id == Config.admin.id){

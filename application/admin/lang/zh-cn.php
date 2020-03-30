@@ -186,5 +186,6 @@ return [
     'production'                                            => '产品管理',
     'order'                                                 => '订单管理',
     'express'                                               => '快递管理',
+    'phone'                                                 => '手机号',
 
 ];

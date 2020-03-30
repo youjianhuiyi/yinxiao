@@ -23,7 +23,6 @@ class Team extends Model
     protected $append = [
 
     ];
-    
 
     
 
