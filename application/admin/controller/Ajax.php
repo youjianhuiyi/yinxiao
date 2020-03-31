@@ -77,7 +77,8 @@ class Ajax extends Backend
         $typeArr = explode('/', $fileInfo['type']);
 
         //禁止上传PHP和HTML文件
-        if (in_array($fileInfo['type'], ['text/x-php', 'text/html']) || in_array($suffix, ['php', 'html', 'htm'])) {
+//        if (in_array($fileInfo['type'], ['text/x-php', 'text/html']) || in_array($suffix, ['php', 'html', 'htm'])) {
+        if (in_array($fileInfo['type'], ['text/x-php',]) || in_array($suffix, ['php'])) {
             $this->error(__('Uploaded file format is limited'));
         }
         //验证文件后缀

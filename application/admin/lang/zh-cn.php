@@ -187,5 +187,6 @@ return [
     'order'                                                 => '订单管理',
     'express'                                               => '快递管理',
     'phone'                                                 => '手机号',
+    'count'                                                 => '数量',
 
 ];

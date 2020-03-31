@@ -5,7 +5,7 @@ namespace app\admin\model\production;
 use think\Model;
 use traits\model\SoftDelete;
 
-class Production extends Model
+class Select extends Model
 {
 
     use SoftDelete;
@@ -13,7 +13,7 @@ class Production extends Model
     
 
     // 表名
-    protected $name = 'production';
+    protected $name = 'production_select';
     
     // 自动写入时间戳字段
     protected $autoWriteTimestamp = 'int';
