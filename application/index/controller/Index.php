@@ -4,6 +4,11 @@ namespace app\index\controller;
 
 use app\common\controller\Frontend;
 
+
+/**
+ * Class Index
+ * @package app\index\controller
+ */
 class Index extends Frontend
 {
 
@@ -11,9 +16,18 @@ class Index extends Frontend
     protected $noNeedRight = '*';
     protected $layout = '';
 
+    /**
+     * @return string
+     * @throws \think\Exception
+     */
     public function index()
     {
-        return $this->view->fetch();
+        //构建需要生成的模块参数
+        $data = [
+
+        ];
+        $this->assign('data',$data);
+        return $this->view->fetch('shoes');
     }
 
 }
