@@ -188,5 +188,6 @@ return [
     'express'                                               => '快递管理',
     'phone'                                                 => '手机号',
     'count'                                                 => '数量',
+    'sysconfig'                                             => '系统设置',
 
 ];
