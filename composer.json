@@ -25,7 +25,8 @@
         "karsonzhang/fastadmin-addons": "~1.1.9",
         "overtrue/pinyin": "~3.0",
         "phpoffice/phpspreadsheet": "^1.2",
-        "topthink/think-migration": "v1.1.1"
+        "topthink/think-migration": "v1.1.1",
+        "yansongda/pay": "v2.6.0"
     },
     "config": {
         "preferred-install": "dist"

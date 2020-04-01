@@ -1,14 +1,14 @@
 <?php
 namespace app\index\controller;
 
-use think\Controller;
+use app\common\controller\Frontend;
 
 /**
  * 投诉控制器
  * Class Complaint
  * @package app\index\controller
  */
-class Complaint extends Controller
+class Complaint extends Frontend
 {
     public function index()
     {
