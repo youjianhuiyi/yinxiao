@@ -43,7 +43,7 @@ class ProductionSelect extends Migrator
             ->addColumn('tongji','string',['limit'=>255,'null'=>false,'default'=>'','comment'=>'统计代码'])
             ->addColumn('createtime','integer',['limit'=>10,'signed'=>false,'null'=>false,'default'=>0,'comment'=>'增加时间'])
             ->addColumn('updatetime','integer',['limit'=>10,'signed'=>false,'null'=>false,'default'=>0,'comment'=>'更新时间'])
-            ->addColumn('deletetime','integer',['limit'=>10,'signed'=>false,'default'=>null,'comment'=>'删除时间'])
+            ->addColumn('deletetime','integer',['limit'=>10,'signed'=>false,'null'=>true,'comment'=>'删除时间'])
             ->create();
     }
 }
