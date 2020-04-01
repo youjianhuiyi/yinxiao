@@ -54,6 +54,7 @@ class PayOrder extends Frontend
             'mode' => 'dev', // optional, dev/hk;当为 `hk` 时，为香港 gateway。
         ];
     }
+
     /**
      * 微信支付
      */
@@ -85,7 +86,7 @@ class PayOrder extends Frontend
             // $pay->package
             // $pay->signType
         }
-            
+
     }
 
 

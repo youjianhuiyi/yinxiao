@@ -5,7 +5,7 @@ namespace app\admin\controller\production;
 use app\common\controller\Backend;
 
 /**
- * 产品管理
+ * 产品文案库
  *
  * @icon fa fa-circle-o
  */
@@ -24,6 +24,7 @@ class Production extends Backend
         $this->model = new \app\admin\model\production\Production;
         $this->view->assign("payModeList", $this->model->getPayModeList());
         $this->view->assign("statusList", $this->model->getStatusList());
+
     }
     
     /**

@@ -17,6 +17,18 @@ class Frontend extends Controller
 {
 
     /**
+     * 微信支付配置参数
+     * @var array
+     */
+    protected $wechatConfig = [];
+
+    /**
+     * 支付宝支付配置参数
+     * @var array
+     */
+    protected $alipayConfig = [];
+
+    /**
      * 布局模板
      * @var string
      */

@@ -11,6 +11,7 @@ use think\Db;
 use think\exception\PDOException;
 use think\exception\ValidateException;
 
+
 class Order extends Frontend
 {
     protected $orderModel = null;
@@ -20,6 +21,7 @@ class Order extends Frontend
         parent::_initialize();
         $this->orderModel = new OrderModel();
     }
+
     /**
      * 生成订单sn
      * @param array $data 生成订单的参数
@@ -50,8 +52,8 @@ class Order extends Frontend
             //构建订单数据
             $data = [
                 'admin_id'  => $params['admin_id'],
-                'admin_name'=> AdminModel::get($params['admin_id'])->nickname,
-                'pid'       => AdminModel::get($params['admin_id'])->pid,
+                'admin_name'=> Admin::get($params['admin_id'])->nickname,
+                'pid'       => Admin::get($params['admin_id'])->pid,
                 'num'       => $params['number'],
                 'name'      => $params['name'],
                 'phone'     => $params['mobile'],

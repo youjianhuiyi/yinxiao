@@ -1,29 +1,44 @@
 <?php
 
-namespace app\admin\controller\express;
+namespace app\admin\controller\production;
 
 use app\common\controller\Backend;
+use think\Db;
+use think\exception\PDOException;
+use think\exception\ValidateException;
+use think\Session;
+use app\admin\model\production\Production as ProductionModel;
 
 /**
- * 快递信息管理
+ * 产品文案选择
  *
  * @icon fa fa-circle-o
  */
-class Express extends Backend
+class Select extends Backend
 {
     
     /**
-     * Express模型对象
-     * @var \app\admin\model\express\Express
+     * Select模型对象
+     * @var \app\admin\model\production\Select
      */
     protected $model = null;
     protected $userInfo = null;
+    protected $goodsData = [];//商品数据
+    protected $selectData = [];//商品数据
 
     public function _initialize()
     {
         parent::_initialize();
-        $this->model = new \app\admin\model\express\Express;
+        $this->model = new \app\admin\model\production\Select;
         $this->userInfo = Session::get('admin');
+        $this->goodsData = ProductionModel::where('status',0)->select();
+        $this->selectData = [0=>'请选择商品模板'];
+        foreach ($this->goodsData as $v) {
+            $this->selectData[$v['id']] = '编号--'.$v['id'].'；-产品名：'.$v['name'].'；-原销售价：'.$v['sales_price'].'；-原产品优惠价：'.$v['discount'];
+        }
+
+        $this->assign('selectData',$this->selectData);
+        $this->assign('goodsData',$this->goodsData);
     }
 
     /**
@@ -195,5 +210,6 @@ class Express extends Backend
         $this->view->assign("row", $row);
         return $this->view->fetch();
     }
+
 
 }

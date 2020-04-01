@@ -1,16 +1,20 @@
 <?php
 
-namespace app\admin\model\team;
+namespace app\admin\model\production;
 
 use think\Model;
 use traits\model\SoftDelete;
 
-class Team extends Model
+class Select extends Model
 {
 
     use SoftDelete;
+
+    
+
     // 表名
-    protected $name = 'team';
+    protected $name = 'production_select';
+    
     // 自动写入时间戳字段
     protected $autoWriteTimestamp = 'int';
 
@@ -23,5 +27,14 @@ class Team extends Model
     protected $append = [
 
     ];
+    
+
+    
+
+
+
+
+
+
 
 }

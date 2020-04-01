@@ -1,16 +1,20 @@
 <?php
 
-namespace app\admin\model\team;
+namespace app\admin\model\sysconfig;
 
 use think\Model;
 use traits\model\SoftDelete;
 
-class Team extends Model
+class Pay extends Model
 {
 
     use SoftDelete;
+
+    
+
     // 表名
-    protected $name = 'team';
+    protected $name = 'sysconfig_pay';
+    
     // 自动写入时间戳字段
     protected $autoWriteTimestamp = 'int';
 
@@ -23,5 +27,14 @@ class Team extends Model
     protected $append = [
 
     ];
+    
+
+    
+
+
+
+
+
+
 
 }

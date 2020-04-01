@@ -1,0 +1,64 @@
+<form id="add-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Pay_name')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-pay_name" data-rule="required" class="form-control" name="row[pay_name]" type="text" value=""  placeholder="用于注释当前支付商户号的信息">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('App_id')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-app_id" data-rule="required" class="form-control" name="row[app_id]" type="text" value="" placeholder="微信支付开发者ID">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('App_secret')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-app_secret" data-rule="required" class="form-control" name="row[app_secret]" type="text" value="" placeholder="微信支付开发者密钥">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Business_code')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-business_code" data-rule="required" class="form-control" name="row[business_code]" type="text" value="" placeholder="微信支付商户号">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Pay_secret')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-pay_secret" data-rule="required" class="form-control" name="row[pay_secret]" type="text" value="" placeholder="微信支付支付密钥">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Secure_secret')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-secure_secret" data-rule="required" class="form-control" name="row[secure_secret]" type="text" value="" placeholder="微信支付安全密钥">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Pay_domain1')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-pay_domain1" data-rule="required" class="form-control" name="row[pay_domain1]" type="text" value="" placeholder="在微信支付后台设置">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Pay_domain2')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-pay_domain2" data-rule="required" class="form-control" name="row[pay_domain2]" type="text" value="" placeholder="在微信支付后台设置">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Pay_domain3')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-pay_domain3" data-rule="required" class="form-control" name="row[pay_domain3]" type="text" value="" placeholder="在微信支付后台设置">
+        </div>
+    </div>
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-success btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>

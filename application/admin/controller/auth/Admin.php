@@ -58,9 +58,15 @@ class Admin extends Backend
         }
 
         //团队数据
-        $teamData = collection(Team::select())->toArray();
+        $teamData = collection(Team::column('name','id'))->toArray();
+        $teamData[0] = '请选择';
+        ksort($teamData);
+        //团队关系
+        $adminData = \app\admin\model\Admin::where('level','in',[0,1,2])->column('nickname','id');
 
-
+        $adminData[0] = '添加账号属于谁的下级，就选择谁，没有下级就选择本项';
+        ksort($adminData);
+        $this->view->assign('adminData',$adminData);
         $this->view->assign('groupdata', $groupdata);
         $this->view->assign('teamData', $teamData);
         $this->assignconfig("admin", ['id' => $this->auth->id]);
@@ -135,6 +141,16 @@ class Admin extends Backend
                 $params['salt'] = Random::alnum();
                 $params['password'] = md5(md5($params['password']) . $params['salt']);
                 $params['avatar'] = '/assets/img/avatar.png'; //设置新管理员默认头像。
+                $teamName = Team::where('id',$params['team_id'])->value('name');
+                $params['team_name'] = $teamName ?:'未知团队';
+                //设置团队关系级别
+                if ($params['pid'] < 3) {
+                    //表示用户不是第一层级
+                    $level = \app\admin\model\Admin::where('id',$params['pid'])->value('level') + 1;
+                } else {
+                    $level = 3;
+                }
+                $params['level'] = $level;
                 $result = $this->model->validate('Admin.add')->save($params);
                 if ($result === false) {
                     $this->error($this->model->getError());
@@ -167,9 +183,20 @@ class Admin extends Backend
         if (!in_array($row->id, $this->childrenAdminIds)) {
             $this->error(__('You have no permission'));
         }
+
         if ($this->request->isPost()) {
             $this->token();
             $params = $this->request->post("row/a");
+            $teamName = Team::where('id',$params['team_id'])->value('name');
+            $params['team_name'] = $teamName  != '' ? $teamName : '未知团队';
+            //设置团队关系级别
+            if ($params['pid'] < 3) {
+                //表示用户不是第一层级
+                $level = \app\admin\model\Admin::where('id',$params['pid'])->value('level') + 1;
+            } else {
+                $level = 3;
+            }
+            $params['level'] = $level;
             if ($params) {
                 if ($params['password']) {
                     if (!Validate::is($params['password'], '\S{6,16}')) {

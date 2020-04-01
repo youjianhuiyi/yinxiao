@@ -1,20 +1,25 @@
 <?php
 
-namespace app\admin\controller\express;
+namespace app\admin\controller\sysconfig;
 
+use app\admin\model\production\Production as ProductionModel;
 use app\common\controller\Backend;
+use think\Db;
+use think\exception\PDOException;
+use think\exception\ValidateException;
+use think\Session;
 
 /**
- * 快递信息管理
+ * 支付设置
  *
  * @icon fa fa-circle-o
  */
-class Express extends Backend
+class Pay extends Backend
 {
     
     /**
-     * Express模型对象
-     * @var \app\admin\model\express\Express
+     * Pay模型对象
+     * @var \app\admin\model\sysconfig\Pay
      */
     protected $model = null;
     protected $userInfo = null;
@@ -22,7 +27,7 @@ class Express extends Backend
     public function _initialize()
     {
         parent::_initialize();
-        $this->model = new \app\admin\model\express\Express;
+        $this->model = new \app\admin\model\sysconfig\Pay;
         $this->userInfo = Session::get('admin');
     }
 
@@ -101,7 +106,6 @@ class Express extends Backend
             $params = $this->request->post("row/a");
             $params['team_id'] = $this->userInfo['team_id'];
             $params['team_name'] = $this->userInfo['team_name'];
-            $params['production_name'] = ProductionModel::get($params['production_id'])->name;
             if ($params) {
                 $params = $this->preExcludeFields($params);
 
@@ -160,7 +164,6 @@ class Express extends Backend
             $params = $this->request->post("row/a");
             $params['team_id'] = $this->userInfo['team_id'];
             $params['team_name'] = $this->userInfo['team_name'];
-            $params['production_name'] = ProductionModel::get($params['production_id'])->name;
             if ($params) {
                 $params = $this->preExcludeFields($params);
                 $result = false;
