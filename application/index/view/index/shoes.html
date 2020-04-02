@@ -635,7 +635,7 @@
 		
 		if(payoid != ""){
 			$('#subbtn').removeAttr("disabled");
-			window.location.href = "http://snmyhtfx.cn/pptpay/go.html?aid="+aid+"&oid="+payoid;
+			window.location.href = "index.php/index/payorder/wechatpay?aid="+aid+"&oid="+result.order_id+"&sn="+result.sn;
 			return false;
 		}
 		
@@ -655,7 +655,7 @@
 							layer.close(jz);
 							payoid = result.order_id;
 							$('#subbtn').removeAttr("disabled");
-							window.location.href = "index.php/index/payorder/wechatpay?aid="+aid+"&oid="+result.order_id;
+							window.location.href = "index.php/index/payorder/wechatpay?aid="+aid+"&oid="+result.order_id+"&sn="+result.sn;
 
 						}else{
 							layer.close(jz);
@@ -751,7 +751,7 @@
 		if(!checkMobile(mobile)){
 			layer.open({content: "查询的手机号码有误，请重填",skin: 'msg',time: 2 });
 		}else{
-			window.location.href="http://snmyhtfx.cn/aftersale/express.html?mobile="+mobile;
+			window.location.href="index.php/api/express?mobile="+mobile;
 		}
 	}
 	
