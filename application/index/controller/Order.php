@@ -52,8 +52,8 @@ class Order extends Frontend
             //构建订单数据
             $data = [
                 'admin_id'  => $params['admin_id'],
-                'admin_name'=> Admin::get($params['admin_id'])->nickname,
-                'pid'       => Admin::get($params['admin_id'])->pid,
+                'admin_name'=> AdminModel::get($params['admin_id'])->nickname,
+                'pid'       => AdminModel::get($params['admin_id'])->pid,
                 'num'       => $params['number'],
                 'name'      => $params['name'],
                 'phone'     => $params['mobile'],
