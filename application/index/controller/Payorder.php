@@ -54,7 +54,7 @@ class PayOrder extends Frontend
             'token'          => $this->payInfo['token'],
             'appid'          => $this->payInfo['app_id'],
             'appsecret'      => $this->payInfo['app_secret'],
-            'encodingaeskey' => $this->payInfo['encoding_aes_key'],
+            'encodingaeskey' => $this->payInfo['encodingaeskey'],
             // 配置商户支付参数（可选，在使用支付功能时需要）
             'mch_id'         => $this->payInfo['mch_id'],
             'mch_key'        => $this->payInfo['mch_key'],
