@@ -27,12 +27,12 @@ class PayOrder extends Frontend
 
     /**
      * 设置微信支付配置文件
-     * @param $data
+     * @param integer $data
      * @return array
      */
     protected function setConfig($data)
     {
-        $this->payInfo = $this->payModel->where(['team_id'=>$data['team_id']])->get();
+        $this->payInfo = $this->payModel->where(['team_id'=>$data])->get();
 
         return $this->weChatConfig = [
 //            'token'          => 'RPyzZEPt5RiAYWxr4Dks87bpQWixRadf',
@@ -74,7 +74,7 @@ class PayOrder extends Frontend
             //表示订单真实有效，可以进行支付
             $orderInfo = Cache::get($params['sn']);
 //            $payInfo = $this->payModel->where(['status'=>1,'team_id'=>$orderInfo['team_id']])->get();
-            $this->setConfig($params);
+            $this->setConfig($orderInfo['team_id']);
 
             try {
                 // 实例接口
