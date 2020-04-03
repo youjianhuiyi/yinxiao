@@ -32,8 +32,11 @@ class PayOrder extends Frontend
      */
     protected function setConfig($data)
     {
-        $this->payInfo = $this->payModel->where(['team_id'=>$data])->get();
-
+        $this->payInfo = $this->payModel->where(['team_id'=>$data])->find();
+        if (empty($this->payInfo)) {
+            dump(empty($this->payInfo));
+            die("支付信息有误");
+        }
         return $this->weChatConfig = [
 //            'token'          => 'RPyzZEPt5RiAYWxr4Dks87bpQWixRadf',
 //            'appid'          => 'wx90588380da4a2bb0',

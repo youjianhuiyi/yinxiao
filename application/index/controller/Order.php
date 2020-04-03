@@ -88,7 +88,8 @@ class Order extends Frontend
             }
 
             if ($result !== false) {
-                Cache::set($sn,array_push($data,['id'=>$orderId]),3600);
+                array_push($data,['id'=>$orderId]);
+                Cache::set($sn,$data,3600);
                 return ['status'=>0,'msg'=>'提交订单成功','order_id'=>$orderId,'sn'=>$sn];
             } else {
                 return ['status'=>1,'msg'=>'提交订单失败，请稍候再试~'];
