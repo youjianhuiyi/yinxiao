@@ -85,7 +85,7 @@ class PayOrder extends Frontend
 
                 // 执行操作
                 $userInfo = $oauth->getOauthAccessToken();
-                dump($userInfo);
+                dump($userInfo);die;
                 // 创建接口实例
                 $weChat = new Pay($this->weChatConfig);
 
