@@ -2,8 +2,7 @@
 namespace app\index\controller;
 
 use app\common\controller\Frontend;
-use Yansongda\Pay\Pay;
-use Yansongda\Supports\Log;
+use WeChat\Pay;
 
 /**
  * 回调处理类
@@ -15,17 +14,22 @@ class Notify extends Frontend
 
     public function WeChatNotify()
     {
-        $pay = Pay::wechat($this->config);
+        try {
+            // 创建接口实例
+            $weChat = new Pay($this->weChatConfig);
 
-        try{
-            $data = $pay->verify(); // 是的，验签就这么简单！
+            // 尝试创建订单
+            $result = $weChat->getNotify();
 
-            Log::debug('Wechat notify', $data->all());
-        } catch (\Exception $e) {
-            // $e->getMessage();
+            // 订单数据处理
+            var_export($result);
+
+        } catch(Exception $e) {
+
+            // 出错啦，处理下吧
+            echo $e->getMessage() . PHP_EOL;
+
         }
-
-        return $pay->success()->send();// laravel 框架中请直接 `return $pay->success()`
     }
 
 

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "df5aa1e335a5bfab311e4f8c1cb4cb72",
+    "content-hash": "628991c4d9978b14c97a52a786bde4ee",
     "packages": [
         {
             "name": "doctrine/cache",
@@ -2216,6 +2216,71 @@
                 "throttle"
             ],
             "time": "2019-06-05T05:08:48+00:00"
+        },
+        {
+            "name": "zoujingli/wechat-developer",
+            "version": "v1.2.20",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zoujingli/WeChatDeveloper.git",
+                "reference": "9afb0a29c658d52dc7b9d46d2f848602124936b7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zoujingli/WeChatDeveloper/zipball/9afb0a29c658d52dc7b9d46d2f848602124936b7",
+                "reference": "9afb0a29c658d52dc7b9d46d2f848602124936b7",
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
+            },
+            "require": {
+                "ext-bcmath": "*",
+                "ext-curl": "*",
+                "ext-json": "*",
+                "ext-libxml": "*",
+                "ext-mbstring": "*",
+                "ext-openssl": "*",
+                "ext-simplexml": "*",
+                "php": ">=5.4"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "We.php"
+                ],
+                "psr-4": {
+                    "WePay\\": "WePay",
+                    "WeChat\\": "WeChat",
+                    "WeMini\\": "WeMini",
+                    "AliPay\\": "AliPay"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Anyon",
+                    "email": "zoujingli@qq.com",
+                    "homepage": "https://thinkadmin.top"
+                }
+            ],
+            "description": "WeChat platform and WeChat payment development tools",
+            "homepage": "https://github.com/zoujingli/WeChatDeveloper",
+            "keywords": [
+                "WeChatDeveloper",
+                "WeMini",
+                "alipay",
+                "wechat",
+                "wechatpay",
+                "wepay"
+            ],
+            "time": "2020-03-14T06:58:18+00:00"
         }
     ],
     "packages-dev": [],

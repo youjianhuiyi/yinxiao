@@ -23,24 +23,14 @@ class Frontend extends Controller
      */
     protected $alipayConfig = [];
 
+    /**
+     * 支付信息
+     */
+    protected $payInfo = [];
+
     public function _initialize()
     {
-//        parent::_initialize();
+        parent::_initialize();
     }
 
-    /**
-     * 刷新Token
-     */
-    protected function token()
-    {
-        $token = $this->request->post('__token__');
-
-        //验证Token
-        if (!Validate::is($token, "token", ['__token__' => $token])) {
-            $this->error(__('Token verification error'), '', ['__token__' => $this->request->token()]);
-        }
-
-        //刷新Token
-        $this->request->token();
-    }
 }
