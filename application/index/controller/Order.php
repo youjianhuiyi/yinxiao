@@ -58,14 +58,14 @@ class Order extends Frontend
                 'name'      => $params['name'],
                 'phone'     => $params['mobile'],
                 'address'   => $params['province'].'-'.$params['city'].'-'.$params['district'].'-'.$params['detailaddress'],
-                'team_id'   => $params['team_id'],
-                'team_name' => TeamModel::get($params['team_id'])->name,
+                'team_id'   => AdminModel::get($params['admin_id'])->team_id,
+                'team_name' => TeamModel::get(AdminModel::get($params['admin_id'])->team_id)->name,
                 'production_id'     => $params['pid'],
                 'production_name'   => $params['production_name'],
                 'goods_info'=> 'pattern='.$params['pattern'].';sex='.$params['sex'].';attr='.$params['attr'],
                 'pay_type'  => $params['pay_type'],
                 'price'     => $params['price'],
-                'pay_id'    => PayModel::get($params['team_id'])->id,
+                'pay_id'    => PayModel::get(AdminModel::get($params['admin_id'])->team_id)->id,
                 'sn'        => $sn
             ];
 
