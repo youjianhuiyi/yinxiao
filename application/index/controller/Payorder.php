@@ -48,10 +48,6 @@ class PayOrder extends Frontend
             $this->setConfig($this->payInfo);
 
             try {
-                // 实例接口
-                $oauth = new Oauth($this->weChatConfig);
-                dump($this->weChatConfig);
-                dump($oauth);
                 // 创建接口实例
                 $weChat = new Pay($this->weChatConfig);
 
@@ -60,7 +56,7 @@ class PayOrder extends Frontend
                     'body'             => '测试商品',
                     'out_trade_no'     => time(),
                     'total_fee'        => '1',
-                    'openid'           => $userInfo['openid'],
+                    'openid'           => $params['openid'],
                     'trade_type'       => 'JSAPI',
                     'notify_url'       => 'http://notify.ckjdsak.cn/index.php/index/notify/WeChatNotify',
                     'spbill_create_ip' => $this->request->ip(),
