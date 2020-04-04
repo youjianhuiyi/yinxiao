@@ -27,59 +27,63 @@ class Index extends Frontend
     {
         //判断访问链接，如果有微信授权链接参数，直接放行到落地页面。如果没有则进行微信授权认证
         $params = $this->request->param();
-        //第一步。判断链接是否有效
-        if (isset($params['check_code']) && !empty($params['check_code'])) {
-            //表示可能已经经过微信授权。再继续判断此key的真实性
-            $str = 'aid='.$params['aid'].'&gid='.$params['gid'].'&tid='.$params['tid'];
-            $newCheckCode = md5($str);
-            if ($newCheckCode == $params['check_code']) {
+        if ($params['openid']) {
+            //表示已经获取了openid
+            dump($params);die;
+            //第一步。判断链接是否有效
+            if (isset($params['check_code']) && !empty($params['check_code'])) {
+                //表示可能已经经过微信授权。再继续判断此key的真实性
+                $str = 'aid='.$params['aid'].'&gid='.$params['gid'].'&tid='.$params['tid'];
+                $newCheckCode = md5($str);
+                if ($newCheckCode == $params['check_code']) {
 
-                if (isset($params['check_key']) && !empty($params['check_key'])) {
-                    //表示可能已经经过微信授权。再继续判断此key的真实性
-                    $str = 'aid='.$params['aid'].'&gid='.$params['gid'].'&tid='.$params['tid'].'&check_code='.$params['check_code'];
-                    $newCheckKey = md5($str);
-                    if ($newCheckKey == $params['check_key']) {
-                        //表示直接放行，跳转到指定落地页面链接，
-                        //构建需要生成的模块参数
-                        try {
-                            // 实例接口
-                            $weChat = new Oauth($this->weChatConfig);
-                            // 执行操作
-                            $result = $weChat->getOauthAccessToken();
-                            dump($result);die;
+                    if (isset($params['check_key']) && !empty($params['check_key'])) {
+                        //表示可能已经经过微信授权。再继续判断此key的真实性
+                        $str = 'aid='.$params['aid'].'&gid='.$params['gid'].'&tid='.$params['tid'].'&check_code='.$params['check_code'];
+                        $newCheckKey = md5($str);
+                        if ($newCheckKey == $params['check_key']) {
+                            //表示直接放行，跳转到指定落地页面链接，
+                            //构建需要生成的模块参数
 
-                        } catch (\Exception $e){
+                            $data = [
 
-                            // 异常处理
-                            echo  $e->getMessage();
-
+                            ];
+                            $this->assign('data',$data);
+                            return $this->view->fetch('shoes');
+                        } else {
+                            //表示需要再判断链接是否有效
+                            exit('链接已经被恶意修改，请重新访问');
+                            //TODO：暂时直接断开程序，后期可以进行拓展，先处理成功的方案 4-4
                         }
 
-
-                        $data = [
-
-                        ];
-                        $this->assign('data',$data);
-                        return $this->view->fetch('shoes');
                     } else {
-                        //表示需要再判断链接是否有效
-                        exit('链接已经被恶意修改，请重新访问');
-                        //TODO：暂时直接断开程序，后期可以进行拓展，先处理成功的方案 4-4
+                        //表示没有微信授权
+                        $this->intoBefore();
                     }
-
                 } else {
-                    //表示没有微信授权
-                    $this->intoBefore();
+                    exit('此链接不是你正确的推广链接');
                 }
-            } else {
-                exit('此链接不是你正确的推广链接');
-            }
 
+            } else {
+                //表示此链接是直接访问此方法的路由，直接拒绝，避免产生不必要的结果
+                exit('请携带正确的参数访问网站，不要这么直接');
+                //TODO:防止用户直接不带任何参数访问落地页面，产生不必要的报错，后期可以进行规避和跳转 4-4
+            }
         } else {
-            //表示此链接是直接访问此方法的路由，直接拒绝，避免产生不必要的结果
-            exit('请携带正确的参数访问网站，不要这么直接');
-            //TODO:防止用户直接不带任何参数访问落地页面，产生不必要的报错，后期可以进行规避和跳转 4-4
+            //表示没有获取openid
+            try {
+                // 实例接口
+                $weChat = new Oauth($this->weChatConfig);
+                // 执行操作
+                dump($weChat);
+                $result = $weChat->getOauthAccessToken();
+                dump($result);
+            } catch (\Exception $e){
+                // 异常处理
+                echo  $e->getMessage();
+            }
         }
+
 
     }
 
