@@ -118,7 +118,6 @@ class Frontend extends Controller
             $weChat = new Oauth($this->weChatConfig);
             // 执行操作
             $result = $weChat->getOauthRedirect($redirect_url);
-            dump($result);die;
         } catch (\Exception $e){
             // 异常处理
             echo  $e->getMessage();
