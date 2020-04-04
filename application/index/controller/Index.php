@@ -30,6 +30,25 @@ class Index extends Frontend
     {
         //判断访问链接，如果有微信授权链接参数，直接放行到落地页面。如果没有则进行微信授权认证
         $params = $this->request->param();
+        try {
+            if (!Cache::has('pay_info_'.$params['tid'])) {
+                //设置缓存-本次记录好缓存，判断是否是支付配置信息记录
+                $this->payInfo = PayModel::where(['team_id'=>$params['tid']])->find()->toArray();
+                Cache::set('pay_info_'.$params['tid'],$this->payInfo,Env::get('redis.expire'));
+            } else {
+                $this->payInfo = Cache::get('pay_info_'.$params['tid']);
+            }
+            $this->weChatConfig=$this->setConfig($this->payInfo);
+            // 实例接口
+            $weChat = new Oauth($this->weChatConfig);
+            // 执行操作
+            $result = $weChat->getOauthAccessToken();
+            dump($result);
+        } catch (\Exception $e){
+            // 异常处理
+            echo  $e->getMessage();
+        }
+        
         if (isset($params['openid']) && !empty($params['openid'])) {
             //表示已经获取了openid
             dump($params);die;
@@ -72,29 +91,7 @@ class Index extends Frontend
                 exit('请携带正确的参数访问网站，不要这么直接');
                 //TODO:防止用户直接不带任何参数访问落地页面，产生不必要的报错，后期可以进行规避和跳转 4-4
             }
-        } else {
-            //表示没有获取openid
-            try {
-                if (!Cache::has('pay_info_'.$params['tid'])) {
-                    //设置缓存-本次记录好缓存，判断是否是支付配置信息记录
-                    $this->payInfo = PayModel::where(['team_id'=>$params['tid']])->find()->toArray();
-                    Cache::set('pay_info_'.$params['tid'],$this->payInfo,Env::get('redis.expire'));
-                } else {
-                    $this->payInfo = Cache::get('pay_info_'.$params['tid']);
-                }
-                $this->weChatConfig=$this->setConfig($this->payInfo);
-                // 实例接口
-                $weChat = new Oauth($this->weChatConfig);
-                // 执行操作
-                dump($weChat);
-                $result = $weChat->getOauthAccessToken();
-                dump($result);
-            } catch (\Exception $e){
-                // 异常处理
-                echo  $e->getMessage();
-            }
         }
-
 
     }
 
