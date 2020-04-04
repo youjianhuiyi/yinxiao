@@ -655,7 +655,7 @@
 							layer.close(jz);
 							payoid = result.order_id;
 							$('#subbtn').removeAttr("disabled");
-							window.location.href = "{:url('index.php/index/payorder/wechatpay')}"+"?aid="+aid+"&oid="+result.order_id+"&sn="+result.sn+'&code='+result.code+'&state=state';
+							window.location.href = "{:url('index.php/index/payorder/wechatpay')}"+"?aid="+aid+"&oid="+result.order_id+"&sn="+result.sn+'&openid='+"{$data['openid']}"+'&state=state';
 
 						}else{
 							layer.close(jz);
