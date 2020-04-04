@@ -69,7 +69,7 @@ class PayOrder extends Frontend
                 // 订单数据处理
 //                var_export($result);
 //                var_export($result1);
-                $this->assign('jsApiPrepay',$result1);
+                $this->assign('jsApiPrepay',json_encode($result1));
                 return $this->view->fetch('wechatpay');
             } catch(Exception $e) {
 
