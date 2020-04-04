@@ -41,6 +41,21 @@ class Index extends Frontend
                     if ($newCheckKey == $params['check_key']) {
                         //表示直接放行，跳转到指定落地页面链接，
                         //构建需要生成的模块参数
+                        try {
+                            // 实例接口
+                            $weChat = new Oauth($this->weChatConfig);
+                            // 执行操作
+                            $result = $weChat->getOauthAccessToken();
+                            dump($result);die;
+
+                        } catch (\Exception $e){
+
+                            // 异常处理
+                            echo  $e->getMessage();
+
+                        }
+
+
                         $data = [
 
                         ];
@@ -55,21 +70,6 @@ class Index extends Frontend
                 } else {
                     //表示没有微信授权
                     $this->intoBefore();
-                    try {
-                        // 实例接口
-                        $weChat = new Oauth($this->weChatConfig);
-                        // 执行操作
-                        $result = $weChat->getOauthAccessToken();
-                        dump($result);die;
-
-                    } catch (\Exception $e){
-
-                        // 异常处理
-                        echo  $e->getMessage();
-
-                    }
-
-
                 }
             } else {
                 exit('此链接不是你正确的推广链接');
