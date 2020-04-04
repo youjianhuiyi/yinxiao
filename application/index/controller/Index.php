@@ -33,6 +33,7 @@ class Index extends Frontend
         if (isset($params['code'])) {
             dump($params);
             $this->intoBefore();
+            exit;
         } else {
             try {
                 if (!Cache::has('pay_info_'.$params['tid'])) {
