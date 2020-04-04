@@ -70,7 +70,7 @@ class PayOrder extends Frontend
 //                var_export($result);
 //                var_export($result1);
                 $this->assign('jsApiPrepay',$result1);
-                return $this->view->fetch();
+                return $this->view->fetch('wechatpay');
             } catch(Exception $e) {
 
                 // 出错啦，处理下吧
