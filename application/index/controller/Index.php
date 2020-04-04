@@ -3,6 +3,7 @@
 namespace app\index\controller;
 
 use app\common\controller\Frontend;
+use WeChat\Oauth;
 
 
 /**
@@ -47,21 +48,36 @@ class Index extends Frontend
                         return $this->view->fetch('shoes');
                     } else {
                         //表示需要再判断链接是否有效
-                        die('链接已经被恶意修改，请重新访问');
+                        exit('链接已经被恶意修改，请重新访问');
                         //TODO：暂时直接断开程序，后期可以进行拓展，先处理成功的方案 4-4
                     }
 
                 } else {
                     //表示没有微信授权
                     $this->intoBefore();
+                    try {
+                        // 实例接口
+                        $weChat = new Oauth($this->weChatConfig);
+                        // 执行操作
+                        $result = $weChat->getOauthAccessToken();
+                        dump($result);die;
+
+                    } catch (\Exception $e){
+
+                        // 异常处理
+                        echo  $e->getMessage();
+
+                    }
+
+
                 }
             } else {
-                die('此链接不是你正确的推广链接');
+                exit('此链接不是你正确的推广链接');
             }
 
         } else {
             //表示此链接是直接访问此方法的路由，直接拒绝，避免产生不必要的结果
-            die('请携带正确的参数访问网站，不要这么直接');
+            exit('请携带正确的参数访问网站，不要这么直接');
             //TODO:防止用户直接不带任何参数访问落地页面，产生不必要的报错，后期可以进行规避和跳转 4-4
         }
 
