@@ -27,7 +27,7 @@ class Index extends Frontend
     {
         //判断访问链接，如果有微信授权链接参数，直接放行到落地页面。如果没有则进行微信授权认证
         $params = $this->request->param();
-        if ($params['openid']) {
+        if (isset($params['openid']) && !empty($params['openid'])) {
             //表示已经获取了openid
             dump($params);die;
             //第一步。判断链接是否有效
