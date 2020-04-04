@@ -43,7 +43,7 @@ class Order extends Frontend
     public function submitOrder()
     {
         if ($this->request->isAjax()) {
-            $params = $this->request->post();
+            $params = $this->request->param();
             if (empty($params) || empty($params['token'])) {
                 //表示假提交或者是伪造提交数据,后期再做token验证
                 return ['status'=>1,'code'=>'提交错误'];

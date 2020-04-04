@@ -647,7 +647,7 @@
 
 		 $.ajax({
 					type : "POST",  //提交方式
-					url : "index.php/index/order/submitOrder",
+					url : "{:url('index.php/index/order/submitOrder')}",
 					data : $("#form1").serialize(),
 					dataType : "json",
 					success : function(result) {

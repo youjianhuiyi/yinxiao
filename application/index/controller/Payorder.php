@@ -5,6 +5,7 @@ use app\common\controller\Frontend;
 use think\Cache;
 use app\admin\model\order\Order as OrderModel;
 use app\admin\model\sysconfig\Pay as PayModel;
+use think\Env;
 use WeChat\Oauth;
 use WeChat\Pay;
 
@@ -36,7 +37,15 @@ class PayOrder extends Frontend
             //表示订单真实有效，可以进行支付
             $orderInfo = Cache::get($params['sn']);
 //            $payInfo = $this->payModel->where(['status'=>1,'team_id'=>$orderInfo['team_id']])->get();
-            $this->setConfig($orderInfo['team_id']);
+            if (!Cache::has('pay_info_'.$orderInfo['team_id'])) {
+                //设置缓存-本次记录好缓存，判断是否是支付配置信息记录
+                $this->payInfo = PayModel::where(['team_id'=>$orderInfo['team_id']])->find()->toArray();
+                Cache::set('pay_info_'.$orderInfo['team_id'],$this->payInfo,Env::get('redis.expire'));
+            } else {
+                $this->payInfo = Cache::get('pay_info_'.$orderInfo['team_id']);
+            }
+
+            $this->setConfig($this->payInfo);
 
             try {
                 // 实例接口
