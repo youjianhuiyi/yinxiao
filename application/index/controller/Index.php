@@ -31,9 +31,7 @@ class Index extends Frontend
         //判断访问链接，如果有微信授权链接参数，直接放行到落地页面。如果没有则进行微信授权认证
         $params = $this->request->param();
         if (!isset($params['code'])) {
-            dump($params);
             $this->intoBefore();
-            exit;
         } else {
             try {
                 if (!Cache::has('pay_info_'.$params['tid'])) {
