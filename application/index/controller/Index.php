@@ -30,31 +30,36 @@ class Index extends Frontend
     {
         //判断访问链接，如果有微信授权链接参数，直接放行到落地页面。如果没有则进行微信授权认证
         $params = $this->request->param();
-        dump($params);
-        try {
-            if (!Cache::has('pay_info_'.$params['tid'])) {
-                //设置缓存-本次记录好缓存，判断是否是支付配置信息记录
-                $this->payInfo = PayModel::where(['team_id'=>$params['tid']])->find()->toArray();
-                Cache::set('pay_info_'.$params['tid'],$this->payInfo,Env::get('redis.expire'));
-            } else {
-                $this->payInfo = Cache::get('pay_info_'.$params['tid']);
+        if (isset($params['code']) && !empty($params['code'])) {
+            $this->intoBefore();
+        } else {
+            dump($params);
+            try {
+                if (!Cache::has('pay_info_'.$params['tid'])) {
+                    //设置缓存-本次记录好缓存，判断是否是支付配置信息记录
+                    $this->payInfo = PayModel::where(['team_id'=>$params['tid']])->find()->toArray();
+                    Cache::set('pay_info_'.$params['tid'],$this->payInfo,Env::get('redis.expire'));
+                } else {
+                    $this->payInfo = Cache::get('pay_info_'.$params['tid']);
+                }
+                $this->weChatConfig=$this->setConfig($this->payInfo);
+                // 实例接口
+                $weChat = new Oauth($this->weChatConfig);
+                // 执行操作
+                $result = $weChat->getOauthAccessToken();
+                dump($this->request->url(true));
+                dump($_GET);
+                dump($result);
+            } catch (\Exception $e){
+                // 异常处理
+                echo  $e->getMessage();
             }
-            $this->weChatConfig=$this->setConfig($this->payInfo);
-            // 实例接口
-            $weChat = new Oauth($this->weChatConfig);
-            // 执行操作
-            $result = $weChat->getOauthAccessToken();
-            dump($this->request->url(true));
-            dump($_GET);
-            dump($result);
-        } catch (\Exception $e){
-            // 异常处理
-            echo  $e->getMessage();
         }
+
+        die;
 
         if (isset($params['openid']) && !empty($params['openid'])) {
             //表示已经获取了openid
-            dump($params);die;
             //第一步。判断链接是否有效
             if (isset($params['check_code']) && !empty($params['check_code'])) {
                 //表示可能已经经过微信授权。再继续判断此key的真实性
