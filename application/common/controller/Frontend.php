@@ -6,6 +6,7 @@ use think\Cache;
 use think\Controller;
 use app\admin\model\sysconfig\Pay as PayModel;
 use think\Env;
+use think\response\Redirect;
 use WeChat\Oauth;
 
 /**
@@ -118,8 +119,7 @@ class Frontend extends Controller
             $weChat = new Oauth($this->weChatConfig);
             // 执行操作
             $result = $weChat->getOauthRedirect($redirect_url);
-            $this->redirect($result);
-            return;
+            header($result);
         } catch (\Exception $e){
             // 异常处理
             echo  $e->getMessage();
