@@ -67,6 +67,7 @@ class PayOrder extends Frontend
                 $result1 = $weChat->createParamsForJsApi($result['prepay_id']);
 
                 // 订单数据处理
+                var_export($result);
                 var_export($result1);
 
             } catch(Exception $e) {
