@@ -106,7 +106,7 @@ class Frontend extends Controller
         } else {
             $this->payInfo = Cache::get('pay_info_'.$params['tid']);
         }
-        $this->weChatConfig=$this->setConfig($this->payInfo);
+        $this->weChatConfig=$this->setConfig($this->payInfo);$this->weChatConfig=$this->setConfig($this->payInfo);
         //第三步：获取当前aid对应的链接参数携带参数跳转-
         //经过上面的验证，需要对已经验证的链接进行重新组装。
         $paramStr = 'aid='.$params['aid'].'&gid='.$params['gid'].'&tid='.$params['tid'].'&check_code='.$params['check_code'];

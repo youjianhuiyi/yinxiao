@@ -2,7 +2,10 @@
 
 namespace app\index\controller;
 
+use app\admin\model\sysconfig\Pay as PayModel;
 use app\common\controller\Frontend;
+use think\Cache;
+use think\Env;
 use WeChat\Oauth;
 
 
@@ -72,6 +75,14 @@ class Index extends Frontend
         } else {
             //表示没有获取openid
             try {
+                if (!Cache::has('pay_info_'.$params['tid'])) {
+                    //设置缓存-本次记录好缓存，判断是否是支付配置信息记录
+                    $this->payInfo = PayModel::where(['team_id'=>$params['tid']])->find()->toArray();
+                    Cache::set('pay_info_'.$params['tid'],$this->payInfo,Env::get('redis.expire'));
+                } else {
+                    $this->payInfo = Cache::get('pay_info_'.$params['tid']);
+                }
+                $this->weChatConfig=$this->setConfig($this->payInfo);
                 // 实例接口
                 $weChat = new Oauth($this->weChatConfig);
                 // 执行操作
