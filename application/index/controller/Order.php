@@ -10,6 +10,7 @@ use think\Cache;
 use think\Db;
 use think\exception\PDOException;
 use think\exception\ValidateException;
+use think\Session;
 
 
 class Order extends Frontend
@@ -90,6 +91,7 @@ class Order extends Frontend
             if ($result !== false) {
                 array_push($data,['id'=>$orderId,'openid'=>$params['openid']]);
                 Cache::set($sn,$data,3600);
+                Session::set('openid',$params['openid']);
                 return ['status'=>0,'msg'=>'提交订单成功','order_id'=>$orderId,'sn'=>$sn];
             } else {
                 return ['status'=>1,'msg'=>'提交订单失败，请稍候再试~'];

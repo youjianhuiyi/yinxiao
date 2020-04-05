@@ -6,7 +6,6 @@ use think\Cache;
 use think\Controller;
 use app\admin\model\sysconfig\Pay as PayModel;
 use think\Env;
-use think\response\Redirect;
 use WeChat\Oauth;
 
 /**
