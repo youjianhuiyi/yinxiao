@@ -36,22 +36,23 @@ class Index extends Frontend
         //判断访问链接，如果有微信授权链接参数，直接放行到落地页面。如果没有则进行微信授权认证
         $params = $this->request->param();
         if (isset($params['code']) && !empty($params['code'])) {
-            if (!$this->verifyCheckKey($params)) {
+            $paramsNew = $this->request->param();
+            if (!$this->verifyCheckKey($paramsNew)) {
                 //表示验证失败，链接被篡改
                 die("请不要使用非法手段更改链接");
             }
             //判断code是否已经缓存 ，因为每个code只能使用一次，并且有效时间为5分钟
-            if (Cache::has($params['code'])) {
-                $wxUserInfo = Cache::get($params['code']);
+            if (Cache::has($paramsNew['code'])) {
+                $wxUserInfo = Cache::get($paramsNew['code']);
             } else {
-                $this->payInfo = $this->getPayInfo($params);
+                $this->payInfo = $this->getPayInfo($paramsNew);
                 $this->weChatConfig = $this->setConfig($this->payInfo);
                 // 实例接口
                 $weChat = new Oauth($this->weChatConfig);
                 // 执行操作
                 $wxUserInfo = $weChat->getOauthAccessToken();
                 //pay_domain_1缓存，记录支付域名，和支付信息一起，记录当前访问用户与固定一个支付域名绑定，30分钟。
-                Cache::set($params['code'],$wxUserInfo,Env::get('redis.expire'));
+                Cache::set($paramsNew['code'],$wxUserInfo,Env::get('redis.expire'));
             }
 
             //表示已经获取了openid
