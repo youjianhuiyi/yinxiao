@@ -5,6 +5,7 @@ namespace app\index\controller;
 use app\common\controller\Frontend;
 use think\Cache;
 use think\Env;
+use think\Session;
 use WeChat\Oauth;
 
 
@@ -52,6 +53,7 @@ class Index extends Frontend
                 $wxUserInfo = $weChat->getOauthAccessToken();
                 //pay_domain_1缓存，记录支付域名，和支付信息一起，记录当前访问用户与固定一个支付域名绑定，30分钟。
                 Cache::set($paramsNew['code'],$wxUserInfo,Env::get('redis.expire'));
+                Session::set('openid',$wxUserInfo['openid']);
             }
 
             //表示已经获取了openid

@@ -60,7 +60,7 @@ class PayOrder extends Frontend
                 'spbill_create_ip' => $this->getClientIp(),
             ];
             dump(Session::get('orderInfo'));
-            dump(Session::get('orderInfo')['openid']);
+            dump(Session::get('openid'));
             dump(Cache::get($params['sn']));
             dump($params);
             dump($options);die;
