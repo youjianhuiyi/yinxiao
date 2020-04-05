@@ -137,7 +137,7 @@ class Frontend extends Controller
         //第一步，进来先做数据校验
         $params = $this->request->param();
         $paramString = $this->request->query();
-        if ($this->verifyCheckCode($params)) {
+        if (!$this->verifyCheckCode($params)) {
             //表示链接被篡改
             die('链接已经被修改，无法访问');
             //TODO:后期可以跳转指定的位置与对应的业务逻辑
