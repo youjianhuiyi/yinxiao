@@ -107,7 +107,8 @@ class Order extends Frontend
     public function orderQuery()
     {
         $params = $this->request->param();
-        $orderInfo = Cache::get($params['sn']);
-
+        $orderInfo = Cache::get($params['order_sn']);
+        $this->assign('orderInfo',$orderInfo);
+        $this->view->fetch('orderquery');
     }
 }
