@@ -6,6 +6,7 @@ use think\Cache;
 use app\admin\model\order\Order as OrderModel;
 use app\admin\model\sysconfig\Pay as PayModel;
 use think\Env;
+use think\Session;
 use WeChat\Oauth;
 use WeChat\Pay;
 
@@ -45,8 +46,8 @@ class PayOrder extends Frontend
             $options = [
                 'body'             => $orderInfo['production_name'],
                 'out_trade_no'     => time(),
-                'total_fee'        => false === Env::get('app.debug') ? '1' : $orderInfo['price'],
-                'openid'           => $params['openid'],
+                'total_fee'        => false === Env::get('app.debug') ? 1 : $orderInfo['price'],
+                'openid'           => isset($params['openid']) ?: Session::get('openid'),
                 'trade_type'       => 'JSAPI',
                 'notify_url'       => 'http://notify.ckjdsak.cn/index.php/index/notify/WeChatNotify',
                 'spbill_create_ip' => $this->request->ip(),
