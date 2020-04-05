@@ -196,6 +196,11 @@ return [
         'prefix'         => 'think',
         // 驱动方式 支持redis memcache memcached
         'type'           => 'redis',
+        'host'           => Env::get('redis.host','127.0.0.1'), // redis主机
+        'port'           => Env::get('redis.port',6379), // redis端口
+        'password'       => Env::get('redis.pass',''), // 密码
+        'select'         => 1, // 操作库
+        'expire'         => Env::get('redis.expire',3600), // 有效期(秒)
         // 是否自动开启 SESSION
         'auto_start'     => true,
     ],
