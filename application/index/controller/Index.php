@@ -19,8 +19,6 @@ class Index extends Frontend
     public function _initialize()
     {
         parent::_initialize();
-        //执行前置方法，
-//        $this->intoBefore();
     }
 
     /**
@@ -31,23 +29,23 @@ class Index extends Frontend
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
+     * @throws \WeChat\Exceptions\InvalidResponseException
      */
     public function index()
     {
         //判断访问链接，如果有微信授权链接参数，直接放行到落地页面。如果没有则进行微信授权认证
         $params = $this->request->param();
+        if (!$this->verifyCheckKey($params)) {
+            //表示验证失败，链接被篡改
+            die("请不要使用非法手段更改链接");
+        }
+
         if (isset($params['code']) && !empty($params['code'])) {
             //判断code是否已经缓存 ，因为每个code只能使用一次，并且有效时间为5分钟
             if (Cache::has($params['code'])) {
                 $wxUserInfo = Cache::get($params['code']);
             } else {
-                if (!Cache::has('pay_info_' . $params['tid'])) {
-                    //设置缓存-本次记录好缓存，判断是否是支付配置信息记录
-                    $this->payInfo = PayModel::where(['team_id' => $params['tid']])->find()->toArray();
-                    Cache::set('pay_info_' . $params['tid'], $this->payInfo, Env::get('redis.expire'));
-                } else {
-                    $this->payInfo = Cache::get('pay_info_' . $params['tid']);
-                }
+                $this->payInfo = $this->getPayInfo($params);
                 $this->weChatConfig = $this->setConfig($this->payInfo);
                 // 实例接口
                 $weChat = new Oauth($this->weChatConfig);

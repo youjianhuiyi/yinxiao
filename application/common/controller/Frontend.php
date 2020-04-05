@@ -44,7 +44,7 @@ class Frontend extends Controller
      */
     public function setConfig($data)
     {
-        return $this->weChatConfig = [
+        return $weChatConfig = [
             'token'          => isset($data['token']) && !empty($data['token']) ? $data['token'] : '',
             'appid'          => $data['app_id'],
             'appsecret'      => $data['app_secret'],
@@ -60,23 +60,67 @@ class Frontend extends Controller
         ];
     }
 
+    /**
+     * 获取加密算法check_code
+     * @param $data
+     * @return string
+     */
+    public function getCheckCode($data)
+    {
+        return  md5('aid='.$data['aid'].'&gid='.$data['gid'].'&tid='.$data['tid']);
+    }
+
+    /**
+     * 获取链接完整性加密串check_key
+     * @param $data
+     * @return string
+     */
+    public function getCheckKey($data)
+    {
+        return  md5('aid='.$data['aid'].'&check_code='.$data['check_code'].'&gid='.$data['gid'].'&tid='.$data['tid']);
+    }
 
     /**
      * 检验链接是否完整
      * @param $data
+     * @return bool
      */
     public function verifyCheckCode($data)
     {
-
+        $newCode = $this->getCheckCode($data);
+        return $data['check_code'] == $newCode ? true : false;
     }
 
     /**
      * 检验微信授权后的链接是否完整
      * @param $data
+     * @return bool
      */
     public function verifyCheckKey($data)
     {
+        $newKey = $this->getCheckKey($data);
+        return $data['check_key'] == $newKey ? true : false;
+    }
 
+    /**
+     * 获取团队支付信息
+     * @param $data
+     * @return array|mixed
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getPayInfo($data)
+    {
+        if (!Cache::has('pay_info_'.$data['tid'])) {
+            //设置缓存-本次记录好缓存，判断是否是支付配置信息记录
+            $payInfo = PayModel::where(['team_id'=>$data['tid']])->find()->toArray();
+            Cache::set('pay_info_'.$data['tid'],$this->payInfo,Env::get('redis.expire'));
+        } else {
+            $payInfo = Cache::get('pay_info_'.$data['tid']);
+        }
+        return $payInfo;
     }
 
 
@@ -93,20 +137,13 @@ class Frontend extends Controller
         //第一步，进来先做数据校验
         $params = $this->request->param();
         $paramString = $this->request->query();
-        $newCode = md5('aid='.$params['aid'].'&gid='.$params['gid'].'&tid='.$params['tid']);
-        if ($params['check_code'] != $newCode) {
+        if ($this->verifyCheckCode($params)) {
             //表示链接被篡改
             die('链接已经被修改，无法访问');
             //TODO:后期可以跳转指定的位置与对应的业务逻辑
         }
         //第二步，获取用户openid与业务员进行绑定，业务员，团队，商品id绑定一个会员。
-        if (!Cache::has('pay_info_'.$params['tid'])) {
-            //设置缓存-本次记录好缓存，判断是否是支付配置信息记录
-            $this->payInfo = PayModel::where(['team_id'=>$params['tid']])->find()->toArray();
-            Cache::set('pay_info_'.$params['tid'],$this->payInfo,Env::get('redis.expire'));
-        } else {
-            $this->payInfo = Cache::get('pay_info_'.$params['tid']);
-        }
+        $this->payInfo = $this->getPayInfo($params);
         $this->weChatConfig=$this->setConfig($this->payInfo);
         //第三步：获取当前aid对应的链接参数携带参数跳转-
         //经过上面的验证，需要对已经验证的链接进行重新组装。
@@ -114,16 +151,11 @@ class Frontend extends Controller
         $newParams = $paramString.'&check_key='.md5($paramStr);
         //TODO:后期可以结合防封域名进行微信授权的跳转
         $redirect_url = $this->request->domain().$this->request->baseFile().'/index/index/index'.'?'.$newParams;
-        try {
-            // 实例接口
-            $weChat = new Oauth($this->weChatConfig);
-            // 执行操作
-            $result = $weChat->getOauthRedirect($redirect_url);
-            header('Location:'.$result);
-        } catch (\Exception $e){
-            // 异常处理
-            echo  $e->getMessage();
-        }
+        // 实例接口
+        $weChat = new Oauth($this->weChatConfig);
+        // 执行操作
+        $result = $weChat->getOauthRedirect($redirect_url);
+        header('Location:'.$result);
         //第四步：通过防封方式，将参数与页面进行跳转到落地页面
 
     }
