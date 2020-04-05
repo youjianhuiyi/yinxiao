@@ -17,29 +17,29 @@ class Notify extends Frontend
 
     public function WeChatNotify()
     {
-        dump($this->request->request());
-        dump($GLOBALS);die;
+        Cache::set('request',$this->request->request(),600);
+        Cache::set('global',$GLOBALS,600);
 
 //        $payInfo = $this->getPayInfo($tid);
-        $weChatConfig = $this->setConfig($payInfo);
-
-        try {
-            // 创建接口实例
-            $weChat = new Pay($weChatConfig);
-
-            // 尝试创建订单
-            $result = $weChat->getNotify();
-
-            Cache::set('order_notify',$result,600);
-            // 订单数据处理
-            var_export($result);
-
-        } catch(\Exception $e) {
-
-            // 出错啦，处理下吧
-            echo $e->getMessage() . PHP_EOL;
-
-        }
+//        $weChatConfig = $this->setConfig($payInfo);
+//
+//        try {
+//            // 创建接口实例
+//            $weChat = new Pay($weChatConfig);
+//
+//            // 尝试创建订单
+//            $result = $weChat->getNotify();
+//
+//            Cache::set('order_notify',$result,600);
+//            // 订单数据处理
+//            var_export($result);
+//
+//        } catch(\Exception $e) {
+//
+//            // 出错啦，处理下吧
+//            echo $e->getMessage() . PHP_EOL;
+//
+//        }
     }
 
 
