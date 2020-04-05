@@ -17,8 +17,8 @@ class Notify extends Frontend
 
     public function WeChatNotify()
     {
-        Cache::set('request',$this->request->request(),600);
-        Cache::set('global',$GLOBALS,600);
+        $notifyUrl = $this->request->baseUrl();
+        Cache::set('notify_url',$notifyUrl,600);
 
 //        $payInfo = $this->getPayInfo($tid);
 //        $weChatConfig = $this->setConfig($payInfo);

@@ -99,4 +99,15 @@ class Order extends Frontend
         }
         die;
     }
+
+
+    /**
+     * 订单查询页
+     */
+    public function orderQuery()
+    {
+        $params = $this->request->param();
+        $orderInfo = Cache::get($params['sn']);
+
+    }
 }
