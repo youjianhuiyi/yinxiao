@@ -59,12 +59,12 @@ class PayOrder extends Frontend
                 'notify_url'       => 'http://notify.ckjdsak.cn/index.php/index/notify/WeChatNotify',/*回调地址*/
                 'spbill_create_ip' => $this->getClientIp(),
             ];
-            dump(Session::get('orderInfo','module'));
-            dump(Session::get('openid','module'));
-            dump(Session::get());
-            dump(Cache::get($params['sn']));
-            dump($params);
-            dump($options);die;
+//            dump(Session::get('orderInfo','module'));
+//            dump(Session::get('openid','module'));
+//            dump(Session::get());
+//            dump(Cache::get($params['sn']));
+//            dump($params);
+//            dump($options);die;
             // 尝试创建订单
             $wxOrder = $weChat->createOrder($options);
             $result = $weChat->createParamsForJsApi($wxOrder['prepay_id']);
