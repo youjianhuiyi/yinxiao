@@ -59,7 +59,6 @@ class PayOrder extends Frontend
                 'notify_url'       => 'http://notify.ckjdsak.cn/index.php/index/notify/WeChatNotify',/*回调地址*/
                 'spbill_create_ip' => $this->getClientIp(),
             ];
-            dump($_SESSION);
             dump(Session::get('orderInfo'));
             dump(Session::get('orderInfo')['openid']);
             dump(Cache::get($params['sn']));
