@@ -17,7 +17,7 @@ class Notify extends Frontend
     public function WeChatNotify()
     {
 
-        $notifyUrl = $this->request->domain();
+        $notifyUrl = $this->request->domain().'/';
         Cache::set('notify_url',$notifyUrl,600);
         //通过回调域名反查所属团队
         $payInfo = null;
