@@ -53,14 +53,15 @@ class PayOrder extends Frontend
             $options = [
                 'body'             => $orderInfo['production_name'],/*商品名称*/
                 'out_trade_no'     => $params['sn'],/*自己系统的订单号*/
-                'total_fee'        => true === Env::get('app.debug') ? 1 : $orderInfo['price']*100,/*价格，单位：分*/
+                'total_fee'        => true == Env::get('app.debug') ? 1 : $orderInfo['price']*100,/*价格，单位：分*/
                 'openid'           => isset(Cache::get($params['sn'])['openid']) ? Cache::get($params['sn'])['openid'] : Session::get('orderInfo')['openid'],/*微信网页授权openid*/
                 'trade_type'       => 'JSAPI',/*支付类型，JSAPI--JSAPI支付（或小程序支付）*/
                 'notify_url'       => 'http://notify.ckjdsak.cn/index.php/index/notify/WeChatNotify',/*回调地址*/
                 'spbill_create_ip' => $this->getClientIp(),
             ];
-            dump(Session::get('orderInfo'));
-            dump(Session::get('openid'));
+            dump(Session::get('orderInfo','module'));
+            dump(Session::get('openid','module'));
+            dump(Session::get());
             dump(Cache::get($params['sn']));
             dump($params);
             dump($options);die;
