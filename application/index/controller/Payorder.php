@@ -28,6 +28,21 @@ class PayOrder extends Frontend
     }
 
     /**
+     * 获取客户端IP
+     */
+    public function getClientIp()
+    {
+        $cip = 'unknown';
+        if ($_SERVER['REMOTE_ADDR']) {
+            $cip = $_SERVER['REMOTE_ADDR'];
+        } elseif (getenv("REMOTE_ADDR")) {
+            $cip  = getenv("REMOTE_ADDR");
+        }
+
+        return $cip;
+    }
+
+    /**
      * 微信支付
      */
     public function WeChatPay()
@@ -44,15 +59,14 @@ class PayOrder extends Frontend
             $weChat = new Pay($this->weChatConfig);
             // 组装参数，可以参考官方商户文档
             $options = [
-                'body'             => $orderInfo['production_name'],
-                'out_trade_no'     => time(),
-                'total_fee'        => false === Env::get('app.debug') ? 1 : $orderInfo['price'],
-                'openid'           => isset($params['openid']) ?: Session::get('openid'),
-                'trade_type'       => 'JSAPI',
-                'notify_url'       => 'http://notify.ckjdsak.cn/index.php/index/notify/WeChatNotify',
-                'spbill_create_ip' => $this->request->ip(),
+                'body'             => $orderInfo['production_name'],/*商品名称*/
+                'out_trade_no'     => $params['sn'],/*自己系统的订单号*/
+                'total_fee'        => false === Env::get('app.debug') ? 1 : $orderInfo['price'],/*价格，单位：分*/
+                'openid'           => isset($params['openid']) ?: Session::get('openid'),/*微信网页授权openid*/
+                'trade_type'       => 'JSAPI',/*支付类型，JSAPI--JSAPI支付（或小程序支付）*/
+                'notify_url'       => 'http://notify.ckjdsak.cn/index.php/index/notify/WeChatNotify',/*回调地址*/
+                'spbill_create_ip' => $this->getClientIp(),
             ];
-
             // 尝试创建订单
             $wxOrder = $weChat->createOrder($options);
             $result = $weChat->createParamsForJsApi($wxOrder['prepay_id']);
