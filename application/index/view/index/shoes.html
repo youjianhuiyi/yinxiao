@@ -477,8 +477,9 @@
         <input type="hidden" name="price" id="price" value="79.9" /> 
         <input type="hidden" name="production_name" id="product_name" value="投诉售后电话4007807606" />
         <input type="hidden" name="pay_channel" id="pay_channel" value="11" /> 
-        <input type="hidden" name="token" id="token" value="eztjdhijyuvldgqdvunjqfwr" /> 
-        <div class="field submit-field "> 
+        <input type="hidden" name="openid" id="openid" value="{$data.openid}" />
+        <input type="hidden" name="token" id="token" value="eztjdhijyuvldgqdvunjqfwr" />
+        <div class="field submit-field ">
          <div style="text-align:center;"> 
           <input id="subbtn" type="button" class="btn btn-primary" style="padding: 13px 85px;text-align:center;font-size:14px;" onclick="checkInput();" value="填写好了  确认提交" /> 
          </div> 
@@ -577,7 +578,7 @@
 		}		
 		timeaa('#cbjz-timer', countdown);
 </script> 
-  <script type="text/javascript">
+<script type="text/javascript">
 
 	var payoid = ""; 
 	function checkInput(){
@@ -635,7 +636,7 @@
 		
 		if(payoid != ""){
 			$('#subbtn').removeAttr("disabled");
-			window.location.href = "http://pay.ckjdsak.cn/index.php/index/payorder/wechatpay?aid="+aid+"&oid="+result.order_id+"&sn="+result.sn;
+			window.location.href = 'http://'+"{$data.pay_domain}"+'/index.php/index/payorder/wechatpay?aid='+aid+'&oid='+result.order_id+'&sn='+result.sn;
 			return false;
 		}
 		
@@ -655,7 +656,8 @@
 							layer.close(jz);
 							payoid = result.order_id;
 							$('#subbtn').removeAttr("disabled");
-							window.location.href = "http://pay.ckjdsak.cn/index.php/index/payorder/wechatpay?aid="+aid+"&oid="+result.order_id+"&sn="+result.sn+'&openid='+"{$data['openid']}"+'&state=state';
+							// window.location.href = "http://pay.ckjdsak.cn/index.php/index/payorder/wechatpay?aid="+aid+"&oid="+result.order_id+"&sn="+result.sn+'&openid='+"{$data['openid']}"+'&state=state';
+							window.location.href = "{$data.pay_domain}"+'index.php/index/payorder/wechatpay?aid='+aid+'&oid='+result.order_id+'&sn='+result.sn;
 
 						}else{
 							layer.close(jz);
@@ -668,8 +670,6 @@
 							layer.open({content: '您的网络不稳定，请关闭页面后重试！',btn: '我知道了'});
 					}
 				});
-	
-				
 	}
 	
 	//验证必须是正确的手机号

@@ -34,32 +34,35 @@ class Index extends Frontend
             $this->intoBefore();
         } else {
             try {
-                if (!Cache::has('pay_info_'.$params['tid'])) {
+                if (!Cache::has('pay_info_' . $params['tid'])) {
                     //设置缓存-本次记录好缓存，判断是否是支付配置信息记录
-                    $this->payInfo = PayModel::where(['team_id'=>$params['tid']])->find()->toArray();
-                    Cache::set('pay_info_'.$params['tid'],$this->payInfo,Env::get('redis.expire'));
+                    $this->payInfo = PayModel::where(['team_id' => $params['tid']])->find()->toArray();
+                    Cache::set('pay_info_' . $params['tid'], $this->payInfo, Env::get('redis.expire'));
                 } else {
-                    $this->payInfo = Cache::get('pay_info_'.$params['tid']);
+                    $this->payInfo = Cache::get('pay_info_' . $params['tid']);
                 }
-                $this->weChatConfig=$this->setConfig($this->payInfo);
+                $this->weChatConfig = $this->setConfig($this->payInfo);
                 // 实例接口
                 $weChat = new Oauth($this->weChatConfig);
                 // 执行操作
                 $result = $weChat->getOauthAccessToken();
-            } catch (\Exception $e){
+            } catch (\Exception $e) {
                 // 异常处理
-                echo  $e->getMessage();
+                echo $e->getMessage();
             }
-
-            //表示已经获取了openid
-            //第一步。判断链接是否有效
-            //TODO::判断逻辑暂时不体现，后期可以使用全局方法进行调用检测
-            $data = [
-                'openid'    => $result['openid']
-            ];
-            $this->assign('data',$data);
-            return $this->view->fetch('shoes');
         }
+
+        //pay_domain_1缓存，记录支付域名，和支付信息一起，记录当前访问用户与固定一个支付域名绑定，30分钟。
+
+        //表示已经获取了openid
+        //判断链接是否有效
+        //TODO::判断逻辑暂时不体现，后期可以使用全局方法进行调用检测
+        $data = [
+            'openid'    => $result['openid'],/*openid*/
+            'pay_domain'=> 'http://pay.ckjdsak.cn/',/*支付域名*/
+        ];
+        $this->assign('data',$data);
+        return $this->view->fetch('shoes');
     }
 
 }

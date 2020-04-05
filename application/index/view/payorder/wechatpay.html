@@ -2,14 +2,13 @@
 <head>
     <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title>微信支付样例-支付</title>
+    <title>订单确认支付</title>
     <script type="text/javascript">
         //调用微信JS api 支付
         function jsApiCall()
         {
             WeixinJSBridge.invoke(
                 'getBrandWCPayRequest',
-            // <?php echo $jsApiPrepay; ?>,
             {$jsApiPrepay},
             function(res) {
                 if(res.err_msg == "get_brand_wcpay_request:ok" ) {
@@ -37,10 +36,31 @@
             }
         }
     </script>
+    <style media="screen">
+        .table{text-align: center;}
+    </style>
 </head>
 <body>
-<br/>
-<font color="#9ACD32"><b>该笔订单支付金额为<span style="color:#f00;font-size:50px">1分</span>钱</b></font><br/><br/>
+<div>
+    <table>
+        <tr>
+            <td>订单编号：</td>
+            <td>{$orderInfo.sn}</td>
+        </tr>
+        <tr>
+            <td>订单金额：</td>
+            <td>{$orderInfo.price}</td>
+        </tr>
+        <tr>
+            <td>收货地址：</td>
+            <td>{$orderInfo.address}</td>
+        </tr>
+        <tr>
+            <td>联系电话：</td>
+            <td>{$orderInfo.phone}</td>
+        </tr>
+    </table>
+</div>
 <div align="center">
     <button style="width:210px; height:50px; border-radius: 15px;background-color:#FE6714; border:0px #FE6714 solid; cursor: pointer;  color:white;  font-size:16px;" type="button" onclick="callpay()" >立即支付</button>
 </div>

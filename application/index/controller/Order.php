@@ -44,8 +44,8 @@ class Order extends Frontend
     {
         if ($this->request->isAjax()) {
             $params = $this->request->param();
-            if (empty($params) || empty($params['token'])) {
-                //表示假提交或者是伪造提交数据,后期再做token验证
+            if (empty($params) || empty($params['openid'])) {
+                //表示假提交或者是伪造提交数据,必须要提交openid，不然为无效订单
                 return ['status'=>1,'code'=>'提交错误'];
             }
             $sn = $this->orderSn($params);
@@ -88,7 +88,7 @@ class Order extends Frontend
             }
 
             if ($result !== false) {
-                array_push($data,['id'=>$orderId]);
+                array_push($data,['id'=>$orderId,'openid'=>$params['openid']]);
                 Cache::set($sn,$data,3600);
                 return ['status'=>0,'msg'=>'提交订单成功','order_id'=>$orderId,'sn'=>$sn];
             } else {
