@@ -99,6 +99,7 @@ class Frontend extends Controller
     public function verifyCheckKey($data)
     {
         $newKey = $this->getCheckKey($data);
+        dump($newKey);
         return $data['check_key'] == $newKey ? true : false;
     }
 

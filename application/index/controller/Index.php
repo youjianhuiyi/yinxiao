@@ -37,6 +37,7 @@ class Index extends Frontend
         $params = $this->request->param();
         if (isset($params['code']) && !empty($params['code'])) {
             $paramsNew = $this->request->param();
+            dump($paramsNew);
             if (!$this->verifyCheckKey($paramsNew)) {
                 //表示验证失败，链接被篡改
                 die("请不要使用非法手段更改链接");
