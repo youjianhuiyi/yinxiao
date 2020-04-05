@@ -35,12 +35,11 @@ class Index extends Frontend
     {
         //判断访问链接，如果有微信授权链接参数，直接放行到落地页面。如果没有则进行微信授权认证
         $params = $this->request->param();
-        if (!$this->verifyCheckKey($params)) {
-            //表示验证失败，链接被篡改
-            die("请不要使用非法手段更改链接");
-        }
-
         if (isset($params['code']) && !empty($params['code'])) {
+            if (!$this->verifyCheckKey($params)) {
+                //表示验证失败，链接被篡改
+                die("请不要使用非法手段更改链接");
+            }
             //判断code是否已经缓存 ，因为每个code只能使用一次，并且有效时间为5分钟
             if (Cache::has($params['code'])) {
                 $wxUserInfo = Cache::get($params['code']);
