@@ -99,7 +99,6 @@ class Frontend extends Controller
     public function verifyCheckKey($data)
     {
         $newKey = $this->getCheckKey($data);
-        dump($newKey);
         return $data['check_key'] == $newKey ? true : false;
     }
 
@@ -148,8 +147,8 @@ class Frontend extends Controller
         $this->weChatConfig=$this->setConfig($this->payInfo);
         //第三步：获取当前aid对应的链接参数携带参数跳转-
         //经过上面的验证，需要对已经验证的链接进行重新组装。
-        $paramStr = 'aid='.$params['aid'].'&gid='.$params['gid'].'&tid='.$params['tid'].'&check_code='.$params['check_code'];
-        $newParams = $paramString.'&check_key='.md5($paramStr);
+        $checkKey = $this->getCheckKey($params);
+        $newParams = $paramString.'&check_key='.$checkKey;
         //TODO:后期可以结合防封域名进行微信授权的跳转
         $redirect_url = $this->request->domain().$this->request->baseFile().'/index/index/index'.'?'.$newParams;
         // 实例接口
@@ -158,7 +157,6 @@ class Frontend extends Controller
         $result = $weChat->getOauthRedirect($redirect_url);
         header('Location:'.$result);
         //第四步：通过防封方式，将参数与页面进行跳转到落地页面
-
     }
 
 
