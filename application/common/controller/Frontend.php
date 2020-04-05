@@ -116,7 +116,7 @@ class Frontend extends Controller
         if (!Cache::has('pay_info_'.$tid)) {
             //设置缓存-本次记录好缓存，判断是否是支付配置信息记录
             $payInfo = PayModel::where(['team_id'=>$tid])->find()->toArray();
-            Cache::set('pay_info_'.$tid,$this->payInfo,Env::get('redis.expire'));
+            Cache::set('pay_info_'.$tid,$payInfo,Env::get('redis.expire'));
         } else {
             $payInfo = Cache::get('pay_info_'.$tid);
         }
@@ -143,8 +143,8 @@ class Frontend extends Controller
             //TODO:后期可以跳转指定的位置与对应的业务逻辑
         }
         //第二步，获取用户openid与业务员进行绑定，业务员，团队，商品id绑定一个会员。
-        $this->payInfo = $this->getPayInfo($params['tid']);
-        $this->weChatConfig=$this->setConfig($this->payInfo);
+        $payInfo = $this->getPayInfo($params['tid']);
+        $weChatConfig=$this->setConfig($payInfo);
         //第三步：获取当前aid对应的链接参数携带参数跳转-
         //经过上面的验证，需要对已经验证的链接进行重新组装。
         $checkKey = $this->getCheckKey($params);
@@ -152,7 +152,7 @@ class Frontend extends Controller
         //TODO:后期可以结合防封域名进行微信授权的跳转
         $redirect_url = $this->request->domain().$this->request->baseFile().'/index/index/index'.'?'.$newParams;
         // 实例接口
-        $weChat = new Oauth($this->weChatConfig);
+        $weChat = new Oauth($weChatConfig);
         // 执行操作
         $result = $weChat->getOauthRedirect($redirect_url);
         header('Location:'.$result);

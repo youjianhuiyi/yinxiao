@@ -17,19 +17,15 @@ class Notify extends Frontend
 
     public function WeChatNotify()
     {
-        if (!Cache::has('pay_info_1')) {
-            //设置缓存-本次记录好缓存，判断是否是支付配置信息记录
-            $this->payInfo = PayModel::where(['team_id'=>1])->find()->toArray();
-            Cache::set('pay_info_1',$this->payInfo,Env::get('redis.expire'));
-        } else {
-            $this->payInfo = Cache::get('pay_info_1');
-        }
+        dump($this->request->request());
+        dump($GLOBALS);die;
 
-        $this->weChatConfig = $this->setConfig($this->payInfo);
+//        $payInfo = $this->getPayInfo($tid);
+        $weChatConfig = $this->setConfig($payInfo);
 
         try {
             // 创建接口实例
-            $weChat = new Pay($this->weChatConfig);
+            $weChat = new Pay($weChatConfig);
 
             // 尝试创建订单
             $result = $weChat->getNotify();

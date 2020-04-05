@@ -2,7 +2,6 @@
 
 namespace app\index\controller;
 
-use app\admin\model\sysconfig\Pay as PayModel;
 use app\common\controller\Frontend;
 use think\Cache;
 use think\Env;
@@ -46,10 +45,10 @@ class Index extends Frontend
             if (Cache::has($paramsNew['code'])) {
                 $wxUserInfo = Cache::get($paramsNew['code']);
             } else {
-                $this->payInfo = $this->getPayInfo($paramsNew['tid']);
-                $this->weChatConfig = $this->setConfig($this->payInfo);
+                $payInfo = $this->getPayInfo($paramsNew['tid']);
+                $weChatConfig = $this->setConfig($payInfo);
                 // 实例接口
-                $weChat = new Oauth($this->weChatConfig);
+                $weChat = new Oauth($weChatConfig);
                 // 执行操作
                 $wxUserInfo = $weChat->getOauthAccessToken();
                 //pay_domain_1缓存，记录支付域名，和支付信息一起，记录当前访问用户与固定一个支付域名绑定，30分钟。

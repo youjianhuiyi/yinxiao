@@ -3,11 +3,8 @@ namespace app\index\controller;
 
 use app\common\controller\Frontend;
 use think\Cache;
-use app\admin\model\order\Order as OrderModel;
-use app\admin\model\sysconfig\Pay as PayModel;
 use think\Env;
 use think\Session;
-use WeChat\Oauth;
 use WeChat\Pay;
 
 /**
@@ -17,14 +14,9 @@ use WeChat\Pay;
  */
 class PayOrder extends Frontend
 {
-    protected $orderModel = null;
-    protected $payModel = null;
-
     public function _initialize()
     {
         parent::_initialize();
-        $this->orderModel = new OrderModel();
-        $this->payModel = new PayModel();
     }
 
     /**
@@ -53,10 +45,10 @@ class PayOrder extends Frontend
         if (Cache::has($params['sn'])) {
             //表示订单真实有效，可以进行支付
             $orderInfo = Cache::get($params['sn']);
-            $this->payInfo = $this->getPayInfo($orderInfo['team_id']);
-            $this->weChatConfig = $this->setConfig($this->payInfo);
+            $payInfo = $this->getPayInfo($orderInfo['team_id']);
+            $weChatConfig = $this->setConfig($payInfo);
             // 创建接口实例
-            $weChat = new Pay($this->weChatConfig);
+            $weChat = new Pay($weChatConfig);
             // 组装参数，可以参考官方商户文档
             $options = [
                 'body'             => $orderInfo['production_name'],/*商品名称*/
