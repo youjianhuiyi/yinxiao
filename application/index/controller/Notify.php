@@ -16,11 +16,14 @@ class Notify extends Frontend
 
     public function WeChatNotify()
     {
+
         $notifyUrl = $this->request->domain();
+        Cache::set('notify_url',$notifyUrl,600);
         //通过回调域名反查所属团队
         $payInfo = null;
         for ($i=1;$i<4;$i++) {
             $payInfo = PayModel::where(['notify_url'.$i=>$notifyUrl])->find();
+            Cache::set('notify_url'.$i,$payInfo,600);
             if ($payInfo) {
                 break;
             }
@@ -28,7 +31,6 @@ class Notify extends Frontend
         $teamId = $payInfo->team_id;
         $payStr = $this->getPayInfo($teamId);
         $weChatConfig = $this->setConfig($payStr);
-        Cache::set('notify_url',$notifyUrl,600);
         try {
             // 创建接口实例
             $weChat = new Pay($weChatConfig);
