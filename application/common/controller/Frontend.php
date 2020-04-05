@@ -104,21 +104,21 @@ class Frontend extends Controller
 
     /**
      * 获取团队支付信息
-     * @param $data
+     * @param $tid
      * @return array|mixed
      * @throws \think\Exception
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function getPayInfo($data)
+    public function getPayInfo($tid)
     {
-        if (!Cache::has('pay_info_'.$data['tid'])) {
+        if (!Cache::has('pay_info_'.$tid)) {
             //设置缓存-本次记录好缓存，判断是否是支付配置信息记录
-            $payInfo = PayModel::where(['team_id'=>$data['tid']])->find()->toArray();
-            Cache::set('pay_info_'.$data['tid'],$this->payInfo,Env::get('redis.expire'));
+            $payInfo = PayModel::where(['team_id'=>$tid])->find()->toArray();
+            Cache::set('pay_info_'.$tid,$this->payInfo,Env::get('redis.expire'));
         } else {
-            $payInfo = Cache::get('pay_info_'.$data['tid']);
+            $payInfo = Cache::get('pay_info_'.$tid);
         }
         return $payInfo;
     }
@@ -143,7 +143,7 @@ class Frontend extends Controller
             //TODO:后期可以跳转指定的位置与对应的业务逻辑
         }
         //第二步，获取用户openid与业务员进行绑定，业务员，团队，商品id绑定一个会员。
-        $this->payInfo = $this->getPayInfo($params);
+        $this->payInfo = $this->getPayInfo($params['tid']);
         $this->weChatConfig=$this->setConfig($this->payInfo);
         //第三步：获取当前aid对应的链接参数携带参数跳转-
         //经过上面的验证，需要对已经验证的链接进行重新组装。

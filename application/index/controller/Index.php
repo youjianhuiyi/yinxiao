@@ -45,7 +45,7 @@ class Index extends Frontend
             if (Cache::has($paramsNew['code'])) {
                 $wxUserInfo = Cache::get($paramsNew['code']);
             } else {
-                $this->payInfo = $this->getPayInfo($paramsNew);
+                $this->payInfo = $this->getPayInfo($paramsNew['tid']);
                 $this->weChatConfig = $this->setConfig($this->payInfo);
                 // 实例接口
                 $weChat = new Oauth($this->weChatConfig);

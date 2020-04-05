@@ -37,7 +37,7 @@ class PayOrder extends Frontend
         if (Cache::has($params['sn'])) {
             //表示订单真实有效，可以进行支付
             $orderInfo = Cache::get($params['sn']);
-            $this->payInfo = $this->getPayInfo($params);
+            $this->payInfo = $this->getPayInfo($orderInfo['team_id']);
             $this->weChatConfig = $this->setConfig($this->payInfo);
             // 创建接口实例
             $weChat = new Pay($this->weChatConfig);
