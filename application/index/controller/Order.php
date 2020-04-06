@@ -11,6 +11,7 @@ use think\Db;
 use think\exception\PDOException;
 use think\exception\ValidateException;
 use think\Session;
+use WeChat\Pay;
 
 
 class Order extends Frontend
@@ -107,7 +108,34 @@ class Order extends Frontend
     public function orderQuery()
     {
         $params = $this->request->param();
-        $orderInfo = Cache::get($params['order_sn']);
+        if (Cache::has($params['order_sn'])) {
+            $orderInfo = Cache::get($params['order_sn']);
+        } else {
+            $orderInfo = OrderModel::where(['sn'=>$params['order_sn']])->find()->toArray();
+        }
+
+//        $payInfo = $this->payInfo($orderInfo['team_id']);
+//        $weChatConfig = $this->setConfig($payInfo);
+//        try {
+//            // 创建接口实例
+//            $wechat = new Pay($weChatConfig);
+//            // 组装参数，可以参考官方商户文档
+//            $options = [
+//                'transaction_id' => $orderInfo['transaction_id'],
+//            ];
+//
+//            // 尝试创建订单
+//            $result = $wechat->queryOrder($options);
+//
+//            // 订单数据处理
+//            var_export($result);
+//
+//        } catch(Exception $e) {
+//
+//            // 出错啦，处理下吧
+//            echo $e->getMessage() . PHP_EOL;
+//
+//        }
         $this->assign('orderInfo',$orderInfo);
         $this->view->fetch('orderquery');
     }

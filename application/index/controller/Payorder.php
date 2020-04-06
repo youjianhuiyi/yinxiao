@@ -56,7 +56,7 @@ class PayOrder extends Frontend
                 'total_fee'        => true == Env::get('app.debug') ? 1 : $orderInfo['price']*100,/*价格，单位：分*/
                 'openid'           =>  Cache::get($params['sn'])['openid'],/*微信网页授权openid*/
                 'trade_type'       => 'JSAPI',/*支付类型，JSAPI--JSAPI支付（或小程序支付）*/
-                'notify_url'       => 'http://notify.ckjdsak.cn/index.php/index/notify/WeChatNotify',/*回调地址*/
+                'notify_url'       => 'http://notify.ckjdsak.cn/index.php/index/notify/WeChatNotify',/*回调地址,需要指定具体的值*/
                 'spbill_create_ip' => $this->getClientIp(),
             ];
             // 尝试创建订单

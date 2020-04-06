@@ -2,8 +2,12 @@
 namespace app\index\controller;
 
 use app\admin\model\sysconfig\Pay as PayModel;
+use app\admin\model\order\Order as OrderModel;
 use app\common\controller\Frontend;
 use think\Cache;
+use think\Db;
+use think\exception\PDOException;
+use think\exception\ValidateException;
 use WeChat\Pay;
 
 /**
@@ -13,6 +17,35 @@ use WeChat\Pay;
  */
 class Notify extends Frontend
 {
+    /**
+     * 签名算法
+     * @param $params   array   接口文档里面相关的参数
+     * @param $key  string  商户支付密钥Key值
+     * @return array|bool   加密成功返回签名值与原参数数组列表
+     */
+    public function signParams($params,$key)
+    {
+        //按字典序排序数组的键名
+        unset($params['sign']);/*剔除sign字段不进行签名算法*/
+        ksort($params);
+        $string = '';
+        if (!empty($params) && is_array($params)) {
+            foreach ($params as $key => $value) {
+                if (is_array($value)) {
+                    $string .= '&'.$key.'='.json_encode($value,JSON_UNESCAPED_UNICODE);
+                } elseif ($value && !empty($value)) {
+                    $string .= '&'.$key.'='.$value;
+                }
+            }
+            //最后拼接商户号入网的reqKey参数
+            $string .= '&key='.$key;
+        } else {
+            return false;
+        }
+        $ownSign = strtoupper(md5(ltrim($string,'&')));/*执行加密算法*/
+        $params['sign'] = $ownSign;/*将签名赋值给数组*/
+        return $params;
+    }
 
     public function WeChatNotify()
     {
@@ -31,22 +64,80 @@ class Notify extends Frontend
         $teamId = $payInfo->team_id;
         $payStr = $this->getPayInfo($teamId);
         $weChatConfig = $this->setConfig($payStr);
-        try {
-            // 创建接口实例
-            $weChat = new Pay($weChatConfig);
-            // 尝试创建订单
-            $result = $weChat->getNotify();
-            Cache::set('order_notify',$result,600);
-            // 订单数据处理
-            var_export($result);
+        // 创建接口实例
+        $weChat = new Pay($weChatConfig);
+        // 尝试创建订单
+        $result = $weChat->getNotify();
+        Cache::set('order_notify',$result,600);
+//        [appid]=>wx90588380da4a2bb0
+//        [bank_type]=>OTHERS
+//        [cash_fee]=>1
+//        [fee_type]=>CNY
+//        [is_subscribe]=>Y
+//        [mch_id]=>1583492131
+//        [nonce_str]=>nrdclxldx8r05pi555dw7o51gqa0vxgr
+//        [openid]=>of5TOwBkJC0jSnth-D20xiL1W_i4
+//        [out_trade_no]=>2020040600445700003000026634
+//        [result_code]=>SUCCESS
+//        [return_code]=>SUCCESS
+//        [sign]=>A654BED136BDA766BB930D9C4ED124CF
+//        [time_end]=>20200406004505
+//        [total_fee]=>1
+//        [trade_type]=>JSAPI
+//        [transaction_id]=>4200000495202004060198644235
+        // 先回调验签
+        $newSign = $this->signParams($result,$payInfo['mch_key']);
 
-        } catch(\Exception $e) {
+        if ($result['sign'] === $newSign) {
+            //表示验签成功
+            //通过回调的信息，反查订单数据
+            if (Cache::has($result['out_trade_no'])) {
+                $orderInfo = Cache::get($result['out_trade_no']);
+            } else {
+                $orderInfo = OrderModel::where(['sn'=>$result['out_trade_no']])->find()->toArray();
+            }
+            //判断订单是否正确
+            if ($result['result_code'] == 'SUCCESS' && $result['return_code'] == 'SUCCESS') {
+                if ($orderInfo['price']*100 == $result['total_fee']) {
+                    //表示订单金额与支付金额一致
+                    $data  = [
+                        'transaction_id' => $result['transaction_id'],/*微信支付订单号*/
+//                        'openid'         => $result['openid'],/*购买者的openid，进行支付的时候进行写入，与支付链接绑定起来*/
+                        'pay_type'       => 0,/*支付类型，0=微信，1=支付宝*/
+                        'pay_status'     => 1,/*支付状态，已经完成支付*/
+                        'pay_id'         => $payInfo['id'],/*使用的支付id，支付链接在产生支付的时候进行写入*/
+                    ];
 
-            // 出错啦，处理下吧
-            echo $e->getMessage() . PHP_EOL;
+                    //更新数据
+                    $result = false;
+                    Db::startTrans();
+                    try {
+                        $result = OrderModel::where(['sn'=>$result['out_trade_no']])->isUpdate(true)->save($data);
+                        Db::commit();
+                    } catch (ValidateException $e) {
+                        Db::rollback();
+                        $this->error($e->getMessage());
+                    } catch (PDOException $e) {
+                        Db::rollback();
+                        $this->error($e->getMessage());
+                    } catch (Exception $e) {
+                        Db::rollback();
+                        $this->error($e->getMessage());
+                    }
 
+                }
+            }
+            //返回成功
+            $str = '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+            echo $str;
+            return ;
+        } else {
+            //返回失败
+            $str = '<xml><return_code><![CDATA[fail]]></return_code><return_msg><![CDATA[fail]]></return_msg></xml>';
+            echo $str;
+            return ;
         }
-    }
 
+    }
 
 }
