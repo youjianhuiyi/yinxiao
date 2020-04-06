@@ -9,19 +9,19 @@ use app\common\controller\Backend;
  *
  * @icon fa fa-circle-o
  */
-class Ground_domain extends Backend
+class Ground extends Backend
 {
     
     /**
-     * Ground_domain模型对象
-     * @var \app\admin\model\sysconfig\Ground_domain
+     * Ground模型对象
+     * @var \app\admin\model\sysconfig\Ground
      */
     protected $model = null;
 
     public function _initialize()
     {
         parent::_initialize();
-        $this->model = new \app\admin\model\sysconfig\Ground_domain;
+        $this->model = new \app\admin\model\sysconfig\Ground;
 
     }
     

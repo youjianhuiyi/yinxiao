@@ -59,16 +59,23 @@ class Admin extends Backend
 
         //团队数据
         $teamData = collection(Team::column('name','id'))->toArray();
-        $teamData[0] = '请选择';
-        ksort($teamData);
+        if ($this->adminInfo['id'] == 1 ) {
+            $teamData[0] = '请选择';
+            ksort($teamData);
+            $newTeamData = $teamData;
+        } else {
+            $newTeamData[0] = $teamData[$this->adminInfo['team_id']];
+        }
         //团队关系
-        $adminData = \app\admin\model\Admin::where('level','in',[0,1,2])->column('nickname','id');
-
+        $adminData = \app\admin\model\Admin::where('level','in',[0,1,2])
+            ->where(['team_id'=>$this->adminInfo['team_id']])
+            ->column('nickname','id');
         $adminData[0] = '添加账号属于谁的下级，就选择谁，没有下级就选择本项';
+
         ksort($adminData);
         $this->view->assign('adminData',$adminData);
         $this->view->assign('groupdata', $groupdata);
-        $this->view->assign('teamData', $teamData);
+        $this->view->assign('teamData', $newTeamData);
         $this->assignconfig("admin", ['id' => $this->auth->id]);
     }
 
@@ -100,19 +107,38 @@ class Admin extends Backend
                 $adminGroupName[$this->auth->id][$n['id']] = $n['name'];
             }
             list($where, $sort, $order, $offset, $limit) = $this->buildparams();
-            $total = $this->model
-                ->where($where)
-                ->where('id', 'in', $this->childrenAdminIds)
-                ->order($sort, $order)
-                ->count();
+            if ($this->adminInfo['id'] == 1) {
+                $total = $this->model
+                    ->where($where)
+                    ->where('id', 'in', $this->childrenAdminIds)
+                    ->order($sort, $order)
+                    ->count();
 
-            $list = $this->model
-                ->where($where)
-                ->where('id', 'in', $this->childrenAdminIds)
-                ->field(['password', 'salt', 'token'], true)
-                ->order($sort, $order)
-                ->limit($offset, $limit)
-                ->select();
+                $list = $this->model
+                    ->where($where)
+                    ->where('id', 'in', $this->childrenAdminIds)
+                    ->field(['password', 'salt', 'token'], true)
+                    ->order($sort, $order)
+                    ->limit($offset, $limit)
+                    ->select();
+            } else {
+                $total = $this->model
+                    ->where($where)
+                    ->where('id', 'in', $this->childrenAdminIds)
+                    ->where(['team_id'=>$this->adminInfo['team_id']])
+                    ->order($sort, $order)
+                    ->count();
+
+                $list = $this->model
+                    ->where($where)
+                    ->where('id', 'in', $this->childrenAdminIds)
+                    ->where(['team_id'=>$this->adminInfo['team_id']])
+                    ->field(['password', 'salt', 'token'], true)
+                    ->order($sort, $order)
+                    ->limit($offset, $limit)
+                    ->select();
+            }
+
             foreach ($list as $k => &$v) {
                 $groups = isset($adminGroupName[$v['id']]) ? $adminGroupName[$v['id']] : [];
                 $v['groups'] = implode(',', array_keys($groups));

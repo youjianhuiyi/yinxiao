@@ -30,7 +30,6 @@ class Select extends Backend
     {
         parent::_initialize();
         $this->model = new \app\admin\model\production\Select;
-        $this->userInfo = Session::get('admin');
         $this->goodsData = ProductionModel::where('status',0)->select();
         $this->selectData = [0=>'请选择商品模板'];
         foreach ($this->goodsData as $v) {

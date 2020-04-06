@@ -5,7 +5,7 @@ namespace app\admin\model\sysconfig;
 use think\Model;
 use traits\model\SoftDelete;
 
-class Ground_domain extends Model
+class Ground extends Model
 {
 
     use SoftDelete;

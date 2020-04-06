@@ -17,6 +17,10 @@ use think\Validate;
  */
 class Backend extends Controller
 {
+    /**
+     * 后台用户缓存
+     */
+    protected $adminInfo = [];
 
     /**
      * 无需登录的方法,同时也就不需要鉴权了
@@ -220,6 +224,8 @@ class Backend extends Controller
         $this->assign('auth', $this->auth);
         //渲染管理员对象
         $this->assign('admin', Session::get('admin'));
+        //初始化管理员
+        $this->adminInfo = Session::get('admin');
     }
 
     /**

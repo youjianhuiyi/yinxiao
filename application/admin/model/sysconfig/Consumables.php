@@ -5,7 +5,7 @@ namespace app\admin\model\sysconfig;
 use think\Model;
 use traits\model\SoftDelete;
 
-class Consumables_domain extends Model
+class Consumables extends Model
 {
 
     use SoftDelete;

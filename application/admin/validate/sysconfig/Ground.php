@@ -4,7 +4,7 @@ namespace app\admin\validate\sysconfig;
 
 use think\Validate;
 
-class Consumables_domain extends Validate
+class Ground extends Validate
 {
     /**
      * 验证规则
