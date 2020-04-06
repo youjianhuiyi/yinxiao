@@ -62,27 +62,12 @@ class Notify extends Frontend
 
     public function WeChatNotify()
     {
-        $data = $this->xml2arr(file_get_contents('php://input'));
-        Cache::set('php_input',$data);die;
-        $notifyUrl = $this->request->domain().'/';
-        Cache::set('notify_url',$notifyUrl,600);
-        //通过回调域名反查所属团队
-        $payInfo = null;
-        for ($i=1;$i<4;$i++) {
-            $payInfo = PayModel::where(['notify_url'.$i=>$notifyUrl])->find();
-            Cache::set('notify_url'.$i,$payInfo,600);
-            if ($payInfo) {
-                break;
-            }
-        }
-        $teamId = $payInfo->team_id;
-        $payStr = $this->getPayInfo($teamId);
-        $weChatConfig = $this->setConfig($payStr);
+        $result = $this->xml2arr(file_get_contents('php://input'));
+        Cache::set('php_input',$result);
+        //通过回调的信息反查订单相关信息
+        $orderInfo = OrderModel::where(['sn'=>$result['out_trade_no']])->find()->toArray();
+        $payInfo = $this->getPayInfo($orderInfo['team_id']);
         // 创建接口实例
-        $weChat = new Pay($weChatConfig);
-        // 尝试创建订单
-        $result = $weChat->getNotify();
-        Cache::set('order_notify',$result,600);
 //        [appid]=>wx90588380da4a2bb0
 //        [bank_type]=>OTHERS
 //        [cash_fee]=>1
@@ -104,43 +89,30 @@ class Notify extends Frontend
 
         if ($result['sign'] === $newSign) {
             //表示验签成功
-            //通过回调的信息，反查订单数据
-            if (Cache::has($result['out_trade_no'])) {
-                $orderInfo = Cache::get($result['out_trade_no']);
-            } else {
-                $orderInfo = OrderModel::where(['sn'=>$result['out_trade_no']])->find()->toArray();
-            }
-            //判断订单是否正确
-            if ($result['result_code'] == 'SUCCESS' && $result['return_code'] == 'SUCCESS') {
-                if ($orderInfo['price']*100 == $result['total_fee']) {
-                    //表示订单金额与支付金额一致
-                    $data  = [
-                        'transaction_id' => $result['transaction_id'],/*微信支付订单号*/
+            $data  = [
+                'transaction_id' => $result['transaction_id'],/*微信支付订单号*/
 //                        'openid'         => $result['openid'],/*购买者的openid，进行支付的时候进行写入，与支付链接绑定起来*/
-                        'pay_type'       => 0,/*支付类型，0=微信，1=支付宝*/
-                        'pay_status'     => 1,/*支付状态，已经完成支付*/
-                        'pay_id'         => $payInfo['id'],/*使用的支付id，支付链接在产生支付的时候进行写入*/
-                    ];
+                'pay_type'       => 0,/*支付类型，0=微信，1=支付宝*/
+                'pay_status'     => 1,/*支付状态，已经完成支付*/
+                'pay_id'         => $payInfo['id'],/*使用的支付id，支付链接在产生支付的时候进行写入*/
+            ];
 
-                    //更新数据
-                    $result = false;
-                    Db::startTrans();
-                    try {
-                        $result = OrderModel::where(['sn'=>$result['out_trade_no']])->isUpdate(true)->save($data);
-                        Db::commit();
-                    } catch (ValidateException $e) {
-                        Db::rollback();
-                        $this->error($e->getMessage());
-                    } catch (PDOException $e) {
-                        Db::rollback();
-                        $this->error($e->getMessage());
-                    } catch (Exception $e) {
-                        Db::rollback();
-                        $this->error($e->getMessage());
-                    }
-
-                }
+            //更新数据
+            Db::startTrans();
+            try {
+                OrderModel::where(['sn'=>$result['out_trade_no']])->isUpdate(true)->save($data);
+                Db::commit();
+            } catch (ValidateException $e) {
+                Db::rollback();
+                $this->error($e->getMessage());
+            } catch (PDOException $e) {
+                Db::rollback();
+                $this->error($e->getMessage());
+            } catch (\Exception $e) {
+                Db::rollback();
+                $this->error($e->getMessage());
             }
+
             //返回成功
             $str = '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
             echo $str;
