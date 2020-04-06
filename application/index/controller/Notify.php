@@ -47,9 +47,23 @@ class Notify extends Frontend
         return $params;
     }
 
+    /**
+     * 解析XML内容到数组
+     * @param string $xml
+     * @return array
+     */
+    public function xml2arr($xml)
+    {
+        $entity = libxml_disable_entity_loader(true);
+        $data = (array)simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
+        libxml_disable_entity_loader($entity);
+        return json_decode(json_encode($data), true);
+    }
+
     public function WeChatNotify()
     {
-
+        $data = $this->xml2arr(file_get_contents('php://input'));
+        Cache::set('php_input',$data);die;
         $notifyUrl = $this->request->domain().'/';
         Cache::set('notify_url',$notifyUrl,600);
         //通过回调域名反查所属团队
