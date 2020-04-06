@@ -122,6 +122,21 @@ class Frontend extends Controller
         return $payInfo;
     }
 
+    /**
+     * 检测用户方法的请求是否合法
+     */
+    public function visited($data)
+    {
+        if (empty($data)) {
+            //表示直接访问链接。
+            die("请访问正确的链接，不要随意改动链接！！！");
+        }
+        //如果链接已经生成
+        $res = $this->verifyCheckCode($data);
+        if (!$res) {
+            die("你访问的链接已经变动，不要随意更改链接~~~");
+        }
+    }
 
     /**
      * 前置授权与判断

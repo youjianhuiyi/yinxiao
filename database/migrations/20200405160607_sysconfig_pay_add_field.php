@@ -32,9 +32,6 @@ class SysconfigPayAddField extends Migrator
         $table
             ->addColumn('pay_domain4','string',['limit'=>120,'after'=>'pay_domain3','null'=>false,'default'=>'','comment'=>'支付域名4'])
             ->addColumn('pay_domain5','string',['limit'=>120,'after'=>'pay_domain4','null'=>false,'default'=>'','comment'=>'支付域名5'])
-            ->addColumn('notify_url1','string',['limit'=>120,'after'=>'pay_domain5','null'=>false,'default'=>'','comment'=>'回调域名1'])
-            ->addColumn('notify_url2','string',['limit'=>120,'after'=>'notify_url1','null'=>false,'default'=>'','comment'=>'回调域名2'])
-            ->addColumn('notify_url3','string',['limit'=>120,'after'=>'notify_url2','null'=>false,'default'=>'','comment'=>'回调域名3'])
             ->update();
     }
 }
