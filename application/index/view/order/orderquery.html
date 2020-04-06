@@ -123,7 +123,7 @@
                         //     }
                         // }
 
-                        res_html += '<dl class="dl"><dt>下单时间：</dt><dd>' + "{date(Y-m-d H:i:s,'orders[i].createtime')}" + '</dd></dl>';
+                        res_html += '<dl class="dl"><dt>下单时间：</dt><dd>' + "{:date('Y-m-d H:i:s',"+orders[i].createtime+")}" + '</dd></dl>';
                         res_html += '</div></div>';
 
                         $("#pdiv").append(res_html);
