@@ -19,7 +19,7 @@ class Notify extends Frontend
      * 签名算法
      * @param $params   array   接口文档里面相关的参数
      * @param $mchKey  string  商户支付密钥Key值
-     * @return array|bool   加密成功返回签名值与原参数数组列表
+     * @return string   加密成功返回签名值与原参数数组列表
      */
     public function signParams($params,$mchKey)
     {
@@ -40,9 +40,7 @@ class Notify extends Frontend
         } else {
             return false;
         }
-        $ownSign = strtoupper(md5(ltrim($string,'&')));/*执行加密算法*/
-        $params['sign'] = $ownSign;/*将签名赋值给数组*/
-        return $params;
+        return strtoupper(md5(ltrim($string,'&')));/*执行加密算法*/
     }
 
     /**
@@ -88,7 +86,7 @@ class Notify extends Frontend
         Cache::set('new_sign',$newSign);
         if ($result['sign'] === $newSign) {
             //表示验签成功
-            Cache::set('sign','ok');
+            Cache::set('test_sign','ok');
             $data  = [
                 'id'            => $orderInfo['id'],
                 'transaction_id' => $result['transaction_id'],/*微信支付订单号*/
