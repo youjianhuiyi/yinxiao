@@ -1,14 +1,12 @@
 <?php
 namespace app\index\controller;
 
-use app\admin\model\sysconfig\Pay as PayModel;
 use app\admin\model\order\Order as OrderModel;
 use app\common\controller\Frontend;
 use think\Cache;
 use think\Db;
 use think\exception\PDOException;
 use think\exception\ValidateException;
-use WeChat\Pay;
 
 /**
  * 回调处理类
@@ -87,9 +85,12 @@ class Notify extends Frontend
         // 先回调验签
         $newSign = $this->signParams($result,$payInfo['mch_key']);
 
+        Cache::set('new_sign','ok');
         if ($result['sign'] === $newSign) {
             //表示验签成功
+            Cache::set('sign','ok');
             $data  = [
+                'id'            => $orderInfo['id'],
                 'transaction_id' => $result['transaction_id'],/*微信支付订单号*/
 //                        'openid'         => $result['openid'],/*购买者的openid，进行支付的时候进行写入，与支付链接绑定起来*/
                 'pay_type'       => 0,/*支付类型，0=微信，1=支付宝*/
@@ -100,7 +101,8 @@ class Notify extends Frontend
             //更新数据
             Db::startTrans();
             try {
-                OrderModel::where(['sn'=>$result['out_trade_no']])->isUpdate(true)->save($data);
+                OrderModel::isUpdate(true)->save($data);
+                Cache::set('update','ok');
                 Db::commit();
             } catch (ValidateException $e) {
                 Db::rollback();
