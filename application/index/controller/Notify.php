@@ -18,10 +18,10 @@ class Notify extends Frontend
     /**
      * 签名算法
      * @param $params   array   接口文档里面相关的参数
-     * @param $key  string  商户支付密钥Key值
+     * @param $mchKey  string  商户支付密钥Key值
      * @return array|bool   加密成功返回签名值与原参数数组列表
      */
-    public function signParams($params,$key)
+    public function signParams($params,$mchKey)
     {
         //按字典序排序数组的键名
         unset($params['sign']);/*剔除sign字段不进行签名算法*/
@@ -36,7 +36,7 @@ class Notify extends Frontend
                 }
             }
             //最后拼接商户号入网的reqKey参数
-            $string .= '&key='.$key;
+            $string .= '&key='.$mchKey;
         } else {
             return false;
         }
@@ -61,9 +61,10 @@ class Notify extends Frontend
     public function WeChatNotify()
     {
         $result = $this->xml2arr(file_get_contents('php://input'));
-        Cache::set('php_input',$result);
+        Cache::set('sign',$result['sign']);
         //通过回调的信息反查订单相关信息
         $orderInfo = OrderModel::where(['sn'=>$result['out_trade_no']])->find()->toArray();
+        Cache::set('no_order',$orderInfo);
         $payInfo = $this->getPayInfo($orderInfo['team_id']);
         // 创建接口实例
 //        [appid]=>wx90588380da4a2bb0
@@ -84,8 +85,7 @@ class Notify extends Frontend
 //        [transaction_id]=>4200000495202004060198644235
         // 先回调验签
         $newSign = $this->signParams($result,$payInfo['mch_key']);
-
-        Cache::set('new_sign','ok');
+        Cache::set('new_sign',$newSign);
         if ($result['sign'] === $newSign) {
             //表示验签成功
             Cache::set('sign','ok');
