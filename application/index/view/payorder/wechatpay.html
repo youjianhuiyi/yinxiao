@@ -37,26 +37,34 @@
         }
     </script>
     <style media="screen">
-        .table{text-align: center;}
+         table,th,tr,td{
+             border:1px solid #111111;
+             border-collapse: collapse;
+             text-wrap: normal;
+         }
     </style>
 </head>
 <body>
 <div>
-    <table>
+    <table width="100%">
         <tr>
-            <td>订单编号：</td>
+            <th width="25%">订单编号：</th>
             <td>{$orderInfo.sn}</td>
         </tr>
         <tr>
-            <td>订单金额：</td>
+            <th>订单金额：</th>
             <td>{$orderInfo.price}</td>
         </tr>
         <tr>
-            <td>收货地址：</td>
-            <td>{$orderInfo.address}</td>
+            <th colpan="2">收货地址：</th>
+            <td colpan="2">{$orderInfo.address}{$orderInfo.address}{$orderInfo.address}{$orderInfo.address}</td>
         </tr>
         <tr>
-            <td>联系电话：</td>
+            <th>收货人：</th>
+            <td>{$orderInfo.name}</td>
+        </tr>
+        <tr>
+            <th>联系电话：</th>
             <td>{$orderInfo.phone}</td>
         </tr>
     </table>

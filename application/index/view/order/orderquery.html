@@ -26,12 +26,11 @@
     <div class="main-bg" style="margin-top:5px;">
         <div class="main">
             <div class="query">
-
                 <div class="query-l fl" style="margin-top:15px;">
                     <input id="mobile" name="mobile" type="tel" maxlength="11" placeholder="请填写下单手机号" value="">
                 </div>
-
-                <div class="query-r fr" style="margin-top:15px;"><span id="sorder" style="background:#cf2a4f">查询</span>
+                <div class="query-r fr" style="margin-top:15px;">
+                    <span id="sorder" style="background:#cf2a4f">查询</span>
                 </div>
             </div>
         </div>
@@ -78,7 +77,7 @@
 
         $.ajax({
             type: "POST",  //提交方式
-            url: "/index.php/home/aftersale/ge",
+            url: "/index.php/index/order/orderQuery",
             data: {mobile: mobile},
             dataType: "json",
             success: function (result) {
@@ -89,41 +88,42 @@
                     var res_html = '';
                     for (var i = 0; i < orders.length; i++) {
                         res_html = '<div class="main-bg"><div class="main">';
-                        res_html += '<dl class="dl"><dt>订单编号：</dt><dd>' + orders[i].oid + '</dd></dl>';
-                        res_html += '<dl class="dl"><dt>订购产品：</dt><dd>' + orders[i].product_name + '</dd></dl>';
-                        var pap = orders[i].pattern;
-                        if (orders[i].sex != null) {
-                            pap += "-" + orders[i].sex;
-                        }
-                        if (orders[i].attr != null) {
-                            pap += "-" + orders[i].attr;
-                        }
-                        res_html += '<dl class="dl"><dt>订购款式：</dt><dd>' + pap + '</dd></dl>';
-                        res_html += '<dl class="dl"><dt>订购数量：</dt><dd>' + orders[i].number + '</dd></dl>';
-                        res_html += '<dl class="dl"><dt>订单金额：</dt><dd>' + orders[i].pay_price + '</dd></dl>';
-                        if (orders[i].pay_status == 2) {
+                        res_html += '<dl class="dl"><dt>订单编号：</dt><dd>' + orders[i].sn + '</dd></dl>';
+                        res_html += '<dl class="dl"><dt>订购产品：</dt><dd>' + orders[i].production_name + '</dd></dl>';
+                        // var pap = orders[i].pattern;
+                        // if (orders[i].sex != null) {
+                        //     pap += "-" + orders[i].sex;
+                        // }
+                        // if (orders[i].attr != null) {
+                        //     pap += "-" + orders[i].attr;
+                        // }
+                        res_html += '<dl class="dl"><dt>订购款式：</dt><dd>' + orders[i].goods_info + '</dd></dl>';
+                        res_html += '<dl class="dl"><dt>订购数量：</dt><dd>' + orders[i].num + '</dd></dl>';
+                        res_html += '<dl class="dl"><dt>订单金额：</dt><dd>' + orders[i].price + '</dd></dl>';
+                        if (orders[i].pay_status == 1) {
                             res_html += '<dl class="dl"><dt>订单状态：</dt><dd><span style="height:18px;line-height:18px;border-radius:.25em;background-color:#5cb85c;">已支付</span></dd></dl>';
                         } else {
                             res_html += '<dl class="dl"><dt>订单状态：</dt><dd><span style="height:18px;line-height:18px;border-radius:.25em;background-color:#777;">未支付</span></dd></dl>';
                         }
                         res_html += '<dl class="dl"><dt>订单姓名：</dt><dd>' + orders[i].name + '</dd></dl>';
-                        res_html += '<dl class="dl"><dt>订单手机：</dt><dd>' + orders[i].mobile + '</dd></dl>';
-                        res_html += '<dl class="dl"><dt>订单地址：</dt><dd>' + orders[i].province + orders[i].city + orders[i].district + ',' + orders[i].detailaddress + '</dd></dl>';
-                        if (orders[i].eid != null) {
-                            if (orders[i].company != null) {
-                                res_html += '<dl class="dl"><dt>快递公司：</dt><dd>' + orders[i].company + '</dl></dd>';
-                            }
-                            $("#copyVal").val(orders[i].eid);
-                            res_html += '<dl class="dl"><dt>快递单号：</dt><a href="http://page.cainiao.com/guoguo/app-myexpress-taobao/express-detail.html?mailNo=' + orders[i].eid + '"><dd>' + orders[i].eid + '</a><div style="display:inline-block;"><button class="copyBtn" style="border: 0;background-color: transparent;outline: none;" data-clipboard-target="#copyVal"><svg t="1564384640835" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5782" width="20" height="20"><path d="M740.6 183.3v71.5h-57.2v-71.5c0-3.8-1.4-7.3-4.2-10-2.8-2.8-6.2-4.2-10-4.2H183.4c-3.8 0-7.3 1.4-10 4.2-2.7 2.8-4.2 6.2-4.2 10v485.9c0 3.8 1.4 7.3 4.2 10 2.8 2.8 6.2 4.2 10 4.2h71.5v57.2h-71.5c-19.6 0-36.5-7-50.4-20.9-14-14-21-30.9-21-50.5V183.3c0-19.6 7-36.5 20.9-50.4 13.9-13.9 30.8-20.9 50.4-20.9h485.9c19.6 0 36.5 7.1 50.4 20.9 14 14 21 30.8 21 50.4z m171.5 171.5v485.9c0 19.6-7.1 36.5-20.9 50.4-14 14-30.8 20.9-50.4 20.9H354.9c-19.6 0-36.5-7.1-50.4-20.9-14-14-20.9-30.8-20.9-50.4V354.8c0-19.6 7-36.5 20.9-50.4 13.9-13.9 30.8-20.9 50.4-20.9h485.9c19.6 0 36.5 7.1 50.4 20.9 13.9 14 20.9 30.8 20.9 50.4z" p-id="5783" fill="#d81e06"></path></svg></button></div></dd></dl>';
-                        } else {
-                            if (orders[i].pay_status == 2) {
-                                res_html += '<dl class="dl"><dt>快递单号：</dt><dd>您的宝贝已在物流仓储中心打包中。</dd></dl>';
-                            } else {
-                                res_html += '<dl class="dl"><dt>快递单号：</dt><dd>暂无</dd></dl>';
-                            }
-                        }
+                        res_html += '<dl class="dl"><dt>订单手机：</dt><dd>' + orders[i].phone + '</dd></dl>';
+                        // res_html += '<dl class="dl"><dt>订单地址：</dt><dd>' + orders[i].province + orders[i].city + orders[i].district + ',' + orders[i].detailaddress + '</dd></dl>';
+                        res_html += '<dl class="dl"><dt>订单地址：</dt><dd>' + orders[i].address + '</dd></dl>';
+                        // if (orders[i].eid != null) {
+                        //     if (orders[i].company != null) {
+                        //         res_html += '<dl class="dl"><dt>快递公司：</dt><dd>' + orders[i].company + '</dl></dd>';
+                        //     }
+                        //     $("#copyVal").val(orders[i].eid);
+                        //     res_html += '<dl class="dl"><dt>快递单号：</dt><a href="http://page.cainiao.com/guoguo/app-myexpress-taobao/express-detail.html?mailNo=' + orders[i].eid + '"><dd>' + orders[i].eid + '</a><div style="display:inline-block;"><button class="copyBtn" style="border: 0;background-color: transparent;outline: none;" data-clipboard-target="#copyVal"><svg t="1564384640835" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5782" width="20" height="20"><path d="M740.6 183.3v71.5h-57.2v-71.5c0-3.8-1.4-7.3-4.2-10-2.8-2.8-6.2-4.2-10-4.2H183.4c-3.8 0-7.3 1.4-10 4.2-2.7 2.8-4.2 6.2-4.2 10v485.9c0 3.8 1.4 7.3 4.2 10 2.8 2.8 6.2 4.2 10 4.2h71.5v57.2h-71.5c-19.6 0-36.5-7-50.4-20.9-14-14-21-30.9-21-50.5V183.3c0-19.6 7-36.5 20.9-50.4 13.9-13.9 30.8-20.9 50.4-20.9h485.9c19.6 0 36.5 7.1 50.4 20.9 14 14 21 30.8 21 50.4z m171.5 171.5v485.9c0 19.6-7.1 36.5-20.9 50.4-14 14-30.8 20.9-50.4 20.9H354.9c-19.6 0-36.5-7.1-50.4-20.9-14-14-20.9-30.8-20.9-50.4V354.8c0-19.6 7-36.5 20.9-50.4 13.9-13.9 30.8-20.9 50.4-20.9h485.9c19.6 0 36.5 7.1 50.4 20.9 13.9 14 20.9 30.8 20.9 50.4z" p-id="5783" fill="#d81e06"></path></svg></button></div></dd></dl>';
+                        // } else {
+                        //     if (orders[i].pay_status == 2) {
+                        //         res_html += '<dl class="dl"><dt>快递单号：</dt><dd>您的宝贝已在物流仓储中心打包中。</dd></dl>';
+                        //     } else {
+                        //         res_html += '<dl class="dl"><dt>快递单号：</dt><dd>暂无</dd></dl>';
+                        //     }
+                        // }
 
-                        res_html += '<dl class="dl"><dt>下单时间：</dt><dd>' + orders[i].create_time + '</dd></dl>';
+                        res_html += '<dl class="dl"><dt>下单时间：</dt><dd>' + orders[i].createtime + '</dd></dl>';
                         res_html += '</div></div>';
 
                         $("#pdiv").append(res_html);
@@ -157,7 +157,5 @@
         alert(e.action);
     });
 </script>
-
-
 </body>
 </html>

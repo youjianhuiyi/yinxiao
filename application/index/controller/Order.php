@@ -11,7 +11,6 @@ use think\Db;
 use think\exception\PDOException;
 use think\exception\ValidateException;
 use think\Session;
-use WeChat\Pay;
 
 
 class Order extends Frontend
@@ -65,7 +64,7 @@ class Order extends Frontend
                 'production_id'     => $params['pid'],
                 'production_name'   => $params['production_name'],
                 'goods_info'=> 'pattern='.$params['pattern'].';sex='.$params['sex'].';attr='.$params['attr'],
-                'pay_type'  => $params['pay_type'],
+//                'pay_type'  => $params['pay_type'],
                 'price'     => $params['price'],
                 'pay_id'    => PayModel::get(AdminModel::get($params['admin_id'])->team_id)->id,
                 'sn'        => $sn
@@ -107,36 +106,25 @@ class Order extends Frontend
      */
     public function orderQuery()
     {
-        $params = $this->request->param();
-        if (Cache::has($params['order_sn'])) {
-            $orderInfo = Cache::get($params['order_sn']);
-        } else {
-            $orderInfo = OrderModel::where(['sn'=>$params['order_sn']])->find()->toArray();
-        }
+        if ($this->request->isAjax()) {
+            $params = $this->request->param();
+            $orderInfo = OrderModel::where(['phone'=>$params['mobile']])->select();
+            if (!empty($orderInfo)) {
+                $data = [
+                    'status'    => 0,
+                    'order'     => $orderInfo,
+                    'msg'       => '获取成功'
+                ];
+            } else {
+                $data = [
+                    'status'    => -1,
+                    'order'     => [],
+                    'msg'       => '获取失败'
+                ];
+            }
 
-//        $payInfo = $this->payInfo($orderInfo['team_id']);
-//        $weChatConfig = $this->setConfig($payInfo);
-//        try {
-//            // 创建接口实例
-//            $wechat = new Pay($weChatConfig);
-//            // 组装参数，可以参考官方商户文档
-//            $options = [
-//                'transaction_id' => $orderInfo['transaction_id'],
-//            ];
-//
-//            // 尝试创建订单
-//            $result = $wechat->queryOrder($options);
-//
-//            // 订单数据处理
-//            var_export($result);
-//
-//        } catch(Exception $e) {
-//
-//            // 出错啦，处理下吧
-//            echo $e->getMessage() . PHP_EOL;
-//
-//        }
-        $this->assign('orderInfo',$orderInfo);
-        $this->view->fetch('orderquery');
+            return $data;
+        }
+        return $this->view->fetch('orderquery');
     }
 }
