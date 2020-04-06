@@ -59,10 +59,8 @@ class Notify extends Frontend
     public function WeChatNotify()
     {
         $result = $this->xml2arr(file_get_contents('php://input'));
-        Cache::set('sign',$result['sign']);
         //通过回调的信息反查订单相关信息
         $orderInfo = OrderModel::where(['sn'=>$result['out_trade_no']])->find()->toArray();
-        Cache::set('no_order',$orderInfo);
         $payInfo = $this->getPayInfo($orderInfo['team_id']);
         // 创建接口实例
 //        [appid]=>wx90588380da4a2bb0
@@ -83,23 +81,20 @@ class Notify extends Frontend
 //        [transaction_id]=>4200000495202004060198644235
         // 先回调验签
         $newSign = $this->signParams($result,$payInfo['mch_key']);
-        Cache::set('new_sign',$newSign);
         if ($result['sign'] === $newSign) {
             //表示验签成功
-            Cache::set('test_sign','ok');
             $data  = [
-                'id'            => $orderInfo['id'],
+                'id'             => $orderInfo['id'],
                 'transaction_id' => $result['transaction_id'],/*微信支付订单号*/
-//                        'openid'         => $result['openid'],/*购买者的openid，进行支付的时候进行写入，与支付链接绑定起来*/
+                'nonce_str'      => $result['nonce_str'],
                 'pay_type'       => 0,/*支付类型，0=微信，1=支付宝*/
                 'pay_status'     => 1,/*支付状态，已经完成支付*/
                 'pay_id'         => $payInfo['id'],/*使用的支付id，支付链接在产生支付的时候进行写入*/
             ];
-
             //更新数据
             Db::startTrans();
             try {
-                OrderModel::isUpdate(true)->save($data);
+                (new OrderModel())->isUpdate(true)->save($data);
                 Cache::set('update','ok');
                 Db::commit();
             } catch (ValidateException $e) {
@@ -112,7 +107,6 @@ class Notify extends Frontend
                 Db::rollback();
                 $this->error($e->getMessage());
             }
-
             //返回成功
             $str = '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
             echo $str;

@@ -65,6 +65,7 @@ class Order extends Frontend
                 'production_name'   => $params['production_name'],
                 'goods_info'=> 'pattern='.$params['pattern'].';sex='.$params['sex'].';attr='.$params['attr'],
 //                'pay_type'  => $params['pay_type'],
+                'openid'    => $params['openid'],
                 'price'     => $params['price'],
                 'pay_id'    => PayModel::get(AdminModel::get($params['admin_id'])->team_id)->id,
                 'sn'        => $sn
