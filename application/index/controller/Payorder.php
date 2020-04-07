@@ -39,7 +39,6 @@ class PayOrder extends Frontend
      */
     public function WeChatPay()
     {
-        return $this->view->fetch('wechatpay');
         //接收订单ID与团队ID和业务员id参数
         $params = $this->request->param();
 
