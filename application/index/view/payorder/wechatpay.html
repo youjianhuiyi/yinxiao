@@ -40,12 +40,26 @@
          table,th,tr,td{
              border:1px solid #111111;
              border-collapse: collapse;
-             text-wrap: normal;
+             word-wrap: normal;
+             padding: 2px;
          }
+        #table {
+            padding-bottom: 20px;
+        }
+         button{
+             width:270px; height:50px; border-radius: 15px;
+             border:0px #0aba06 solid; cursor: pointer;  color:white;  font-size:16px;
+             background-image: url("/assets/img/wepaylogo.png");
+             background-color: #0aba06;
+             background-repeat: no-repeat;
+             background-size:60px;
+             margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
-<div>
+<h3 align="center">订单确认</h3>
+<div id="table">
     <table width="100%">
         <tr>
             <th width="25%">订单编号：</th>
@@ -57,7 +71,7 @@
         </tr>
         <tr>
             <th colpan="2">收货地址：</th>
-            <td colpan="2">{$orderInfo.address}</td>
+            <td colpan="2" id="wrap">{$orderInfo.address}</td>
         </tr>
         <tr>
             <th>收货人：</th>
@@ -70,7 +84,7 @@
     </table>
 </div>
 <div align="center">
-    <button style="width:210px; height:50px; border-radius: 15px;background-color:#FE6714; border:0px #FE6714 solid; cursor: pointer;  color:white;  font-size:16px;" type="button" onclick="callpay()" >立即支付</button>
+    <button type="button" onclick="callpay()" >立即支付</button>
 </div>
 </body>
 </html>
