@@ -111,7 +111,7 @@ class Express extends Backend
             $params = $this->request->post("row/a");
             $params['team_id'] = $this->adminInfo['team_id'];
             $params['team_name'] = $this->adminInfo['team_name'];
-            $params['production_name'] = ProductionModel::get($params['production_id'])->name;
+            $params['order_id'] = $this->orderModel->where(['sn'=>$params['order_sn']])->find()->id;
             if ($params) {
                 $params = $this->preExcludeFields($params);
 
@@ -170,7 +170,7 @@ class Express extends Backend
             $params = $this->request->post("row/a");
             $params['team_id'] = $this->adminInfo['team_id'];
             $params['team_name'] = $this->adminInfo['team_name'];
-            $params['production_name'] = ProductionModel::get($params['production_id'])->name;
+            $params['order_id'] = $this->orderModel->where(['sn'=>$params['order_sn']])->find()->id;
             if ($params) {
                 $params = $this->preExcludeFields($params);
                 $result = false;
@@ -205,6 +205,7 @@ class Express extends Backend
         $this->view->assign("row", $row);
         return $this->view->fetch();
     }
+
 
     /**
      * 导入
