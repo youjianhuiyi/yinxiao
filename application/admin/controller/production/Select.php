@@ -2,12 +2,13 @@
 
 namespace app\admin\controller\production;
 
+use app\admin\controller\team\Team;
 use app\common\controller\Backend;
 use think\Db;
 use think\exception\PDOException;
 use think\exception\ValidateException;
-use think\Session;
 use app\admin\model\production\Production as ProductionModel;
+use app\admin\model\team\Team as TeamModel;
 
 /**
  * 产品文案选择
@@ -22,14 +23,14 @@ class Select extends Backend
      * @var \app\admin\model\production\Select
      */
     protected $model = null;
-    protected $userInfo = null;
     protected $goodsData = [];//商品数据
     protected $selectData = [];//商品数据
-
+    protected $teamModel = null;
     public function _initialize()
     {
         parent::_initialize();
         $this->model = new \app\admin\model\production\Select;
+        $this->teamModel = new TeamModel();
         $this->goodsData = ProductionModel::where('status',0)->select();
         $this->selectData = [0=>'请选择商品模板'];
         foreach ($this->goodsData as $v) {
@@ -55,13 +56,13 @@ class Select extends Backend
             list($where, $sort, $order, $offset, $limit) = $this->buildparams();
             $total = $this->model
                 ->where($where)
-                ->where(['team_id'=>$this->userInfo['team_id']])
+                ->where(['team_id'=>$this->adminInfo['team_id']])
                 ->order($sort, $order)
                 ->count();
 
             $list = $this->model
                 ->where($where)
-                ->where(['team_id'=>$this->userInfo['team_id']])
+                ->where(['team_id'=>$this->adminInfo['team_id']])
                 ->order($sort, $order)
                 ->limit($offset, $limit)
                 ->select();
@@ -86,14 +87,14 @@ class Select extends Backend
             $total = $this->model
                 ->onlyTrashed()
                 ->where($where)
-                ->where(['team_id'=>$this->userInfo['team_id']])
+                ->where(['team_id'=>$this->adminInfo['team_id']])
                 ->order($sort, $order)
                 ->count();
 
             $list = $this->model
                 ->onlyTrashed()
                 ->where($where)
-                ->where(['team_id'=>$this->userInfo['team_id']])
+                ->where(['team_id'=>$this->adminInfo['team_id']])
                 ->order($sort, $order)
                 ->limit($offset, $limit)
                 ->select();
@@ -113,8 +114,8 @@ class Select extends Backend
     {
         if ($this->request->isPost()) {
             $params = $this->request->post("row/a");
-            $params['team_id'] = $this->userInfo['team_id'];
-            $params['team_name'] = $this->userInfo['team_name'];
+            $params['team_id'] = $this->adminInfo['team_id'];
+            $params['team_name'] = $params['team_id'] == 0 ? '平台测试':$this->adminInfo['team_name'];
             $params['production_name'] = ProductionModel::get($params['production_id'])->name;
             if ($params) {
                 $params = $this->preExcludeFields($params);
@@ -122,7 +123,7 @@ class Select extends Backend
                 if ($this->dataLimit && $this->dataLimitFieldAutoFill) {
                     $params[$this->dataLimitField] = $this->auth->id;
                 }
-                $result = false;
+                $result = $result1 = false;
                 Db::startTrans();
                 try {
                     //是否采用模型验证
@@ -132,6 +133,10 @@ class Select extends Backend
                         $this->model->validateFailException(true)->validate($validate);
                     }
                     $result = $this->model->allowField(true)->save($params);
+                    //团队数据更新
+                    $teamData = $this->teamModel->get($params['team_id'])->team_productions;
+                    $newTeamProduction = empty($teamData) ? $params['production_id'] : $teamData.','.$params['production_id'];
+                    $result1 = $this->teamModel->isUpdate(true)->save($newTeamProduction,['id'=>$params['team_id']]);
                     Db::commit();
                 } catch (ValidateException $e) {
                     Db::rollback();
@@ -143,7 +148,7 @@ class Select extends Backend
                     Db::rollback();
                     $this->error($e->getMessage());
                 }
-                if ($result !== false) {
+                if ($result !== false && $result1 !== false) {
                     $this->success();
                 } else {
                     $this->error(__('No rows were inserted'));
@@ -172,12 +177,12 @@ class Select extends Backend
         }
         if ($this->request->isPost()) {
             $params = $this->request->post("row/a");
-            $params['team_id'] = $this->userInfo['team_id'];
-            $params['team_name'] = $this->userInfo['team_name'];
+            $params['team_id'] = $this->adminInfo['team_id'];
+            $params['team_name'] = $params['team_id'] == 0 ? '平台测试':$this->adminInfo['team_name'];
             $params['production_name'] = ProductionModel::get($params['production_id'])->name;
             if ($params) {
                 $params = $this->preExcludeFields($params);
-                $result = false;
+                $result =  $result1 = false;
                 Db::startTrans();
                 try {
                     //是否采用模型验证
@@ -187,6 +192,10 @@ class Select extends Backend
                         $row->validateFailException(true)->validate($validate);
                     }
                     $result = $row->allowField(true)->save($params);
+                    //团队数据更新
+                    $teamData = $this->teamModel->get($params['team_id'])->team_productions;
+                    $newTeamProduction = empty($teamData) ? $params['production_id'] : $teamData.','.$params['production_id'];
+                    $result1 = $this->teamModel->isUpdate(true)->save($newTeamProduction,['id'=>$params['team_id']]);
                     Db::commit();
                 } catch (ValidateException $e) {
                     Db::rollback();
@@ -198,7 +207,7 @@ class Select extends Backend
                     Db::rollback();
                     $this->error($e->getMessage());
                 }
-                if ($result !== false) {
+                if ($result !== false && $result1 !== false) {
                     $this->success();
                 } else {
                     $this->error(__('No rows were updated'));

@@ -22,13 +22,11 @@ class Pay extends Backend
      * @var \app\admin\model\sysconfig\Pay
      */
     protected $model = null;
-    protected $userInfo = null;
 
     public function _initialize()
     {
         parent::_initialize();
         $this->model = new \app\admin\model\sysconfig\Pay;
-        $this->userInfo = Session::get('admin');
     }
 
     /**
@@ -46,13 +44,13 @@ class Pay extends Backend
             list($where, $sort, $order, $offset, $limit) = $this->buildparams();
             $total = $this->model
                 ->where($where)
-                ->where(['team_id'=>$this->userInfo['team_id']])
+                ->where(['team_id'=>$this->adminInfo['team_id']])
                 ->order($sort, $order)
                 ->count();
 
             $list = $this->model
                 ->where($where)
-                ->where(['team_id'=>$this->userInfo['team_id']])
+                ->where(['team_id'=>$this->adminInfo['team_id']])
                 ->order($sort, $order)
                 ->limit($offset, $limit)
                 ->select();
@@ -77,14 +75,14 @@ class Pay extends Backend
             $total = $this->model
                 ->onlyTrashed()
                 ->where($where)
-                ->where(['team_id'=>$this->userInfo['team_id']])
+                ->where(['team_id'=>$this->adminInfo['team_id']])
                 ->order($sort, $order)
                 ->count();
 
             $list = $this->model
                 ->onlyTrashed()
                 ->where($where)
-                ->where(['team_id'=>$this->userInfo['team_id']])
+                ->where(['team_id'=>$this->adminInfo['team_id']])
                 ->order($sort, $order)
                 ->limit($offset, $limit)
                 ->select();
@@ -104,8 +102,8 @@ class Pay extends Backend
     {
         if ($this->request->isPost()) {
             $params = $this->request->post("row/a");
-            $params['team_id'] = $this->userInfo['team_id'];
-            $params['team_name'] = $this->userInfo['team_name'];
+            $params['team_id'] = $this->adminInfo['team_id'];
+            $params['team_name'] = $this->adminInfo['team_name'];
             if ($params) {
                 $params = $this->preExcludeFields($params);
 
@@ -129,7 +127,7 @@ class Pay extends Backend
                 } catch (PDOException $e) {
                     Db::rollback();
                     $this->error($e->getMessage());
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     Db::rollback();
                     $this->error($e->getMessage());
                 }
@@ -162,8 +160,8 @@ class Pay extends Backend
         }
         if ($this->request->isPost()) {
             $params = $this->request->post("row/a");
-            $params['team_id'] = $this->userInfo['team_id'];
-            $params['team_name'] = $this->userInfo['team_name'];
+            $params['team_id'] = $this->adminInfo['team_id'];
+            $params['team_name'] = $this->adminInfo['team_name'];
             if ($params) {
                 $params = $this->preExcludeFields($params);
                 $result = false;
@@ -183,7 +181,7 @@ class Pay extends Backend
                 } catch (PDOException $e) {
                     Db::rollback();
                     $this->error($e->getMessage());
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     Db::rollback();
                     $this->error($e->getMessage());
                 }
