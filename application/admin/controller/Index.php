@@ -57,11 +57,14 @@ class Index extends Backend
      */
     public function login()
     {
+        //登录前置方法
+        $paramSn = $this->request->param();
         $url = $this->request->get('url', 'index/index');
         if ($this->auth->isLogin()) {
             $this->success(__("You've logged in, do not login again"), $url);
         }
         if ($this->request->isPost()) {
+
             $username = $this->request->post('username');
             $password = $this->request->post('password');
             $keeplogin = $this->request->post('keeplogin');
@@ -76,25 +79,42 @@ class Index extends Backend
                 'password'  => $password,
                 '__token__' => $token,
             ];
-            if (Config::get('fastadmin.login_captcha')) {
-                $rule['captcha'] = 'require|captcha';
-                $data['captcha'] = $this->request->post('captcha');
+
+            //加密登录入口判断
+            $snStr = null;
+            if (isset($paramSn['sn'])) {
+                $snStr = base64_decode(urldecode($paramSn['sn']));
             }
-            $validate = new Validate($rule, [], ['username' => __('Username'), 'password' => __('Password'), 'captcha' => __('Captcha')]);
-            $result = $validate->check($data);
-            if (!$result) {
-                $this->error($validate->getError(), $url, ['token' => $this->request->token()]);
-            }
-            AdminLog::setTitle(__('Login'));
-            $result = $this->auth->login($username, $password, $keeplogin ? 86400 : 0);
-            if ($result === true) {
-                Hook::listen("admin_login_after", $this->request);
-                $this->success(__('Login successful'), $url, ['url' => $url, 'id' => $this->auth->id, 'username' => $username, 'avatar' => $this->auth->avatar]);
+            //除平台管理员外，所有用户必须带有参数进入
+            if ($snStr === $username || (empty($snStr) && $username === 'admin' || strtolower($username) == 'admin')) {
+
+                if (Config::get('fastadmin.login_captcha')) {
+                    $rule['captcha'] = 'require|captcha';
+                    $data['captcha'] = $this->request->post('captcha');
+                }
+                $validate = new Validate($rule, [], ['username' => __('Username'), 'password' => __('Password'), 'captcha' => __('Captcha')]);
+                $result = $validate->check($data);
+                if (!$result) {
+                    $this->error($validate->getError(), $url, ['token' => $this->request->token()]);
+                }
+                AdminLog::setTitle(__('Login'));
+                $result = $this->auth->login($username, $password, $keeplogin ? 86400 : 0);
+
+                if ($result === true) {
+                    Hook::listen("admin_login_after", $this->request);
+                    $this->success(__('Login successful'), $url, ['url' => $url, 'id' => $this->auth->id, 'username' => $username, 'avatar' => $this->auth->avatar]);
+                } else {
+                    $msg = $this->auth->getError();
+                    $msg = $msg ? $msg : __('Username or password is incorrect');
+                    $this->error($msg, $url, ['token' => $this->request->token()]);
+                }
             } else {
                 $msg = $this->auth->getError();
-                $msg = $msg ? $msg : __('Username or password is incorrect');
+                $msg = $msg ? $msg :'请使用正确的登录链接进行登录';
                 $this->error($msg, $url, ['token' => $this->request->token()]);
             }
+
+
         }
 
         // 根据客户端的cookie,判断是否可以自动登录

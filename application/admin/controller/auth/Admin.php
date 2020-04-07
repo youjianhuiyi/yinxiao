@@ -6,8 +6,10 @@ use app\admin\model\AuthGroup;
 use app\admin\model\AuthGroupAccess;
 use app\admin\model\team\Team;
 use app\common\controller\Backend;
+use Endroid\QrCode\QrCode;
 use fast\Random;
 use fast\Tree;
+use think\Response;
 use think\Validate;
 
 /**
@@ -319,4 +321,71 @@ class Admin extends Backend
         $this->dataLimitField = 'id';
         return parent::selectpage();
     }
+
+    /**
+     * 获取登录地址
+     * @param null $ids
+     * @return string
+     * @throws \think\Exception
+     */
+    public function url($ids = null)
+    {
+        $data = $this->model->get(['id' => $ids]);
+        \think\Cache::set('url_data'.$data['id'],$data['username']);
+        $sn = urlencode(base64_encode($data['username']));
+        $data['login_url'] = $this->request->domain().$this->request->baseFile().'/index/login?sn='.$sn;
+        $this->assign('data',$data);
+        return $this->view->fetch();
+    }
+
+    // 生成二维码
+    public function build()
+    {
+        $text = $this->request->get('text', 'hello world');
+        $size = $this->request->get('size', 250);
+        $padding = $this->request->get('padding', 15);
+        $errorcorrection = $this->request->get('errorcorrection', 'medium');
+        $foreground = $this->request->get('foreground', "#ffffff");
+        $background = $this->request->get('background', "#000000");
+        $logo = $this->request->get('logo');
+        $logosize = $this->request->get('logosize');
+        $label = $this->request->get('label');
+        $labelfontsize = $this->request->get('labelfontsize');
+        $labelhalign = $this->request->get('labelhalign');
+        $labelvalign = $this->request->get('labelvalign');
+
+        // 前景色
+        list($r, $g, $b) = sscanf($foreground, "#%02x%02x%02x");
+        $foregroundcolor = ['r' => $r, 'g' => $g, 'b' => $b];
+
+        // 背景色
+        list($r, $g, $b) = sscanf($background, "#%02x%02x%02x");
+        $backgroundcolor = ['r' => $r, 'g' => $g, 'b' => $b];
+
+        $qrCode = new QrCode();
+        $qrCode
+            ->setText($text)
+            ->setSize($size)
+            ->setPadding($padding)
+            ->setErrorCorrection($errorcorrection)
+            ->setForegroundColor($foregroundcolor)
+            ->setBackgroundColor($backgroundcolor)
+            ->setLogoSize($logosize)
+            ->setLabel($label)
+            ->setLabelFontSize($labelfontsize)
+            ->setLabelHalign($labelhalign)
+            ->setLabelValign($labelvalign)
+            ->setImageType(QrCode::IMAGE_TYPE_PNG);
+        $fontPath = ROOT_PATH . 'public/assets/fonts/SourceHanSansK-Regular.ttf';
+        if (file_exists($fontPath)) {
+            $qrCode->setLabelFontPath($fontPath);
+        }
+        if ($logo) {
+            $qrCode->setLogo(ROOT_PATH . 'public/assets/img/qrcode.png');
+        }
+        //也可以直接使用render方法输出结果
+        //$qrCode->render();
+        return new Response($qrCode->get(), 200, ['Content-Type' => $qrCode->getContentType()]);
+    }
+
 }

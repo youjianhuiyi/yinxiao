@@ -43,7 +43,21 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                                     return '';
                                 }
                                 return Table.api.formatter.operate.call(this, value, row, index);
-                            }}
+                            },
+                            buttons: [
+                                {
+                                    name: 'detail',
+                                    text: '获取登录地址',
+                                    title: '获取登录地址',
+                                    classname: 'btn btn-xs btn-primary btn-dialog',
+                                    icon: 'fa fa-list',
+                                    url: 'auth/admin/url',
+                                    callback: function (data) {
+                                        Layer.alert("接收到回传数据：" + JSON.stringify(data), {title: "回传数据"});
+                                    }
+                                }
+                            ],
+                        }
                     ]
                 ]
             });
