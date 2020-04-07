@@ -1,27 +1,15 @@
 <form id="edit-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
 
     <div class="form-group">
-        <label class="control-label col-xs-12 col-sm-2">{:__('Team_id')}:</label>
-        <div class="col-xs-12 col-sm-8">
-            <input id="c-team_id" data-rule="required" data-source="team/index" class="form-control selectpage" name="row[team_id]" type="text" value="{$row.team_id|htmlentities}">
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="control-label col-xs-12 col-sm-2">{:__('Team_name')}:</label>
-        <div class="col-xs-12 col-sm-8">
-            <input id="c-team_name" data-rule="required" class="form-control" name="row[team_name]" type="text" value="{$row.team_name|htmlentities}">
-        </div>
-    </div>
-    <div class="form-group">
         <label class="control-label col-xs-12 col-sm-2">{:__('Sn')}:</label>
         <div class="col-xs-12 col-sm-8">
-            <input id="c-sn" data-rule="required" class="form-control" name="row[sn]" type="text" value="{$row.sn|htmlentities}">
+            <input id="c-sn" data-rule="required" class="form-control" name="row[sn]" type="text" value="{$row.sn|htmlentities}" readonly="readonly">
         </div>
     </div>
     <div class="form-group">
         <label class="control-label col-xs-12 col-sm-2">{:__('Name')}:</label>
         <div class="col-xs-12 col-sm-8">
-            <input id="c-name" data-rule="required" class="form-control" name="row[name]" type="text" value="{$row.name|htmlentities}">
+            <input id="c-name" data-rule="required" class="form-control" name="row[name]" type="text" value="{$row.name|htmlentities}" >
         </div>
     </div>
     <div class="form-group">
@@ -30,40 +18,35 @@
             <input id="c-phone" data-rule="required" class="form-control" name="row[phone]" type="text" value="{$row.phone|htmlentities}">
         </div>
     </div>
-    <div class="form-group">
-        <label class="control-label col-xs-12 col-sm-2">{:__('Production_id')}:</label>
-        <div class="col-xs-12 col-sm-8">
-            <input id="c-production_id" data-rule="required" data-source="production/index" class="form-control selectpage" name="row[production_id]" type="text" value="{$row.production_id|htmlentities}">
-        </div>
-    </div>
+    <input name="row[production_id]" type="hidden" value="{$row.production_id|htmlentities}">
     <div class="form-group">
         <label class="control-label col-xs-12 col-sm-2">{:__('Production_name')}:</label>
         <div class="col-xs-12 col-sm-8">
-            <input id="c-production_name" data-rule="required" class="form-control" name="row[production_name]" type="text" value="{$row.production_name|htmlentities}">
+            <input id="c-production_name" data-rule="required" class="form-control" name="row[production_name]" type="text" value="{$row.production_name|htmlentities}" readonly="readonly">
         </div>
     </div>
     <div class="form-group">
         <label class="control-label col-xs-12 col-sm-2">{:__('Num')}:</label>
         <div class="col-xs-12 col-sm-8">
-            <input id="c-num" data-rule="required" class="form-control" name="row[num]" type="number" value="{$row.num|htmlentities}">
+            <input id="c-num" data-rule="required" class="form-control" name="row[num]" type="number" value="{$row.num|htmlentities}" readonly="readonly">
         </div>
     </div>
     <div class="form-group">
         <label class="control-label col-xs-12 col-sm-2">{:__('Admin_name')}:</label>
         <div class="col-xs-12 col-sm-8">
-            <input id="c-admin_name" data-rule="required" class="form-control" name="row[admin_name]" type="text" value="{$row.admin_name|htmlentities}">
+            <input id="c-admin_name" data-rule="required" class="form-control" name="row[admin_name]" type="text" value="{$row.admin_name|htmlentities}" readonly="readonly">
         </div>
     </div>
     <div class="form-group">
         <label class="control-label col-xs-12 col-sm-2">{:__('Pay_type')}:</label>
         <div class="col-xs-12 col-sm-8">
-            <input id="c-pay_type" data-rule="required" class="form-control" name="row[pay_type]" type="number" value="{$row.pay_type|htmlentities}">
+            <input id="c-pay_type" data-rule="required" class="form-control" name="row[pay_type]" type="number" value="{$row.pay_type|htmlentities}" readonly="readonly">
         </div>
     </div>
     <div class="form-group">
         <label class="control-label col-xs-12 col-sm-2">{:__('Pay_status')}:</label>
         <div class="col-xs-12 col-sm-8">
-            <input id="c-pay_status" data-rule="required" class="form-control" name="row[pay_status]" type="number" value="{$row.pay_status|htmlentities}">
+            <input id="c-pay_status" data-rule="required" class="form-control" name="row[pay_status]" type="number" value="{$row.pay_status|htmlentities}" readonly="readonly">
         </div>
     </div>
     <div class="form-group">
@@ -73,9 +56,21 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="control-label col-xs-12 col-sm-2">{:__('Order_time')}:</label>
+        <label class="control-label col-xs-12 col-sm-2">{:__('Createtime')}:</label>
         <div class="col-xs-12 col-sm-8">
-            <input id="c-order_time" data-rule="required" class="form-control datetimepicker" data-date-format="YYYY-MM-DD HH:mm:ss" data-use-current="true" name="row[order_time]" type="text" value="{:$row.order_time?datetime($row.order_time):''}">
+            <input id="c-createtime" readonly="readonly" data-rule="required" class="form-control datetimepicker" data-date-format="YYYY-MM-DD HH:mm:ss" data-use-current="true" name="row[createtime]" type="text" value="{:$row.createtime?datetime($row.createtime):''}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Express_com')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-express_com" data-rule="required" class="form-control" name="row[express_com]" type="text" value="{$row.express_com|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Express_no')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-express_no" data-rule="required" class="form-control" name="row[express_no]" type="text" value="{$row.express_no|htmlentities}">
         </div>
     </div>
     <div class="form-group">

@@ -10,8 +10,6 @@ class Order extends Model
 
     use SoftDelete;
 
-    
-
     // 表名
     protected $name = 'order';
     
@@ -25,24 +23,7 @@ class Order extends Model
 
     // 追加属性
     protected $append = [
-        'order_time_text'
     ];
-    
-
-    
-
-
-
-    public function getOrderTimeTextAttr($value, $data)
-    {
-        $value = $value ? $value : (isset($data['order_time']) ? $data['order_time'] : '');
-        return is_numeric($value) ? date("Y-m-d H:i:s", $value) : $value;
-    }
-
-    protected function setOrderTimeAttr($value)
-    {
-        return $value === '' ? null : ($value && !is_numeric($value) ? strtotime($value) : $value);
-    }
 
 
 }

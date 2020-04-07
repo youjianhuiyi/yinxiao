@@ -21,26 +21,46 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                 url: $.fn.bootstrapTable.defaults.extend.index_url,
                 pk: 'id',
                 sortName: 'id',
+                search:false,
                 columns: [
                     [
                         {checkbox: true},
                         {field: 'id', title: __('Id'),operate:false},
-                        {field: 'team_id', title: __('Team_id'),operate:false,visible:false},
-                        {field: 'team_name', title: __('Team_name')},
                         {field: 'sn', title: __('Sn')},
-                        {field: 'name', title: __('Name')},
-                        {field: 'phone', title: __('Phone')},
+                        {field: 'name', title: __('Name'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
+                        {field: 'phone', title: __('Phone'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
                         {field: 'production_id', title: __('Production_id'),operate:false,visible:false},
-                        {field: 'production_name', title: __('Production_name')},
+                        {field: 'production_name', title: __('Production_name'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
                         {field: 'num', title: __('Num')},
                         {field: 'admin_id', title: __('Admin_id'),operate:false,visible:false},
-                        {field: 'admin_name', title: __('Admin_name')},
-                        {field: 'pay_type', title: __('Pay_type')},
-                        {field: 'pay_status', title: __('Pay_status')},
-                        {field: 'order_status', title: __('Order_status')},
+                        {field: 'admin_name', title: __('Admin_name'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
+                        {field: 'pay_type', title: __('Pay_type'),searchList: {"0":"微信支付", "1": "其他支付"}},
+                        {field: 'pay_status', title: __('Pay_status'),searchList: {"1": "已付款", "0": "未付款"}},
+                        {field: 'order_status', title: __('Order_status'),searchList: {
+                                "0":"正在出库中",
+                                "1": "退货",
+                                "2":"补货",
+                                "3":"退款",
+                                "4":"退货退款",
+                        }},
                         {field: 'createtime', title: __('Createtime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
                         {field: 'updatetime', title: __('Updatetime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
-                        {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate, formatter: Table.api.formatter.operate}
+                        {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate, formatter: Table.api.formatter.operate,
+                            buttons:[
+                                {
+                                    name: 'detail',
+                                    text: '订单详情',
+                                    title: '订单详情',
+                                    classname: 'btn btn-xs btn-primary btn-dialog',
+                                    icon: 'fa fa-list',
+                                    url: 'order/order/detail',
+                                    callback: function (data) {
+                                        Layer.alert("接收到回传数据：", {title: "回传数据"});
+                                    }
+                                }
+                            ]
+
+                        }
                     ]
                 ]
             });
