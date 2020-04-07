@@ -43,7 +43,6 @@
                 <input id="c-qr_image" data-rule="required" class="form-control" size="50" name="row[qr_image]" type="text" value="{$row.qr_image|htmlentities}">
                 <div class="input-group-addon no-border no-padding">
                     <span><button type="button" id="plupload-qr_image" class="btn btn-danger plupload" data-input-id="c-qr_image" data-mimetype="image/gif,image/jpeg,image/png,image/jpg,image/bmp" data-multiple="false" data-preview-id="p-qr_image"><i class="fa fa-upload"></i> {:__('Upload')}</button></span>
-                    <span><button type="button" id="fachoose-qr_image" class="btn btn-primary fachoose" data-input-id="c-qr_image" data-mimetype="image/*" data-multiple="false"><i class="fa fa-list"></i> {:__('Choose')}</button></span>
                 </div>
                 <span class="msg-box n-right" for="c-qr_image"></span>
             </div>
@@ -57,11 +56,9 @@
                 <input id="c-modulefile" data-rule="required" class="form-control" size="50" name="row[modulefile]" type="text" value="{$row.modulefile|htmlentities}">
                 <div class="input-group-addon no-border no-padding">
                     <span><button type="button" id="plupload-modulefile" class="btn btn-danger plupload" data-input-id="c-modulefile" data-multiple="false" data-preview-id="p-modulefile"><i class="fa fa-upload"></i> {:__('Upload')}</button></span>
-                    <span><button type="button" id="fachoose-modulefile" class="btn btn-primary fachoose" data-input-id="c-modulefile" data-multiple="false"><i class="fa fa-list"></i> {:__('Choose')}</button></span>
                 </div>
                 <span class="msg-box n-right" for="c-modulefile"></span>
             </div>
-            <ul class="row list-inline plupload-preview" id="p-modulefile"></ul>
         </div>
     </div>
     <div class="form-group">
@@ -80,12 +77,6 @@
         <label class="control-label col-xs-12 col-sm-2">{:__('Status')}:</label>
         <div class="col-xs-12 col-sm-8">
             <input id="c-status" data-rule="required" class="form-control" name="row[status]" type="number" value="{$row.status|htmlentities}">
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="control-label col-xs-12 col-sm-2">{:__('Count')}:</label>
-        <div class="col-xs-12 col-sm-8">
-            <input id="c-count" data-rule="required" class="form-control" name="row[count]" type="number" value="{$row.count|htmlentities}">
         </div>
     </div>
     <div class="form-group layer-footer">

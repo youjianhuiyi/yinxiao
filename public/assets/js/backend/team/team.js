@@ -21,12 +21,13 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                 url: $.fn.bootstrapTable.defaults.extend.index_url,
                 pk: 'id',
                 sortName: 'id',
+                search:false,
                 columns: [
                     [
                         {checkbox: true},
-                        {field: 'id', title: __('Id')},
+                        {field: 'id', title: __('Id'),operate:false},
                         {field: 'name', title: __('Name')},
-                        {field: 'admin_id', title: __('Admin_id')},
+                        {field: 'admin_id', title: __('Admin_id'),operate:false,visible:false},
                         {field: 'admin_username', title: __('Admin_username')},
                         {field: 'phone', title: __('Phone')},
                         {field: 'team_productions', title: __('Team_productions')},
