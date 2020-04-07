@@ -24,15 +24,15 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                 columns: [
                     [
                         {checkbox: true},
-                        {field: 'id', title: __('Id')},
-                        {field: 'production_id', title: __('Production_id')},
+                        {field: 'id', title: __('Id'),operate:false},
+                        {field: 'production_id', title: __('Production_id'),operate:false,visible:false},
                         {field: 'production_name', title: __('Production_name')},
-                        {field: 'team_id', title: __('Team_id')},
-                        {field: 'team_name', title: __('Team_name')},
-                        {field: 'url', title: __('Url'), formatter: Table.api.formatter.url},
+                        {field: 'team_id', title: __('Team_id'),operate:false,visible:false},
+                        {field: 'team_name', title: __('Team_name'),operate:false,visible:false},
+                        {field: 'url', title: __('Url'), formatter: Table.api.formatter.url,operate:false,visible:false},
                         {field: 'count', title: __('Count')},
                         {field: 'order_done', title: __('Order_done')},
-                        {field: 'is_forbidden', title: __('Is_forbidden')},
+                        {field: 'is_forbidden', title: __('Is_forbidden'),operate:false,visible:false},
                         {field: 'createtime', title: __('Createtime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
                         {field: 'updatetime', title: __('Updatetime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
                         {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate, formatter: Table.api.formatter.operate}
