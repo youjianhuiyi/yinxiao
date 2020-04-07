@@ -21,10 +21,11 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                 url: $.fn.bootstrapTable.defaults.extend.index_url,
                 pk: 'id',
                 sortName: 'id',
+                search:false,
                 columns: [
                     [
                         {checkbox: true},
-                        {field: 'id', title: __('Id')},
+                        {field: 'id', title: __('Id'),operate:false},
                         {field: 'domain_url', title: __('Domain_url'), formatter: Table.api.formatter.url},
                         {field: 'count', title: __('Count')},
                         {field: 'is_forbidden', title: __('Is_forbidden')},
