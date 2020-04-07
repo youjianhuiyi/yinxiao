@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <title>二维码生成 - {$site.name}</title>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="http://apps.bdimg.com/libs/html5shiv/3.7/html5shiv.min.js"></script>
+    <script src="http://apps.bdimg.com/libs/respond.js/1.4.2/respond.js"></script>
+    <![endif]-->
+    <style>
+        .login-url-new{ width:330px; margin:8% auto;}
+        .login-url-new dl:nth-child(2){border: 3px solid #FF5722;}
+        .login-url-new dl:nth-child(2) dd{background:#FF5722; color:#fff; }
+        .login-url-new dl{border: 3px solid #218ffd; width: 330px; text-align:center; border-radius: 10px; background:#fff; float:left;}
+        .login-url-new dl dt{ padding:10px 0;}
+        .login-url-new dl dd{background:#218ffd; color:#fff; padding-bottom: 15px;}
+        .login-url-new dl dd li{ font-size:14px; line-height:40px;}
+        /*.login-url-new dl dd p{ height:50px;}*/
+        .login-url-new dl dd ol{ text-align: justify;background:#fff;width:125px; color:#000; line-height:35px;border-radius: 3px; cursor: pointer; margin:0px auto;}
+    </style>
+</head>
+<body>
+    <form action="" method="post">
+        <input type="hidden" name="text" value="{$data['production_url']}">
+    </form>
+    <div class="mall">
+        <div class="login-url-new">
+            <dl>
+                <dt><img src="" alt="" id='qrcodeimg' /></dt>
+                <dd>
+                    <li>代理商&员工登陆地址</li>
+                    <p>(长按保存图片用手机浏览器扫码进入)</p>
+                    <p id='qrcodeurl'>{$data['production_url']}</p>
+                    <ol class="copy_bsp">复制地址</ol>
+                </dd>
+            </dl>
+        </div>
+    </div>
+<script type="text/javascript" src="/assets/js/clipboard.min.js"></script>
+<script src="https://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $("form").submit(function () {
+            $("#qrcodeimg").prop("src", "{:url('production/url/build',[],false)}?" + $(this).serialize());
+            $("#qrcodeurl").text();
+            return false;
+        });
+        $("form").trigger('submit');
+    });
+</script>
+
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        //复制粘贴
+        $('.copy_bsp').click(function(){
+            var copytext=$('#qrcodeurl').text();
+            var clipboard = new ClipboardJS('.copy_bsp', {
+                text: function() {
+                    return copytext;
+                }
+            });
+            clipboard.on('success', function(e) {
+                Layer.alert("已复制好，可贴粘!!!", {title: "温馨提示"});
+            });
+        });
+
+    });
+</script>
+
+
+</body>
+</html>

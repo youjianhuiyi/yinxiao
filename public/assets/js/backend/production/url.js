@@ -21,6 +21,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                 url: $.fn.bootstrapTable.defaults.extend.index_url,
                 pk: 'id',
                 sortName: 'id',
+                search:false,
                 columns: [
                     [
                         {checkbox: true},
@@ -35,7 +36,22 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {field: 'is_forbidden', title: __('Is_forbidden'),operate:false,visible:false},
                         {field: 'createtime', title: __('Createtime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
                         {field: 'updatetime', title: __('Updatetime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
-                        {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate, formatter: Table.api.formatter.operate}
+                        {
+                            field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate,
+                            buttons: [
+                                {
+                                    name: 'detail',
+                                    text: '获取登录地址',
+                                    title: '获取登录地址',
+                                    classname: 'btn btn-xs btn-primary btn-dialog',
+                                    icon: 'fa fa-list',
+                                    url: 'production/url/url',
+                                    callback: function (data) {
+                                        Layer.alert("接收到回传数据：", {title: "回传数据"});
+                                    }
+                                }],
+                            formatter: Table.api.formatter.operate
+                        }
                     ]
                 ]
             });
