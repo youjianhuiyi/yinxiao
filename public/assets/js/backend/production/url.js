@@ -41,8 +41,8 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                             buttons: [
                                 {
                                     name: 'detail',
-                                    text: '获取登录地址',
-                                    title: '获取登录地址',
+                                    text: '获取商品推广链接',
+                                    title: '获取商品推广链接',
                                     classname: 'btn btn-xs btn-primary btn-dialog',
                                     icon: 'fa fa-list',
                                     url: 'production/url/url',

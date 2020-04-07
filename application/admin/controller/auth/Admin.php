@@ -338,7 +338,14 @@ class Admin extends Backend
         return $this->view->fetch();
     }
 
-    // 生成二维码
+    /**
+     * 生成二维码
+     * @return Response
+     * @throws \Endroid\QrCode\Exceptions\DataDoesntExistsException
+     * @throws \Endroid\QrCode\Exceptions\ImageFunctionFailedException
+     * @throws \Endroid\QrCode\Exceptions\ImageFunctionUnknownException
+     * @throws \Endroid\QrCode\Exceptions\ImageTypeInvalidException
+     */
     public function build()
     {
         $text = $this->request->get('text', 'hello world');

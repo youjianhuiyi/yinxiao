@@ -2,12 +2,10 @@
 
 namespace app\admin\controller\sysconfig;
 
-use app\admin\model\production\Production as ProductionModel;
 use app\common\controller\Backend;
 use think\Db;
 use think\exception\PDOException;
 use think\exception\ValidateException;
-use think\Session;
 
 /**
  * 支付设置
@@ -93,7 +91,6 @@ class Pay extends Backend
         }
         return $this->view->fetch();
     }
-
 
     /**
      * 添加
