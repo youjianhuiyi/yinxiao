@@ -27,17 +27,17 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
             // 初始化表格
             table.bootstrapTable({
                 url: $.fn.bootstrapTable.defaults.extend.index_url,
+                search:false,
                 columns: [
                     [
-                        {field: 'state', checkbox: true, },
                         {field: 'id', title: 'ID',operate:false},
                         {field: 'username', title: __('Username'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
                         {field: 'nickname', title: __('Nickname'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
                         {field: 'groups_text', title: __('Group'), operate:false, formatter: Table.api.formatter.label},
                         {field: 'phone', title: __('phone'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
-                        {field: 'team_name', title: '所属团队',operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
-                        {field: 'status', title: __("Status"), formatter: Table.api.formatter.status,operate:false},
-                        {field: 'logintime', title: __('Login time'), formatter: Table.api.formatter.datetime, operate: 'RANGE', addclass: 'datetimerange', sortable: true},
+                        {field: 'team_name', title: '所属团队',operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符',visible:false},
+                        {field: 'status', title: __("Status"), formatter: Table.api.formatter.status,operate:false,visible:false},
+                        {field: 'logintime', title: __('Login time'), formatter: Table.api.formatter.datetime, operate: 'RANGE', addclass: 'datetimerange', sortable: true,visible:false},
                         {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate, formatter: function (value, row, index) {
                                 if(row.id == Config.admin.id){
                                     return '';
