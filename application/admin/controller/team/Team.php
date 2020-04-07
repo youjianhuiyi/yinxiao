@@ -7,7 +7,7 @@ use app\common\controller\Backend;
 /**
  * 团队管理
  *
- * @icon fa fa-circle-o
+ * @icon fa fa-sitemap
  */
 class Team extends Backend
 {

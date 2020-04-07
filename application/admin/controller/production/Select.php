@@ -2,7 +2,6 @@
 
 namespace app\admin\controller\production;
 
-use app\admin\controller\team\Team;
 use app\common\controller\Backend;
 use think\Db;
 use think\exception\PDOException;
@@ -13,7 +12,7 @@ use app\admin\model\team\Team as TeamModel;
 /**
  * 产品文案选择
  *
- * @icon fa fa-circle-o
+ * @icon fa fa-file-word-o
  */
 class Select extends Backend
 {

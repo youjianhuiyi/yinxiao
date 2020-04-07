@@ -10,7 +10,7 @@ use think\exception\ValidateException;
 /**
  * 支付设置
  *
- * @icon fa fa-circle-o
+ * @icon fa fa-weixin
  */
 class Pay extends Backend
 {

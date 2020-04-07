@@ -11,7 +11,7 @@ use think\Session;
 /**
  * 快递信息管理
  *
- * @icon fa fa-circle-o
+ * @icon fa fa-space-shuttle
  */
 class Express extends Backend
 {

@@ -7,7 +7,7 @@ use app\common\controller\Backend;
 /**
  * 订单管理
  *
- * @icon fa fa-circle-o
+ * @icon fa fa-first-order
  */
 class Order extends Backend
 {

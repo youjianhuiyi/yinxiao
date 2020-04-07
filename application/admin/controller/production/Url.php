@@ -10,7 +10,7 @@ use think\Response;
 /**
  * 商品链接
  *
- * @icon fa fa-circle-o
+ * @icon fa fa-link
  */
 class Url extends Backend
 {

@@ -7,7 +7,7 @@ use app\common\controller\Backend;
 /**
  * 产品文案库
  *
- * @icon fa fa-circle-o
+ * @icon fa fa-cubes
  */
 class Production extends Backend
 {
