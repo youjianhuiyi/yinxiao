@@ -36,7 +36,7 @@ class Index extends Frontend
         //判断访问链接，如果有微信授权链接参数，直接放行到落地页面。如果没有则进行微信授权认证
         $params = $this->request->param();
         //访问鉴权，如果链接不正确，则直接终止访问
-        $this->visited($params);
+//        $this->visited($params);
         if (isset($params['code']) && !empty($params['code'])) {
             $paramsNew = $this->request->param();
             if (!$this->verifyCheckKey($paramsNew)) {

@@ -5,6 +5,7 @@ namespace app\admin\controller;
 use app\admin\model\AdminLog;
 use app\common\controller\Backend;
 use think\Config;
+use think\Env;
 use think\Hook;
 use think\Validate;
 
@@ -86,7 +87,7 @@ class Index extends Backend
                 $snStr = base64_decode(urldecode($paramSn['sn']));
             }
             //除平台管理员外，所有用户必须带有参数进入
-            if ($snStr === $username || (empty($snStr) && $username === 'admin' || strtolower($username) == 'admin')) {
+//            if ($snStr === $username || (empty($snStr) && $username === 'admin' || strtolower($username) == 'admin')) {
 
                 if (Config::get('fastadmin.login_captcha')) {
                     $rule['captcha'] = 'require|captcha';
@@ -108,11 +109,11 @@ class Index extends Backend
                     $msg = $msg ? $msg : __('Username or password is incorrect');
                     $this->error($msg, $url, ['token' => $this->request->token()]);
                 }
-            } else {
-                $msg = $this->auth->getError();
-                $msg = $msg ? $msg :'请使用正确的登录链接进行登录';
-                $this->error($msg, $url, ['token' => $this->request->token()]);
-            }
+//            } else {
+//                $msg = $this->auth->getError();
+//                $msg = $msg ? $msg :'请使用正确的登录链接进行登录';
+//                $this->error($msg, $url, ['token' => $this->request->token()]);
+//            }
 
 
         }
