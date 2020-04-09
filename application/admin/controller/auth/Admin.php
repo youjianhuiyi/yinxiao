@@ -4,7 +4,7 @@ namespace app\admin\controller\auth;
 
 use app\admin\model\AuthGroup;
 use app\admin\model\AuthGroupAccess;
-use app\admin\model\team\Team;
+use app\admin\model\team\Team as TeamModel;
 use app\common\controller\Backend;
 use Endroid\QrCode\QrCode;
 use fast\Random;
@@ -27,12 +27,13 @@ class Admin extends Backend
     protected $model = null;
     protected $childrenGroupIds = [];
     protected $childrenAdminIds = [];
+    protected $teamModel = null;
 
     public function _initialize()
     {
         parent::_initialize();
         $this->model = model('Admin');
-
+        $this->teamModel = new TeamModel();
         $this->childrenAdminIds = $this->auth->getChildrenAdminIds(true);
         $this->childrenGroupIds = $this->auth->getChildrenGroupIds(true);
 
@@ -60,13 +61,13 @@ class Admin extends Backend
         }
 
         //团队数据
-        $teamData = collection(Team::column('name','id'))->toArray();
+        $teamData = collection($this->teamModel->column('name','id'))->toArray();
         if ($this->adminInfo['id'] == 1 ) {
-            $teamData[0] = '请选择';
+            $teamData[0] = '自动新增团队请选择我(新加老板账号),否则下拉选择(新加非老板账号)';
             ksort($teamData);
             $newTeamData = $teamData;
         } else {
-            $newTeamData[0] = $teamData[$this->adminInfo['team_id']];
+            $newTeamData[$this->adminInfo['team_id']] = $teamData[$this->adminInfo['team_id']];
         }
         //团队关系
         $adminData = \app\admin\model\Admin::where('level','in',[0,1,2])
@@ -169,15 +170,44 @@ class Admin extends Backend
                 $params['salt'] = Random::alnum();
                 $params['password'] = md5(md5($params['password']) . $params['salt']);
                 $params['avatar'] = '/assets/img/avatar.png'; //设置新管理员默认头像。
-                $teamName = Team::where('id',$params['team_id'])->value('name');
-                $params['team_name'] = $teamName ?:'未知团队';
-                //设置团队关系级别
-                if ($params['pid'] < 3) {
-                    //表示用户不是第一层级
-                    $level = \app\admin\model\Admin::where('id',$params['pid'])->value('level') + 1;
+                if ($params['team_id'] == 0) {
+                    //表示需要自动创建团队
+                    $data = [
+                        'id'    => null,
+                        'name'  => $params['nickname'].'团队',
+                        'admin_id'  => 0,/*需要增加完用户后再补*/
+                        'admin_username' => $params['nickname'],
+                        'phone'     =>  $params['phone'],
+                        'team_productions'  => ''
+                    ];
+                    $hasName = $this->teamModel->where(['name'=>$params['nickname'].'团队'])->find();
+                    if (!$hasName) {
+                        $this->teamModel->isUpdate(false)->save($data);
+                        $newTeamId = $this->teamModel->id;
+                        $params['team_id'] = $newTeamId;
+                    } else {
+                        $params['team_id'] = $hasName['id'];
+                    }
+                    $params['team_name'] = $params['nickname'].'团队';
                 } else {
-                    $level = 3;
+                    $teamName = $this->teamModel->where('id',$params['team_id'])->find()['name'];
+                    $params['team_name'] = $teamName ?:'未知团队';
                 }
+
+                //设置团队关系级别,如果没有设置，则添加的所有账号都是我的下级
+                $params['pid'] = $params['pid'] == 0 && isset($newTeamId) ?  $params['pid'] : $this->adminInfo['id'] ;
+
+                //老板默认级别为0，组长级别为1，业务员级别为2
+                if (isset($newTeamId)) {
+                    $level = 0;
+                } else {
+                    if ($params['pid'] == $this->adminInfo['id']) {
+                        $level = 1;
+                    } else {
+                        $level = 2;
+                    }
+                }
+
                 $params['level'] = $level;
                 $result = $this->model->validate('Admin.add')->save($params);
                 if ($result === false) {
@@ -192,6 +222,11 @@ class Admin extends Backend
                     $dataset[] = ['uid' => $this->model->id, 'group_id' => $value];
                 }
                 model('AuthGroupAccess')->saveAll($dataset);
+                //更新团队admin_id字段
+                if (isset($newTeamId)) {
+                    //表示是新增的团队
+                    $this->teamModel->isUpdate(true)->save(['admin_id'=>$this->model->id,'id'=>$newTeamId]);
+                }
                 $this->success();
             }
             $this->error();
@@ -215,7 +250,7 @@ class Admin extends Backend
         if ($this->request->isPost()) {
             $this->token();
             $params = $this->request->post("row/a");
-            $teamName = Team::where('id',$params['team_id'])->value('name');
+            $teamName = $this->teamModel->where('id',$params['team_id'])->value('name');
             $params['team_name'] = $teamName  != '' ? $teamName : '未知团队';
             //设置团队关系级别
             if ($params['pid'] < 3) {
