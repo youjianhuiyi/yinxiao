@@ -74,7 +74,8 @@ class Url extends Backend
         $str = 'aid='.$this->adminInfo['id'].'&gid='.$ids.'&tid='.$this->adminInfo['team_id'];
         $checkCode = md5($str);
         //TODO::先使用本机域名，后面加入防封方式进行域名选择切换
-        $url = $this->request->domain().'/index.php/index/index?'.$str.'&check_code='.$checkCode;
+        $url = 'http://api.ckjdsak.cn/index.php/index/index?'.$str.'&check_code='.$checkCode;
+//        $url = $this->request->domain().'/index.php/index/index?'.$str.'&check_code='.$checkCode;
         $data['production_url'] = $url;
         $this->assign('data',$data);
         return $this->view->fetch();
