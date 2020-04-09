@@ -183,7 +183,12 @@ return [
         // 缓存前缀
         'prefix' => '',
         // 缓存有效期 0表示永久缓存
-        'expire' => 0,
+        // 驱动方式 支持redis memcache memcached
+        'host'           => Env::get('redis.host','127.0.0.1'), // redis主机
+        'port'           => Env::get('redis.port',6379), // redis端口
+        'password'       => Env::get('redis.pass',''), // 密码
+        'select'         => 1, // 操作库
+        'expire'         => Env::get('redis.expire',3600), // 有效期(秒)
     ],
     // +----------------------------------------------------------------------
     // | 会话设置
