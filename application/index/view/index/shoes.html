@@ -656,7 +656,7 @@
 							layer.close(jz);
 							payoid = result.order_id;
 							$('#subbtn').removeAttr("disabled");
-							window.location.href = "{$data.api_domain}"+'index.php/index/payorder/wechatpay?aid='+aid+'&oid='+result.order_id+'&gid='+"{$data.gid}"+'&tid='+"{$data.tid}"+'&check_code='+"{$data.check_code}"+'&tp='+"{$data.tp}";
+							window.location.href = "{$data.api_domain}"+'index.php/index/payorder/wechatpay?aid='+"{$data.aid}"+'&oid='+result.order_id+'&gid='+"{$data.gid}"+'&tid='+"{$data.tid}"+'&check_code='+"{$data.check_code}"+'&tp='+"{$data.tp}";
 
 						}else{
 							layer.close(jz);
