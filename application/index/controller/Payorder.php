@@ -40,9 +40,9 @@ class PayOrder extends Frontend
     }
 
     /**
-     * 微信支付
+     * 微信授权
      */
-    public function WeChatPay()
+    public function WeChatGrant()
     {
         //判断访问链接，如果有微信授权链接参数，直接放行到落地页面。如果没有则进行微信授权认证
         $params = $this->request->param();
@@ -92,10 +92,17 @@ class PayOrder extends Frontend
                 // 尝试创建订单
                 $wxOrder = $weChat->createOrder($options);
                 $result = $weChat->createParamsForJsApi($wxOrder['prepay_id']);
+                $returnData = [
+                    'jsapi' => $result,
+                    'order_info' => $orderInfo
+                ];
+                Cache::set($wxUserInfo['openid'],$returnData);
+                //跳转到微信支付
+                header('Location:'.'http://pay.ckjdsak.cn/index.php/payorder/readypay?openid='.$wxUserInfo['openid']);
                 // 订单数据处理
-                $this->assign('jsApiPrepay', json_encode($result));
-                $this->assign('orderInfo', $orderInfo);
-                return $this->view->fetch('wechatpay');
+//                $this->assign('jsApiPrepay', json_encode($result));
+//                $this->assign('orderInfo', $orderInfo);
+//                return $this->view->fetch('wechatpay');
             } else {
                 //表示非法请求
                 die('你请求的支付地址有错误，请重新下单支付');
@@ -105,23 +112,25 @@ class PayOrder extends Frontend
             $this->intoBefore($params);
         }
 
-
-
-
-
-
-
-
-
-
-
-
-//        if (isset($params['code']) && !empty($params['code'])) {
-
-//        } else {
-//            $this->intoBefore();
-//        }
     }
 
 
+    /**
+     * 微信支付
+     */
+    public function readyPay()
+    {
+        $param = $this->request->param();
+        if (Cache::has($param['openid'])) {
+            //表示是正常的订单支付
+            $data = Cache::get($param['openid']);
+            $this->assign('jsApiPrepay', json_encode($data['jsapi']));
+            $this->assign('orderInfo', $data['order_info']);
+            return $this->view->fetch('wechatpay');
+        } else {
+            //表示非法请求
+            die('你请求的支付地址有错误，请重新下单支付');
+        }
+
+    }
 }

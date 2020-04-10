@@ -175,7 +175,7 @@ class Frontend extends Controller
         $newParams = $paramString.'&check_key='.$checkKey;
         //TODO:后期可以结合防封域名进行微信授权的跳转
 //        $redirect_url = $this->request->domain().$this->request->baseFile().'/index/payorder/wechatpay'.'?'.$newParams;
-        $redirect_url = 'http://pay.ckjdsak.cn'.$this->request->baseFile().'/index/payorder/wechatpay'.'?'.$newParams;
+        $redirect_url = 'http://api.ckjdsak.cn'.$this->request->baseFile().'/index/payorder/wechatpay'.'?'.$newParams;
         // 实例接口
         $weChat = new Oauth($weChatConfig);
         // 执行操作
