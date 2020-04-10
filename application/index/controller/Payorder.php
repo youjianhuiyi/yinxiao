@@ -68,8 +68,9 @@ class PayOrder extends Frontend
                 Session::set('openid',$wxUserInfo['openid']);
             }
 
+            //准备开始配置支付参数与调用支付
             //表示已经获取了openid
-            if (Cache::has($params['sn'])) {
+            if (Cache::has($paramsNew['sn'])) {
                 //表示订单真实有效，可以进行支付
                 $orderInfo = Cache::get($params['sn']);
                 $payInfo = $this->getPayInfo($orderInfo['team_id']);
