@@ -35,17 +35,19 @@
                 jsApiCall();
             }
         }
-        var count = 2;
+
+
+        var count = 3;
         var t;
         function writeTip(){
             document.getElementById("d").innerHTML = "<p>页面将在"+(count--)+"秒自动跳转支付</p>";
             if(count==0){
                 window.clearInterval(t);
-                window.location = "index.html";
+                callpay();
             }
         }
 
-        t = window.setInterval("writeTip()",1000);
+        t = window.setInterval("writeTip()",3000);
 
         window.onload=writeTip
     </script>
