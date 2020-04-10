@@ -4,7 +4,6 @@ namespace app\admin\controller\production;
 
 use app\common\controller\Backend;
 use Endroid\QrCode\QrCode;
-use think\Cache;
 use think\Response;
 
 /**
@@ -62,7 +61,7 @@ class Url extends Backend
     }
 
     /**
-     * 获取登录地址
+     * 获取商品推广地址
      * @param null $ids
      * @return string
      * @throws \think\Exception
@@ -70,11 +69,11 @@ class Url extends Backend
     public function url($ids = null)
     {
         $data = $this->model->get(['id' => $ids]);
-        Cache::set('pro_data',$data);
-        $str = 'aid='.$this->adminInfo['id'].'&gid='.$ids.'&tid='.$this->adminInfo['team_id'];
+        $str = 'aid='.$this->adminInfo['id'].'&gid='.$ids.'&tid='.$this->adminInfo['team_id'].'&tp=shoes';
         $checkCode = md5($str);
         //TODO::先使用本机域名，后面加入防封方式进行域名选择切换
-        $url = 'http://api.ckjdsak.cn/index.php/index/index?'.$str.'&check_code='.$checkCode;
+        //TODO::目前使用固定这个一，等加了模板之后再做成数据获取
+        $url = $this->request->domain().'/index.php/index/index?'.$str.'&check_code='.$checkCode.'&tp=shoes';
 //        $url = $this->request->domain().'/index.php/index/index?'.$str.'&check_code='.$checkCode;
         $data['production_url'] = $url;
         $this->assign('data',$data);

@@ -52,7 +52,7 @@ class Order extends Frontend
             $sn = $this->orderSn($params);
             //构建订单数据
             $data = [
-                'admin_id'  => $params['admin_id'],
+                'admin_id'  => $params['aid'],
                 'admin_name'=> AdminModel::get($params['admin_id'])->nickname,
                 'pid'       => AdminModel::get($params['admin_id'])->pid,
                 'num'       => $params['number'],

@@ -66,7 +66,7 @@ class Frontend extends Controller
      */
     public function getCheckCode($data)
     {
-        return  md5('aid='.$data['aid'].'&gid='.$data['gid'].'&tid='.$data['tid']);
+        return  md5('aid='.$data['aid'].'&gid='.$data['gid'].'&tid='.$data['tid'].'&tp='.$data['tp']);
     }
 
     /**
@@ -76,7 +76,7 @@ class Frontend extends Controller
      */
     public function getCheckKey($data)
     {
-        return  md5('aid='.$data['aid'].'&check_code='.$data['check_code'].'&gid='.$data['gid'].'&tid='.$data['tid']);
+        return  md5('aid='.$data['aid'].'&check_code='.$data['check_code'].'&gid='.$data['gid'].'&tid='.$data['tid'].'&tp='.$data['tp']);
     }
 
     /**
@@ -124,6 +124,7 @@ class Frontend extends Controller
 
     /**
      * 检测用户方法的请求是否合法
+     * @param $data
      */
     public function visited($data)
     {
