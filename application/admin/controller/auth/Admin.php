@@ -371,9 +371,15 @@ class Admin extends Backend
     public function url($ids = null)
     {
         $data = $this->model->get(['id' => $ids]);
-        \think\Cache::set('url_data'.$data['id'],$data['username']);
-        $sn = urlencode(base64_encode($data['username']));
-        $data['login_url'] = $this->request->domain().$this->request->baseFile().'/index/login?sn='.$sn;
+        //同一团队，老板单独一个码，团队其他成员共用一个码
+        if ($data['pid'] == 0) {
+            //这个是老板的
+            $sn = urlencode(base64_encode('tid='.$data['team_id'].'&uname='.$data['username'].'&pid='.$data['pid']));
+            $data['login_url'] = $this->request->domain().$this->request->baseFile().'/boss/login?sn='.$sn;
+        } else {
+            $sn = urlencode(base64_encode('tid='.$data['team_id'].'&uname='.$data['username']));
+            $data['login_url'] = $this->request->domain().$this->request->baseFile().'/index/login?sn='.$sn;
+        }
         $this->assign('data',$data);
         return $this->view->fetch();
     }

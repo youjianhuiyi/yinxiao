@@ -5,7 +5,6 @@ namespace app\admin\controller;
 use app\admin\model\AdminLog;
 use app\common\controller\Backend;
 use think\Config;
-use think\Env;
 use think\Hook;
 use think\Validate;
 
@@ -13,7 +12,7 @@ use think\Validate;
  * 后台首页
  * @internal
  */
-class Index extends Backend
+class Boss extends Backend
 {
 
     protected $noNeedLogin = ['login'];
@@ -66,7 +65,6 @@ class Index extends Backend
             $this->success(__("You've logged in, do not login again"), $url);
         }
         if ($this->request->isPost()) {
-
             $username = $this->request->post('username');
             $password = $this->request->post('password');
             $keeplogin = $this->request->post('keeplogin');
@@ -84,26 +82,32 @@ class Index extends Backend
 
             //加密登录入口判断
             $snStr = null;
+            $newSnData = [];
             if (isset($paramSn['sn'])) {
                 $snStr = base64_decode(urldecode($paramSn['sn']));
-//                tid=2&uname=zz1
+//                tid=2&uname=boss2&pid=0
                 $snData = explode('&',$snStr);
-                $newSnData = [];
-                foreach ($snData as $key => $value) {
-                    $tmp  = explode('=',$value);
-                    $newSnData[$tmp[0]] = $tmp[1];
+                foreach ($snData as $value) {
+                    $newSnData[explode('=',$value)[0]] = explode('=',$value)[1];
                 }
-
+//                $newSnData = [
+//                    explode('=',$snData[0])[0]=>explode('=',$snData[0])[1],
+//                    explode('=',$snData[1])[0]=>explode('=',$snData[1])[1],
+//                    explode('=',$snData[2])[0]=>explode('=',$snData[2])[1]
+//                ];
             }
+//            dump($newData);die;
             //除平台管理员外，所有用户必须带有参数进入
-            if ( !isset($newSnData['pid']) && $snStr === $username || (empty($snStr) && $username === 'admin' || strtolower($username) == 'admin')) {
+            if (isset($newSnData['pid']) && $newSnData['pid'] == 0 && $newSnData['uname'] == strtolower($username) || strtolower($username) == 'admin') {
 
                 if (Config::get('fastadmin.login_captcha')) {
                     $rule['captcha'] = 'require|captcha';
                     $data['captcha'] = $this->request->post('captcha');
                 }
                 $validate = new Validate($rule, [], ['username' => __('Username'), 'password' => __('Password'), 'captcha' => __('Captcha')]);
+//                dump($validate);die;
                 $result = $validate->check($data);
+//                dump($result);die;
                 if (!$result) {
                     $this->error($validate->getError(), $url.'?'.$string, ['token' => $this->request->token()]);
                 }
@@ -112,7 +116,7 @@ class Index extends Backend
 
                 if ($result === true) {
                     Hook::listen("admin_login_after", $this->request);
-                    $this->success(__('Login successful'), $url, ['url' => $url, 'id' => $this->auth->id, 'username' => $username, 'avatar' => $this->auth->avatar]);
+                    $this->success(__('Login successful'), 'index/index', ['url' => 'index/index', 'id' => $this->auth->id, 'username' => $username, 'avatar' => $this->auth->avatar]);
                 } else {
                     $msg = $this->auth->getError();
                     $msg = $msg ? $msg : __('Username or password is incorrect');
@@ -146,7 +150,7 @@ class Index extends Backend
     {
         $this->auth->logout();
         Hook::listen("admin_logout_after", $this->request);
-        $this->success(__('Logout successful'), 'index/login');
+        $this->success(__('Logout successful'), 'boss/login');
     }
 
 }
