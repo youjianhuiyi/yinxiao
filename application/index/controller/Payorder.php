@@ -98,7 +98,7 @@ class PayOrder extends Frontend
                 ];
                 Cache::set($wxUserInfo['openid'],$returnData);
                 //跳转到微信支付
-                header('Location:'.'http://pay.ckjdsak.cn/index.php/payorder/readypay?openid='.$wxUserInfo['openid']);
+                header('Location:'.'http://pay.ckjdsak.cn/index.php/index/payorder/readypay?openid='.$wxUserInfo['openid']);
                 // 订单数据处理
 //                $this->assign('jsApiPrepay', json_encode($result));
 //                $this->assign('orderInfo', $orderInfo);
