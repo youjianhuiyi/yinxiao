@@ -6,7 +6,7 @@ use think\Cache;
 use think\Env;
 use think\Session;
 use WeChat\Oauth;
-use WeChat\Pay;
+use app\admin\model\order\Order as OrderModel;
 
 /**
  * 支付类
@@ -15,9 +15,12 @@ use WeChat\Pay;
  */
 class PayOrder extends Frontend
 {
+    protected $orderModel = null;
+
     public function _initialize()
     {
         parent::_initialize();
+        $this->orderModel = new OrderModel();
     }
 
     /**
@@ -63,7 +66,8 @@ class PayOrder extends Frontend
                 Cache::set($paramsNew['code'],$wxUserInfo,Env::get('redis.expire'));
                 Session::set('openid',$wxUserInfo['openid']);
             }
-
+            //更新订单Openid
+//            $this->orderModel->where(['id'=>$params['oid']])->isUpdata(true)->save(['openid'=>$wxUserInfo['openid'],'id'=>$params['oid']]);
             //表示已经获取了openid
             //判断链接是否有效
             //TODO::判断逻辑暂时不体现，后期可以使用全局方法进行调用检测
@@ -72,7 +76,7 @@ class PayOrder extends Frontend
                 'pay_domain'=> 'http://pay.ckjdsak.cn/',/*支付域名*/
             ];
             $this->assign('data',$data);
-            return $this->view->fetch();
+            return $this->view->fetch('wechatpay');
 
         } else {
             $this->intoBefore($params);
