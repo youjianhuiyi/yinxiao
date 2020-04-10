@@ -160,6 +160,7 @@ class Frontend extends Controller
         //第一步，进来先做数据校验
 //        $params = $this->request->param();
         $paramString = $this->request->query();
+        Cache::set('into_data',$data);
         if (!$this->verifyCheckCode($data)) {
             //表示链接被篡改
             die('链接已经被修改，无法访问');
