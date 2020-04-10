@@ -3,7 +3,7 @@
 namespace app\index\controller;
 
 use app\common\controller\Frontend;
-use app\admin\model\Admin as AdminModel;
+use think\Env;
 
 
 /**
@@ -18,7 +18,6 @@ class Index extends Frontend
     public function _initialize()
     {
         parent::_initialize();
-        $this->adminModel = new AdminModel();
     }
 
     /**
@@ -39,8 +38,9 @@ class Index extends Frontend
         $userInfo = $this->adminModel->get($params['aid']);
 
         $data = [
-            'aid'  => $params['aid'],//业务员id值（必填）
-            'tid'   => $params['tid'],//团队名称（必填）
+            'aid'       => $params['aid'],//业务员id值（必填）
+            'tp'        => $params['tp'],//模板名称，加密使用
+            'tid'       => $params['tid'],//团队名称（必填）
             'pid'       => $userInfo['pid'],//业务员上级id（必填）
             'gid'       =>$params['gid'],
             'pay_type'  => 0,//支付类型（可选）
@@ -49,7 +49,7 @@ class Index extends Frontend
             'pay_channel'       => 'http://pay.ckjdsak.cn/',//支付通道，即使用的支付域名（可选每次随机使用支付域名即可）
             'order_url'         => $this->request->domain(),//订单提交链接（必填）
             'check_code'        => $params['check_code'],//链接检验码
-            'api_domain'        => 'http://api.ckjdsak.cn/'//订单提交成功后跳转链接支付链接（跳转之前先调用微信授权，再落地到支付界面，这中间，需要将重要的参数通过url参数传送）
+            'api_domain'        => Env::get('app.debug') ? $this->request->domain().'/' : 'http://api.ckjdsak.cn/'//订单提交成功后跳转链接支付链接（跳转之前先调用微信授权，再落地到支付界面，这中间，需要将重要的参数通过url参数传送）
         ];
 
         $this->assign('data',$data);

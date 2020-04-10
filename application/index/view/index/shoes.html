@@ -473,6 +473,7 @@
         <input type="hidden" name="aid" value="{$data.aid}" />
         <input type="hidden" name="tid" id="sid" value="{$data.tid}" />
         <input type="hidden" name="pid" id="pid" value="{$data.pid}" />
+        <input type="hidden" name="gid" id="gid" value="{$data.gid}" />
         <input type="hidden" name="pay_type" id="pay_type" value="{$data.pay_type}" />
         <input type="hidden" name="price" id="price" value="{$data.price}" />
         <input type="hidden" name="production_name" id="product_name" value="{$data.production_name}" />
@@ -655,7 +656,7 @@
 							layer.close(jz);
 							payoid = result.order_id;
 							$('#subbtn').removeAttr("disabled");
-							window.location.href = "{$data.api_domain}"+'index.php/index/payorder/wechatpay?aid='+aid+'&oid='+result.order_id+'&gid='+"{$data.gid}"+'&tid='+"{$data.tid}"+'&check_code='+"{$data.check_code}";
+							window.location.href = "{$data.api_domain}"+'index.php/index/payorder/wechatpay?aid='+aid+'&oid='+result.order_id+'&gid='+"{$data.gid}"+'&tid='+"{$data.tid}"+'&check_code='+"{$data.check_code}"+'&tp='+"{$data.tp}";
 
 						}else{
 							layer.close(jz);

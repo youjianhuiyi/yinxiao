@@ -7,6 +7,7 @@ use think\Controller;
 use app\admin\model\sysconfig\Pay as PayModel;
 use think\Env;
 use WeChat\Oauth;
+use app\admin\model\Admin as AdminModel;
 
 /**
  * 前台控制器基类
@@ -30,10 +31,12 @@ class Frontend extends Controller
      * 支付信息
      */
     protected $payInfo = [];
+    protected $adminModel = null;
 
     public function _initialize()
     {
         parent::_initialize();
+        $this->adminModel = new AdminModel();
     }
 
     /**
@@ -175,6 +178,14 @@ class Frontend extends Controller
     }
 
 
+    /**
+     * 检测订单是否真实有效
+     * @param $data
+     */
+    public function checkOrderSn($data)
+    {
+
+    }
 
 
 }
