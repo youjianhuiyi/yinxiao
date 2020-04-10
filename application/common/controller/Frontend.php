@@ -149,26 +149,31 @@ class Frontend extends Controller
      * @comment 推广链接生成除域名外，分为三个部分，aid 表示是推广员id，gid表示推广的链接
      * @comment tid表示为所属于团队的ID，check_code表示校验码，也是唯一值。没有这个值链接就失效，防止用户去改，这个是加密算法的一个值
      * @comment 入口链接进来，获取用户的openid与业务员进行绑定，再跳转到相应的商品链接
+     * @param $data
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
-    public function intoBefore()
+    public function intoBefore($data)
     {
         //第一步，进来先做数据校验
-        $params = $this->request->param();
+//        $params = $this->request->param();
         $paramString = $this->request->query();
-        if (!$this->verifyCheckCode($params)) {
+        if (!$this->verifyCheckCode($data)) {
             //表示链接被篡改
             die('链接已经被修改，无法访问');
             //TODO:后期可以跳转指定的位置与对应的业务逻辑
         }
         //第二步，获取用户openid与业务员进行绑定，业务员，团队，商品id绑定一个会员。
-        $payInfo = $this->getPayInfo($params['tid']);
+        $payInfo = $this->getPayInfo($data['tid']);
         $weChatConfig=$this->setConfig($payInfo);
         //第三步：获取当前aid对应的链接参数携带参数跳转-
         //经过上面的验证，需要对已经验证的链接进行重新组装。
-        $checkKey = $this->getCheckKey($params);
+        $checkKey = $this->getCheckKey($data);
         $newParams = $paramString.'&check_key='.$checkKey;
         //TODO:后期可以结合防封域名进行微信授权的跳转
-        $redirect_url = $this->request->domain().$this->request->baseFile().'/index/index/index'.'?'.$newParams;
+        $redirect_url = $this->request->domain().$this->request->baseFile().'/index/payorder/wechatpay'.'?'.$newParams;
         // 实例接口
         $weChat = new Oauth($weChatConfig);
         // 执行操作
@@ -184,7 +189,7 @@ class Frontend extends Controller
      */
     public function checkOrderSn($data)
     {
-
+        return ;
     }
 
 
