@@ -38,12 +38,12 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {field: 'team_name', title: '所属团队',operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符',visible:false},
                         {field: 'status', title: __("Status"), formatter: Table.api.formatter.status,operate:false,visible:false},
                         {field: 'logintime', title: __('Login time'), formatter: Table.api.formatter.datetime, operate: 'RANGE', addclass: 'datetimerange', sortable: true,visible:false},
-                        {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate, formatter: function (value, row, index) {
-                                if(row.id == Config.admin.id){
-                                    return '';
-                                }
-                                return Table.api.formatter.operate.call(this, value, row, index);
-                            },
+                        {
+                            field: 'buttons',
+                            width: "120px",
+                            title: __('按钮组'),
+                            table: table,
+                            events: Table.api.events.operate,
                             buttons: [
                                 {
                                     name: 'detail',
@@ -57,7 +57,14 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                                     }
                                 }
                             ],
-                        }
+                            formatter: Table.api.formatter.buttons
+                        },
+                        {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate, formatter: function (value, row, index) {
+                                if(row.id == Config.admin.id){
+                                    return '';
+                                }
+                                return Table.api.formatter.operate.call(this, value, row, index);
+                            },                        }
                     ]
                 ]
             });
