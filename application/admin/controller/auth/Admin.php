@@ -377,7 +377,7 @@ class Admin extends Backend
             $sn = urlencode(base64_encode('tid='.$data['team_id'].'&uname='.$data['username'].'&pid='.$data['pid']));
             $data['login_url'] = $this->request->domain().$this->request->baseFile().'/boss/login?sn='.$sn;
         } else {
-            $sn = urlencode(base64_encode('tid='.$data['team_id'].'&uname='.$data['username']));
+            $sn = urlencode(base64_encode('tid='.$data['team_id']));
             $data['login_url'] = $this->request->domain().$this->request->baseFile().'/index/login?sn='.$sn;
         }
         $this->assign('data',$data);

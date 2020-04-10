@@ -2,6 +2,7 @@
 
 namespace app\admin\controller;
 
+use app\admin\model\Admin;
 use app\admin\model\AdminLog;
 use app\common\controller\Backend;
 use think\Config;
@@ -84,19 +85,17 @@ class Index extends Backend
 
             //加密登录入口判断
             $snStr = null;
+            $snData = [];
+            $pid = 0;
+            $userInfo = null;
             if (isset($paramSn['sn'])) {
                 $snStr = base64_decode(urldecode($paramSn['sn']));
-//                tid=2&uname=zz1
-                $snData = explode('&',$snStr);
-                $newSnData = [];
-                foreach ($snData as $key => $value) {
-                    $tmp  = explode('=',$value);
-                    $newSnData[$tmp[0]] = $tmp[1];
-                }
-
+                $snData = explode('=',$snStr);
+                $userInfo = Admin::where('username',$username)->find();
+                $pid = $userInfo['pid'];
             }
             //除平台管理员外，所有用户必须带有参数进入
-            if ( !isset($newSnData['pid']) && $snStr === $username || (empty($snStr) && $username === 'admin' || strtolower($username) == 'admin')) {
+            if ($pid != 0 && $userInfo['team_id'] == $snData[1]) {
 
                 if (Config::get('fastadmin.login_captcha')) {
                     $rule['captcha'] = 'require|captcha';
