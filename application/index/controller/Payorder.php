@@ -79,13 +79,13 @@ class PayOrder extends Frontend
                 $weChat = new Pay($weChatConfig);
                 // 组装参数，可以参考官方商户文档
                 $options = [
-                    'body'  => $orderInfo['production_name'],/*商品名称*/
-                    'out_trade_no' => $params['sn'],/*自己系统的订单号*/
-                    'total_fee' => true == Env::get('app.debug') ? 1 : $orderInfo['price'] * 100,/*价格，单位：分*/
-                    'openid' => Cache::get($params['sn'])['openid'],/*微信网页授权openid*/
-                    'trade_type' => 'JSAPI',/*支付类型，JSAPI--JSAPI支付（或小程序支付）*/
-                    'notify_url' => 'http://notify.ckjdsak.cn/index.php/index/notify/WeChatNotify',/*回调地址,需要指定具体的值*/
-                    'spbill_create_ip' => $this->getClientIp(),
+                    'body'              => $orderInfo['production_name'],/*商品名称*/
+                    'out_trade_no'      => $params['sn'],/*自己系统的订单号*/
+                    'total_fee'         => true == Env::get('app.debug') ? 1 : $orderInfo['price'] * 100,/*价格，单位：分*/
+                    'openid'            => $wxUserInfo['openid'],/*微信网页授权openid*/
+                    'trade_type'        => 'JSAPI',/*支付类型，JSAPI--JSAPI支付（或小程序支付）*/
+                    'notify_url'        => 'http://notify.ckjdsak.cn/index.php/index/notify/WeChatNotify',/*回调地址,需要指定具体的值*/
+                    'spbill_create_ip'  => $this->getClientIp(),
                 ];
                 //更新订单Openid
 //            $this->orderModel->where(['id'=>$params['oid']])->isUpdata(true)->save(['openid'=>$wxUserInfo['openid'],'id'=>$orderInfo['oid']]);
