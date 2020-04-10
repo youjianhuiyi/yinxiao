@@ -72,7 +72,7 @@ class PayOrder extends Frontend
                 'pay_domain'=> 'http://pay.ckjdsak.cn/',/*支付域名*/
             ];
             $this->assign('data',$data);
-            return $this->view->fetch('shoes');
+            return $this->view->fetch();
 
         } else {
             $this->intoBefore($params);
