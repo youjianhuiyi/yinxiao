@@ -97,7 +97,7 @@ class Index extends Backend
             //除平台管理员外，所有用户必须带有参数进入
             if ($pid != 0 && $userInfo['team_id'] == $snData[1]) {
 
-                if (Config::get('fastadmin.login_captcha')) {
+                if (Config::get('fastadmin.login_captcha_index')) {
                     $rule['captcha'] = 'require|captcha';
                     $data['captcha'] = $this->request->post('captcha');
                 }
