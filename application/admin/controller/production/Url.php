@@ -5,6 +5,8 @@ namespace app\admin\controller\production;
 use app\common\controller\Backend;
 use Endroid\QrCode\QrCode;
 use think\Response;
+use app\admin\model\sysconfig\Consumables as ConsumablesModel;
+use app\admin\model\sysconfig\Ground as GroundModel;
 
 /**
  * 商品链接
@@ -18,11 +20,15 @@ class Url extends Backend
      * Url模型对象
      */
     protected $model = null;
+    protected $groundModel = null;
+    protected $consumablesModel = null;
 
     public function _initialize()
     {
         parent::_initialize();
         $this->model = new \app\admin\model\production\Production_select;
+        $this->groundModel = new GroundModel();
+        $this->consumablesModel = new ConsumablesModel();
 
     }
 
@@ -69,6 +75,7 @@ class Url extends Backend
     public function url($ids = null)
     {
         $data = $this->model->get(['id' => $ids]);
+
         $str = 'aid='.$this->adminInfo['id'].'&gid='.$ids.'&tid='.$this->adminInfo['team_id'].'&tp=shoes';
         $checkCode = md5($str);
         //TODO::先使用本机域名，后面加入防封方式进行域名选择切换
