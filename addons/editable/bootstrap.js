@@ -1,5 +1,4 @@
-define([], function () {
-    require.config({
+require.config({
     paths: {
         'editable': '../libs/bootstrap-table/dist/extensions/editable/bootstrap-table-editable.min',
         'x-editable': '../addons/editable/js/bootstrap-editable.min',
@@ -25,4 +24,3 @@ if ($("table.table").size() > 0) {
         };
     });
 }
-});
