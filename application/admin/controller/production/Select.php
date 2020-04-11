@@ -118,12 +118,20 @@ class Select extends Backend
             $params['team_id'] = $this->adminInfo['team_id'];
             $params['team_name'] = $params['team_id'] == 0 ? '平台测试':$this->adminInfo['team_name'];
             $params['production_name'] = $this->productionModel->get($params['production_id'])->name;
-//            dump($params);die;
             if ($params) {
                 $params = $this->preExcludeFields($params);
                 $params['sales_price'] = $params['sales_price'] == 0 ? $this->productionModel->get($params['production_id'])->sales_price : $params['sales_price'];
                 $params['discount'] = $params['discount'] == 0 ? $this->productionModel->get($params['production_id'])->discount : $params['discount'];
                 $params['true_price'] = $params['true_price'] == 0 ? $this->productionModel->get($params['production_id'])->true_price : $params['true_price'];
+                //判断填写的数据
+                if ($params['sales_price'] > $params['discount']) {
+                    if ($params['sales_price']-$params['discount'] != $params['true_price']) {
+                        $params['true_price'] = $params['sales_price']-$params['discount'];
+                    }
+                } else {
+                    $this->error('价格体系填写不正确！');
+                }
+
 
                 if ($this->dataLimit && $this->dataLimitFieldAutoFill) {
                     $params[$this->dataLimitField] = $this->auth->id;
@@ -167,6 +175,10 @@ class Select extends Backend
 
     /**
      * 编辑
+     * @param null $ids
+     * @return string
+     * @throws \think\Exception
+     * @throws \think\exception\DbException
      */
     public function edit($ids = null)
     {
@@ -189,7 +201,14 @@ class Select extends Backend
                 $params['sales_price'] = $params['sales_price'] == 0 ? $this->productionModel->get($params['production_id'])->sales_price : $params['sales_price'];
                 $params['discount'] = $params['discount'] == 0 ? $this->productionModel->get($params['production_id'])->discount : $params['discount'];
                 $params['true_price'] = $params['true_price'] == 0 ? $this->productionModel->get($params['production_id'])->true_price : $params['true_price'];
-
+                //判断填写的数据
+                if ($params['sales_price'] > $params['discount']) {
+                    if ($params['sales_price']-$params['discount'] != $params['true_price']) {
+                        $params['true_price'] = $params['sales_price']-$params['discount'];
+                    }
+                } else {
+                    $this->error('价格体系填写不正确！');
+                }
                 $params = $this->preExcludeFields($params);
                 $result =  $result1 = false;
                 Db::startTrans();
