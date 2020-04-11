@@ -36,7 +36,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {field: 'modulefile', title: __('Modulefile'),formatter: Table.api.formatter.url,operate:false},
                         {field: 'special_code', title: __('Special_code'),operate:false,visible:false},
                         {field: 'tongji', title: __('Tongji'),operate:false,visible:false},
-                        {field: 'status', title: __('Status'),operate:false,visible:false,formatter:function (value,row,index) {
+                        {field: 'status', title: __('Status'),operate:false,formatter:function (value,row,index) {
                                 if (value === 0 ) {return '正常';}
                                 if (value === 1 ) {return '停用';}
                             }},

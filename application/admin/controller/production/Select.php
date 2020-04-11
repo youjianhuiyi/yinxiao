@@ -25,12 +25,14 @@ class Select extends Backend
     protected $goodsData = [];//商品数据
     protected $selectData = [];//商品数据
     protected $teamModel = null;
+    protected $productionModel = null;
     public function _initialize()
     {
         parent::_initialize();
         $this->model = new \app\admin\model\production\Select;
         $this->teamModel = new TeamModel();
-        $this->goodsData = ProductionModel::where('status',0)->select();
+        $this->productionModel = new ProductionModel();
+        $this->goodsData = $this->productionModel->where('status',0)->select();
         $this->selectData = [0=>'请选择商品模板'];
         foreach ($this->goodsData as $v) {
             $this->selectData[$v['id']] = '编号--'.$v['id'].'；-产品名：'.$v['name'].'；-原销售价：'.$v['sales_price'].'；-原产品优惠价：'.$v['discount'];
@@ -115,9 +117,13 @@ class Select extends Backend
             $params = $this->request->post("row/a");
             $params['team_id'] = $this->adminInfo['team_id'];
             $params['team_name'] = $params['team_id'] == 0 ? '平台测试':$this->adminInfo['team_name'];
-            $params['production_name'] = ProductionModel::get($params['production_id'])->name;
+            $params['production_name'] = $this->productionModel->get($params['production_id'])->name;
+//            dump($params);die;
             if ($params) {
                 $params = $this->preExcludeFields($params);
+                $params['sales_price'] = $params['sales_price'] == 0 ? $this->productionModel->get($params['production_id'])->sales_price : $params['sales_price'];
+                $params['discount'] = $params['discount'] == 0 ? $this->productionModel->get($params['production_id'])->discount : $params['discount'];
+                $params['true_price'] = $params['true_price'] == 0 ? $this->productionModel->get($params['production_id'])->true_price : $params['true_price'];
 
                 if ($this->dataLimit && $this->dataLimitFieldAutoFill) {
                     $params[$this->dataLimitField] = $this->auth->id;
@@ -178,8 +184,12 @@ class Select extends Backend
             $params = $this->request->post("row/a");
             $params['team_id'] = $this->adminInfo['team_id'];
             $params['team_name'] = $params['team_id'] == 0 ? '平台测试':$this->adminInfo['team_name'];
-            $params['production_name'] = ProductionModel::get($params['production_id'])->name;
+            $params['production_name'] = $this->productionModel->get($params['production_id'])->name;
             if ($params) {
+                $params['sales_price'] = $params['sales_price'] == 0 ? $this->productionModel->get($params['production_id'])->sales_price : $params['sales_price'];
+                $params['discount'] = $params['discount'] == 0 ? $this->productionModel->get($params['production_id'])->discount : $params['discount'];
+                $params['true_price'] = $params['true_price'] == 0 ? $this->productionModel->get($params['production_id'])->true_price : $params['true_price'];
+
                 $params = $this->preExcludeFields($params);
                 $result =  $result1 = false;
                 Db::startTrans();

@@ -8,7 +8,7 @@
     <div class="form-group">
         <label class="control-label col-xs-12 col-sm-2">说明 :</label>
         <div class="col-xs-12 col-sm-8">
-            <input id="c-info" class="form-control" disabled="disabled" type="text" value="请根据商品模板库里面的相关信息，修改以下数据为自己独有的数值☟☟☟">
+            <input id="c-info" class="form-control" disabled="disabled" type="text" value="请根据商品模板库里面的相关信息，修改以下数据为自己独有的数值⬇️⬇️⬇️">
         </div>
     </div>
     <div class="form-group">
@@ -18,9 +18,21 @@
         </div>
     </div>
     <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">销售价说明 :</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-info1" class="form-control" disabled="disabled" type="text" value="表示需要展示在页面里面的价格，如果不写，则使用方案默认值⬆️⬆️⬆️">
+        </div>
+    </div>
+    <div class="form-group">
         <label class="control-label col-xs-12 col-sm-2">{:__('Discount')}:</label>
         <div class="col-xs-12 col-sm-8">
             <input id="c-discount" data-rule="required" class="form-control" step="0.01" name="row[discount]" type="number" value="0.00">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">折扣价说明 :</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-info2" class="form-control" disabled="disabled" type="text" value="表示优惠券价格，如果不写，则使用方案默认值⬆️⬆️⬆️">
         </div>
     </div>
     <div class="form-group">
@@ -30,27 +42,33 @@
         </div>
     </div>
     <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">真实价说明 :</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-info3" class="form-control" disabled="disabled" type="text" value="表示本产品真实卖价，如果不写，则使用方案默认值⬆️⬆️⬆️">
+        </div>
+    </div>
+    <div class="form-group">
         <label class="control-label col-xs-12 col-sm-2">{:__('Phone1')}:</label>
         <div class="col-xs-12 col-sm-8">
-            <input id="c-phone1" data-rule="required" class="form-control" name="row[phone1]" type="text" value="">
+            <input id="c-phone1" data-rule="required" class="form-control" name="row[phone1]" type="text" value="" placeholder="客服电话号码">
         </div>
     </div>
     <div class="form-group">
         <label class="control-label col-xs-12 col-sm-2">{:__('Phone2')}:</label>
         <div class="col-xs-12 col-sm-8">
-            <input id="c-phone2" data-rule="required" class="form-control" name="row[phone2]" type="text" value="">
+            <input id="c-phone2" data-rule="required" class="form-control" name="row[phone2]" type="text" value="" placeholder="客服电话号码">
         </div>
     </div>
-    <div class="form-group">
-        <label class="control-label col-xs-12 col-sm-2">{:__('Special_code')}:</label>
-        <div class="col-xs-12 col-sm-8">
-            <input id="c-special_code" data-rule="required" class="form-control" name="row[special_code]" type="text" value="">
-        </div>
-    </div>
+<!--    <div class="form-group">-->
+<!--        <label class="control-label col-xs-12 col-sm-2">{:__('Special_code')}:</label>-->
+<!--        <div class="col-xs-12 col-sm-8">-->
+<!--            <input id="c-special_code" data-rule="required" class="form-control" name="row[special_code]" type="text" value="">-->
+<!--        </div>-->
+<!--    </div>-->
     <div class="form-group">
         <label class="control-label col-xs-12 col-sm-2">{:__('Tongji')}:</label>
         <div class="col-xs-12 col-sm-8">
-            <input id="c-tongji" data-rule="required" class="form-control" name="row[tongji]" type="text" value="">
+            <input id="c-tongji" data-rule="required" class="form-control" name="row[tongji]" type="text" value=""  placeholder="输入自己的统计代码，可以更好的查看流量记录">
         </div>
     </div>
     <div class="form-group layer-footer">
