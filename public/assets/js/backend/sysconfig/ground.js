@@ -10,6 +10,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                     edit_url: 'sysconfig/ground/edit',
                     del_url: 'sysconfig/ground/del',
                     multi_url: 'sysconfig/ground/multi',
+                    import_url:'sysconfig/ground/import',
                     table: 'ground_domain',
                 }
             });
@@ -27,10 +28,14 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {checkbox: true},
                         {field: 'id', title: __('Id'),operate:false},
                         {field: 'domain_url', title: __('Domain_url')},
-                        {field: 'count', title: __('Count')},
                         {field: 'team_id', title: __('Team_id'),operate:false,visible:false},
                         {field: 'team_name', title: __('Team_name')},
                         {field: 'is_forbidden', title: __('Is_forbidden'),searchList: {"1": "已封", "0": "正常"}, formatter: function(value,row,index){
+                                if(value === 1){return '已封';}
+                                if(value === 0){return '正常';}
+                            }
+                        },
+                        {field: 'is_inuse', title: __('is_inuse'),searchList: {"1": "已使用", "0": "未使用"}, formatter: function(value,row,index){
                                 if(value === 1){return '已封';}
                                 if(value === 0){return '正常';}
                             }

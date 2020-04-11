@@ -9,6 +9,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form','editable'], function 
                     add_url: 'sysconfig/consumables/add',
                     edit_url: 'sysconfig/consumables/edit',
                     del_url: 'sysconfig/consumables/del',
+                    import_url: 'sysconfig/consumables/import',
                     multi_url: 'sysconfig/consumables/multi',
                     table: 'consumables_domain',
                 }

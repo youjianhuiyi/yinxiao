@@ -9,6 +9,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                     add_url: 'express/express/add',
                     edit_url: 'express/express/edit',
                     del_url: 'express/express/del',
+                    import_url: 'express/express/import',
                     multi_url: 'express/express/multi',
                     table: 'express',
                 }

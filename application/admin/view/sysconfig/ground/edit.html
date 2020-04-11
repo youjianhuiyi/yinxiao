@@ -13,9 +13,21 @@
 <!--        </div>-->
 <!--    </div>-->
     <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Team')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:Form::select('row[team_id]',$teamData,$row.team_id,['data-rule'=>'required'])}
+        </div>
+    </div>
+    <div class="form-group">
         <label class="control-label col-xs-12 col-sm-2">{:__('Is_forbidden')}:</label>
         <div class="col-xs-12 col-sm-8">
             {:build_radios('row[is_forbidden]', ['0'=>'正常', '1'=>'禁用'],$row.is_forbidden)}
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Is_inuse')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[is_inuse]', ['0'=>'未使用', '1'=>'已使用'],$row.is_inuse)}
         </div>
     </div>
     <div class="form-group layer-footer">
