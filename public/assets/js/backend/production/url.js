@@ -25,7 +25,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                 columns: [
                     [
                         {checkbox: true},
-                        {field: 'id', title: __('Id'),operate:false},
+                        {field: 'id', title: __('Id'),operate:false,visible:false},
                         {field: 'production_id', title: __('Production_id'),operate:false,visible:false},
                         {field: 'production_name', title: __('Production_name')},
                         {field: 'team_id', title: __('Team_id'),operate:false,visible:false},
@@ -35,7 +35,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {field: 'order_done', title: __('Order_done')},
                         {field: 'is_forbidden', title: __('Is_forbidden'),operate:false,visible:false},
                         {field: 'createtime', title: __('Createtime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
-                        {field: 'updatetime', title: __('Updatetime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
+                        {field: 'updatetime', title: __('Updatetime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime,visible:false},
                         {
                             field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate,
                             buttons: [
