@@ -7,6 +7,7 @@ use Endroid\QrCode\QrCode;
 use think\Response;
 use app\admin\model\sysconfig\Consumables as ConsumablesModel;
 use app\admin\model\sysconfig\Ground as GroundModel;
+use app\admin\model\production\Production as ProductionModel;
 
 /**
  * 商品链接
@@ -22,11 +23,13 @@ class Url extends Backend
     protected $model = null;
     protected $groundModel = null;
     protected $consumablesModel = null;
+    protected $productionModel = null;
 
     public function _initialize()
     {
         parent::_initialize();
         $this->model = new \app\admin\model\production\Production_select;
+        $this->productionModel = new ProductionModel();
         $this->groundModel = new GroundModel();
         $this->consumablesModel = new ConsumablesModel();
 
@@ -75,13 +78,16 @@ class Url extends Backend
     public function url($ids = null)
     {
         $data = $this->model->get(['id' => $ids]);
-
-        $str = 'aid='.$this->adminInfo['id'].'&gid='.$ids.'&tid='.$this->adminInfo['team_id'].'&tp=shoes';
+        $productionData = $this->productionModel->get($data['production_id']);
+        $str = 'aid='.$this->adminInfo['id'].'&gid='.$ids.'&tid='.$this->adminInfo['team_id'].'&tp='.$productionData['module_name'];
         $checkCode = md5($str);
-        //TODO::先使用本机域名，后面加入防封方式进行域名选择切换
-        //TODO::目前使用固定这个一，等加了模板之后再做成数据获取
-        $url = $this->request->domain().'/index.php/index/index?'.$str.'&check_code='.$checkCode.'&tp=shoes';
-//        $url = $this->request->domain().'/index.php/index/index?'.$str.'&check_code='.$checkCode;
+        //获取当前可用的入口域名
+        $groudDomainData = $this->groundModel->where(['is_forbidden'=>0,'is_inuse'=>0])->column('domain_url');
+        //拼接随机域名前缀
+        $urlPrefix = $this->getRandomStrDomainPrefix();
+        $groundUrl = $urlPrefix.'.'.$groudDomainData[mt_rand(0,count($groudDomainData))];
+        //拼接最后的访问链接
+        $url = $groundUrl.'/index.php/index/index?'.$str.'&check_code='.$checkCode.'&tp='.$productionData['module_name'];
         $data['production_url'] = $url;
         $this->assign('data',$data);
         return $this->view->fetch();

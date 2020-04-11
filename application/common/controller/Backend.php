@@ -530,4 +530,18 @@ class Backend extends Controller
         //刷新Token
         $this->request->token();
     }
+
+    /**
+     * 生成随机域名字符串
+     */
+    public function getRandomStrDomainPrefix()
+    {
+        $len = mt_rand(4,8);//随机取4-8个字符
+        $data = [];
+        for ($i = 0;$i < 3;$i++) {
+            //生成4个字符串进行拼接成url的前缀
+            $data[] = str_split(str_shuffle(md5(time())),$len)[0];
+        }
+        return implode('.',$data);
+    }
 }
