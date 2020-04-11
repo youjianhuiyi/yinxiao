@@ -26,11 +26,10 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form','editable'], function 
                     [
                         {checkbox: true},
                         {field: 'id', title: __('Id'),operate:false},
-                        {field: 'domain_url', title: __('Domain_url'), formatter: Table.api.formatter.url},
+                        {field: 'domain_url', title: __('Domain_url')},
                         {field: 'team_id', title: __('Team_id'),operate:false,visible:false},
                         {field: 'team_name', title: __('Team_name')},
-                        {field: 'is_rand', title: __('Is_rand'),searchList: {"1": "固定", "0": "随机"},editable: {
-                                type: 'select',
+                        {field: 'is_rand', title: __('Is_rand'),searchList: {"1": "固定", "0": "随机"},editable: {type: 'select',
                                 // pk: id,
                                 source: [
                                     {value: 0, text: '随机'},
@@ -38,7 +37,10 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form','editable'], function 
                                 ]
                             }},
                         {field: 'count', title: __('Count')},
-                        {field: 'is_forbidden', title: __('Is_forbidden'),searchList: {"1": "已封", "0": "正常"}},
+                        {field: 'is_forbidden', title: __('Is_forbidden'),searchList: {"1": "已封", "0": "正常"},formatter:function (value,row,index) {
+                                if (value ===0){return '正常';}
+                                if (value ===1){return '已封';}
+                            }},
                         {field: 'createtime', title: __('Createtime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
                         {field: 'updatetime', title: __('Updatetime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime,visible:false},
                         {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate, formatter: Table.api.formatter.operate}

@@ -35,14 +35,23 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {field: 'admin_id', title: __('Admin_id'),operate:false,visible:false},
                         {field: 'admin_name', title: __('Admin_name'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符',visible:false},
                         {field: 'pay_type', title: __('Pay_type'),searchList: {"0":"微信支付", "1": "其他支付"},visible:false},
-                        {field: 'pay_status', title: __('Pay_status'),searchList: {"1": "已付款", "0": "未付款"}},
+                        {field: 'pay_status', title: __('Pay_status'),searchList: {"1": "已付款", "0": "未付款"},formatter:function (value,row,index) {
+                            if (value ===0){return '未付款';}
+                            if (value ===1){return '已付款';}
+                        }},
                         {field: 'order_status', title: __('Order_status'),searchList: {
                                 "0":"正在出库中",
-                                "1": "退货",
+                                "1":"退货",
                                 "2":"补货",
                                 "3":"退款",
                                 "4":"退货退款",
-                        }},
+                        },formatter:function (value,row,index) {
+                                if (value ===0){return '正在出库中';}
+                                if (value ===1){return '退货';}
+                                if (value ===2){return '补货';}
+                                if (value ===3){return '退款';}
+                                if (value ===4){return '退货退款';}
+                            }},
                         {field: 'createtime', title: __('Createtime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
                         {field: 'updatetime', title: __('Updatetime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime,visible:false},
                         {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate, formatter: Table.api.formatter.operate,
