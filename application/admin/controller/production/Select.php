@@ -3,6 +3,7 @@
 namespace app\admin\controller\production;
 
 use app\common\controller\Backend;
+use think\Cache;
 use think\Db;
 use think\exception\PDOException;
 use think\exception\ValidateException;
@@ -149,6 +150,8 @@ class Select extends Backend
                     $teamData = $this->teamModel->get($params['team_id'])->team_productions;
                     $newTeamProduction = empty($teamData) ? $params['production_id'] : $teamData.','.$params['production_id'];
                     $result1 = $this->teamModel->isUpdate(true)->save($newTeamProduction,['id'=>$params['team_id']]);
+                    //将本团队的商品数据缓存起来
+                    Cache::set('tid='.$params['team_id'].'&gid='.$params['production_id'],$params,-1);
                     Db::commit();
                 } catch (ValidateException $e) {
                     Db::rollback();
@@ -225,7 +228,8 @@ class Select extends Backend
                         $newTeamProduction = empty($teamData) ? $params['production_id'] : $teamData.','.$params['production_id'];
                         $result1 = $this->teamModel->isUpdate(true)->save($newTeamProduction,['id'=>$params['team_id']]);
                     }
-
+                    //将本团队的商品数据缓存起来
+                    Cache::set('pro_module?tid='.$params['team_id'].'&gid='.$params['production_id'],$params,-1);
                     Db::commit();
                 } catch (ValidateException $e) {
                     Db::rollback();
