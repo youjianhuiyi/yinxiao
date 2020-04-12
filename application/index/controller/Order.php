@@ -45,10 +45,6 @@ class Order extends Frontend
         if ($this->request->isAjax()) {
             $params = $this->request->param();
             //TODO::测试流程先不判断订单是否有效，后面再做这块的检验
-//            if (empty($params) || empty($params['openid'])) {
-//                //表示假提交或者是伪造提交数据,必须要提交openid，不然为无效订单
-//                return ['status'=>1,'code'=>'提交错误'];
-//            }
             $sn = $this->orderSn($params);
             //构建订单数据
             $data = [
@@ -58,14 +54,12 @@ class Order extends Frontend
                 'num'       => $params['number'],
                 'name'      => $params['name'],
                 'phone'     => $params['mobile'],
-                'address'   => $params['province'].'-'.$params['city'].'-'.$params['district'].'-'.$params['detailaddress'],
+                'address'   => $params['province'].$params['city'].$params['district'].$params['detailaddress'],
                 'team_id'   => $this->adminModel->get($params['aid'])->team_id,
                 'team_name' => $this->teamModel->get($this->adminModel->get($params['aid'])->team_id)->name,
                 'production_id'     => $params['gid'],
                 'production_name'   => $params['production_name'],
-                'goods_info'=> 'pattern='.$params['pattern'].';sex='.$params['sex'].';attr='.$params['attr'],
-//                'pay_type'  => $params['pay_type'],
-//                'openid'    => $params['openid'],
+                'goods_info'=> '款式='.$params['pattern'].';性别='.$params['sex'].';属性='.$params['attr'],
                 'price'     => $params['price'],
 //                'pay_id'    => PayModel::get(AdminModel::get($params['admin_id'])->team_id)->id,
                 'sn'        => $sn
