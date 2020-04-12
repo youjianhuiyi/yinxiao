@@ -187,8 +187,8 @@ return [
         'host'           => Env::get('redis.host','127.0.0.1'), // redis主机
         'port'           => Env::get('redis.port',6379), // redis端口
         'password'       => Env::get('redis.pass',''), // 密码
-        'select'         => 1, // 操作库
-        'expire'         => Env::get('redis.expire',3600), // 有效期(秒)
+        'select'         => 0, // 操作库
+        'expire'         => Env::get('redis.expire',-1), // 有效期(秒)
     ],
     // +----------------------------------------------------------------------
     // | 会话设置
@@ -207,7 +207,7 @@ return [
         'port'           => Env::get('redis.port',6379), // redis端口
         'password'       => Env::get('redis.pass',''), // 密码
         'select'         => 1, // 操作库
-        'expire'         => Env::get('redis.expire',3600), // 有效期(秒)
+        'expire'         => Env::get('redis.expire',-1), // 有效期(秒)
     ],
     // +----------------------------------------------------------------------
     // | Cookie设置

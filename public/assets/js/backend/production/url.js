@@ -58,6 +58,14 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
 
             // 为表格绑定事件
             Table.api.bindevent(table);
+            // 启动和暂停按钮
+            $(document).on("click", ".btn-start,.btn-pause", function () {
+                //在table外不可以使用添加.btn-change的方法
+                //只能自己调用Table.api.multi实现
+                //如果操作全部则ids可以置为空
+                var ids = Table.api.selectedids(table);
+                Table.api.multi("changestatus", ids.join(","), table, this);
+            });
         },
         recyclebin: function () {
             // 初始化表格参数配置

@@ -132,7 +132,6 @@ class Select extends Backend
                     $this->error('价格体系填写不正确！');
                 }
 
-
                 if ($this->dataLimit && $this->dataLimitFieldAutoFill) {
                     $params[$this->dataLimitField] = $this->auth->id;
                 }
@@ -221,9 +220,12 @@ class Select extends Backend
                     }
                     $result = $row->allowField(true)->save($params);
                     //团队数据更新
-                    $teamData = $this->teamModel->get($params['team_id'])->team_productions;
-                    $newTeamProduction = empty($teamData) ? $params['production_id'] : $teamData.','.$params['production_id'];
-                    $result1 = $this->teamModel->isUpdate(true)->save($newTeamProduction,['id'=>$params['team_id']]);
+                    if ($params['team_id'] != 0) {
+                        $teamData = $this->teamModel->get($params['team_id'])->team_productions;
+                        $newTeamProduction = empty($teamData) ? $params['production_id'] : $teamData.','.$params['production_id'];
+                        $result1 = $this->teamModel->isUpdate(true)->save($newTeamProduction,['id'=>$params['team_id']]);
+                    }
+
                     Db::commit();
                 } catch (ValidateException $e) {
                     Db::rollback();

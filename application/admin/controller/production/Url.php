@@ -4,10 +4,17 @@ namespace app\admin\controller\production;
 
 use app\common\controller\Backend;
 use Endroid\QrCode\QrCode;
+use think\Cache;
+use think\Db;
+use think\exception\PDOException;
+use think\exception\ValidateException;
 use think\Response;
 use app\admin\model\sysconfig\Consumables as ConsumablesModel;
 use app\admin\model\sysconfig\Ground as GroundModel;
 use app\admin\model\production\Production as ProductionModel;
+use app\admin\model\production\Production_select as Production_selectModel;
+use app\admin\model\production\Url as UrlModel;
+use function fast\array_except;
 
 /**
  * 商品链接
@@ -16,11 +23,12 @@ use app\admin\model\production\Production as ProductionModel;
  */
 class Url extends Backend
 {
-    
+
     /**
      * Url模型对象
      */
     protected $model = null;
+    protected $selectModel = null;
     protected $groundModel = null;
     protected $consumablesModel = null;
     protected $productionModel = null;
@@ -28,8 +36,9 @@ class Url extends Backend
     public function _initialize()
     {
         parent::_initialize();
-        $this->model = new \app\admin\model\production\Production_select;
         $this->productionModel = new ProductionModel();
+        $this->model = new UrlModel();
+        $this->selectModel = new Production_selectModel();
         $this->groundModel = new GroundModel();
         $this->consumablesModel = new ConsumablesModel();
 
@@ -51,12 +60,14 @@ class Url extends Backend
             $total = $this->model
                 ->where($where)
                 ->where(['team_id'=>$this->adminInfo['team_id']])
+                ->where(['admin_id'=>$this->adminInfo['id']])
                 ->order($sort, $order)
                 ->count();
 
             $list = $this->model
                 ->where($where)
                 ->where(['team_id'=>$this->adminInfo['team_id']])
+                ->where(['admin_id'=>$this->adminInfo['id']])
                 ->order($sort, $order)
                 ->limit($offset, $limit)
                 ->select();
@@ -69,6 +80,84 @@ class Url extends Backend
         return $this->view->fetch();
     }
 
+
+    /**
+     * 生成产品数据
+     */
+    public function setProductionData()
+    {
+        $uid = $this->adminInfo['id'];
+        //查找出当前团队所选择的产品模板数据
+        $productionSelectData = $this->selectModel->where(['team_id'=>$this->adminInfo['team_id']])->select();
+        $params = [];
+        foreach ($productionSelectData as $value) {
+            $params[] = [
+                'production_id'     =>  $value['production_id'],
+                'production_name'   =>  $value['production_name'],
+                'team_id'           =>  $this->adminInfo['team_id'],
+                'team_name'         =>  $this->adminInfo['team_name'],
+                'admin_id'          =>  $uid,
+                'admin_name'        =>  $this->adminInfo['nickname']
+            ];
+        }
+        //对比当前用户已经生成了几个商品
+        $existsSelectProductionData = $this->model->where(['team_id'=>$this->adminInfo['team_id'],'admin_id'=>$uid])->select();
+        $newParams = [];
+        $neArr = [];
+        //判断
+        if (count($params) > count($existsSelectProductionData)) {
+            //表示商品数量大于已经选择的数量。
+            foreach ($params as $key => $value) {
+                foreach ($existsSelectProductionData as $val) {
+                    if ($value['production_id'] == $val['production_id']) {
+                        //表示已经该用户已经生成过该商品的记录，删除记录
+                        $newParams[] = $value;
+                        break;
+                    }
+                }
+            }
+            //求出未生成的链接
+            foreach ($params as $k1 => $v1) {
+                if (in_array($v1,$newParams)) {
+                    unset($params[$k1]);
+                }
+            }
+            //整理数据
+            sort($params);
+        } elseif (count($params) ==  count($existsSelectProductionData)) {
+            //表示商品数量与链接种类数量一致，不需要操作。
+            $this->error('商品数量与链接种类数量一致，不需要操作，直接获取链接即可');
+        } else {
+            //表示商品数量小于链接数量，这个是个bug。商品没有，还发什么链接
+            $this->error('商品数量小于链接数量，这个是个bug。商品没有，还发什么链接');
+        }
+
+        //更新数据表
+        if ($params) {
+            $result = false;
+            Db::startTrans();
+            try {
+                $result = $this->model->allowField(true)->saveAll($params);
+                Db::commit();
+            } catch (ValidateException $e) {
+                Db::rollback();
+                $this->error($e->getMessage());
+            } catch (PDOException $e) {
+                Db::rollback();
+                $this->error($e->getMessage());
+            } catch (\Exception $e) {
+                Db::rollback();
+                $this->error($e->getMessage());
+            }
+            if ($result !== false) {
+                $this->success();
+            } else {
+                $this->error(__('No rows were inserted'));
+            }
+        }
+        $this->error(__('Parameter %s can not be empty', ''));
+    }
+
     /**
      * 获取商品推广地址
      * @param null $ids
@@ -77,19 +166,85 @@ class Url extends Backend
      */
     public function url($ids = null)
     {
-        $data = $this->model->get(['id' => $ids]);
-        $productionData = $this->productionModel->get($data['production_id']);
+        //获取当前选择项目的数据
+        $urlData = $this->model->get($ids);
+        //获取主表商品相关数据
+        $productionData = $this->productionModel->get($urlData['production_id']);
+        //加密算法
         $str = 'aid='.$this->adminInfo['id'].'&gid='.$ids.'&tid='.$this->adminInfo['team_id'].'&tp='.$productionData['module_name'];
         $checkCode = md5($str);
         //获取当前可用的入口域名
         $groudDomainData = $this->groundModel->where(['is_forbidden'=>0,'is_inuse'=>0])->column('domain_url');
-        //拼接随机域名前缀
-        $urlPrefix = $this->getRandomStrDomainPrefix();
-        $groundUrl = $urlPrefix.'.'.$groudDomainData[mt_rand(0,count($groudDomainData))];
-        //拼接最后的访问链接
-        $url = $groundUrl.'/index.php/index/index?'.$str.'&check_code='.$checkCode.'&tp='.$productionData['module_name'];
-        $data['production_url'] = $url;
-        $this->assign('data',$data);
+
+        //判断域名是否已经被封
+        if (1 === $urlData['is_forbidden']) {
+            //表示已经被封，需要重新生成新的入口推广链接
+            //拼接随机域名前缀
+            $urlPrefix = $this->getRandomStrDomainPrefix();
+            $groundUrl = $urlPrefix.'.'.$groudDomainData[mt_rand(0,count($groudDomainData))];
+            //拼接最后的访问链接
+            $url = 'http://'.$groundUrl.'/index.php/index/index?'.$str.'&check_code='.$checkCode.'&tp='.$productionData['module_name'];
+            //缓存好当前入口链接
+            $params = [
+                'id'    => $ids,
+                'url'               =>  $url,
+                'domain_url'        =>  $groundUrl,
+            ];
+
+            //更新数据表
+            Db::startTrans();
+            try {
+                $this->model->allowField(true)->isUpdate(true)->save($params,['id'=>$ids]);
+                Cache::set('ground_url_'.$this->adminInfo['id'],$url);
+                Db::commit();
+            } catch (ValidateException $e) {
+                Db::rollback();
+                $this->error($e->getMessage());
+            } catch (PDOException $e) {
+                Db::rollback();
+                $this->error($e->getMessage());
+            } catch (\Exception $e) {
+                Db::rollback();
+                $this->error($e->getMessage());
+            }
+        } else {
+            //表示域名正常，不需要重新生成，直接返回即可
+            if (empty($urlData['url'])) {
+                //拼接随机域名前缀
+                $urlPrefix = $this->getRandomStrDomainPrefix();
+                $groundUrl = $urlPrefix.'.'.$groudDomainData[mt_rand(0,count($groudDomainData)-1)];
+                //拼接最后的访问链接
+                $url = 'http://'.$groundUrl.'/index.php/index/index?'.$str.'&check_code='.$checkCode;
+                $params = [
+                    'id'            => $ids,
+                    'url'           =>  $url,
+                    'domain_url'    =>  $groundUrl,
+                ];
+                //更新数据表
+                Db::startTrans();
+                try {
+                    $this->model->allowField(true)->isUpdate(true)->save($params,['id'=>$ids]);
+                    Cache::set('ground_url_'.$this->adminInfo['id'],$url);
+                    Db::commit();
+                } catch (ValidateException $e) {
+                    Db::rollback();
+                    $this->error($e->getMessage());
+                } catch (PDOException $e) {
+                    Db::rollback();
+                    $this->error($e->getMessage());
+                } catch (\Exception $e) {
+                    Db::rollback();
+                    $this->error($e->getMessage());
+                }
+            }
+        }
+        if (Cache::has('ground_url_'.$this->adminInfo['id'])) {
+            $urlData['production_url'] = Cache::get('ground_url_'.$this->adminInfo['id']);
+        } else {
+            $urlData['production_url'] = $this->model->get($ids)->url;
+        }
+
+        $this->assign('data',$urlData);
         return $this->view->fetch();
     }
 
@@ -180,13 +335,13 @@ class Url extends Backend
         return $this->error('不允许此操作');
     }
 
-    /**
-     * 删除
-     * @param null $ids
-     * @internal
-     */
-    public function del($ids = null)
-    {
-        return $this->error('不允许此操作');
-    }
+//    /**
+//     * 删除
+//     * @param null $ids
+//     * @internal
+//     */
+//    public function del($ids = null)
+//    {
+//        return $this->error('不允许此操作');
+//    }
 }
