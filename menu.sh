@@ -21,5 +21,3 @@ php think menu -c express/express
 php think menu -c sysconfig/pay
 php think menu -c sysconfig/consumables
 php think menu -c sysconfig/ground
-
-
