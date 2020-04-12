@@ -3,7 +3,6 @@
 namespace app\index\controller;
 
 use app\common\controller\Frontend;
-use think\Cache;
 use think\Env;
 use app\admin\model\production\Production_select as SelectModel;
 
@@ -45,13 +44,7 @@ class Index extends Frontend
         //$payConfig = $this->getPayInfo($params['tid']);
 
         //访问绑定支付商户号与支付域名随机
-        $userIp = $this->request->ip();//获取访问者的IP，与当前链接绑定一个支付号给他。
-        if (Cache::has($userIp.'pay_config')) {
-            $payData = $this->payModel->where(['team_id'=>$params['tid'],['is_forbidden'=>0]])->select();
-            $userPayData = $payData[mt_rand(0,count($payData)-1)];
-            //绑定支付配置。如果该用户再次访问，如果有缓存则直接读取。如果没有缓存或者被封，则跳转其他支付
-            Cache::set($userIp.'pay_config',$userPayData);
-        }
+        $payInfo = $this->getPayInfo($params['tid']);
         //将本团队的商品数据缓存起来
         $data = [
             'aid'       => $params['aid'],//业务员id值（必填）
@@ -62,10 +55,10 @@ class Index extends Frontend
             'pay_type'  => 0,//支付类型（可选）
             'price'     => $goodsData['true_price'],//支付价格（必填）
             'production_name'   => $goodsData['production_name'],//商品名称（必填）
-            'pay_channel'       => $userPayData['pay_domain1'],//支付通道，即使用的支付域名（可选每次随机使用支付域名即可）
+            'pay_channel'       => $payInfo['pay_domain1'],//支付通道，即使用的支付域名（可选每次随机使用支付域名即可）
             'order_url'         => $this->request->domain(),//订单提交链接（必填）
             'check_code'        => $params['check_code'],//链接检验码
-            'api_domain'        => Env::get('app.debug') ? $userPayData['grant_domain_1'] : 'http://api.ckjdsak.cn/'//订单提交成功后跳转链接支付链接（跳转之前先调用微信授权，再落地到支付界面，这中间，需要将重要的参数通过url参数传送）
+            'api_domain'        => Env::get('app.debug') ? $payInfo['grant_domain_1'] : 'http://api.ckjdsak.cn/'//订单提交成功后跳转链接支付链接（跳转之前先调用微信授权，再落地到支付界面，这中间，需要将重要的参数通过url参数传送）
         ];
 
         $this->assign('data',$data);
