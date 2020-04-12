@@ -30,8 +30,8 @@ class UrlAdd extends Migrator
     {
         $table = $this->table('production_url');
         $table
-            ->changeColumn('check_code','string',['limit'=>32,'after'=>'order_done','null'=>false,'default'=>'','comment'=>'推广码'])
-            ->changeColumn('query_string','string',['limit'=>100,'after'=>'check_code','null'=>false,'default'=>'','comment'=>'推广字串'])
+            ->addColumn('check_code','string',['limit'=>32,'after'=>'order_done','null'=>false,'default'=>'','comment'=>'推广码'])
+            ->addColumn('query_string','string',['limit'=>100,'after'=>'check_code','null'=>false,'default'=>'','comment'=>'推广字串'])
             ->update();
     }
 }
