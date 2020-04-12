@@ -79,13 +79,13 @@ class Index extends Frontend
      */
     public function loadGround()
     {
-        if ($this->request->isAjax()) {
+//        if ($this->request->isAjax()) {
             //表示403页面发来的请求
             Cache::set('403params',$this->request->param());
             return json_encode(['code'=>'successcode','data'=>'http://www.baidu.com']);
-        } else {
-            return json_encode(['code'=>'failure','data'=>'http://www.qq.com']);
-        }
+//        } else {
+//            return json_encode(['code'=>'failure','data'=>'http://www.qq.com']);
+//        }
     }
 
 }
