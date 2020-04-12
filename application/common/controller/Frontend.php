@@ -71,7 +71,10 @@ class Frontend extends Controller
      */
     public function getCheckCode($data)
     {
-        return  md5('aid='.$data['aid'].'&gid='.$data['gid'].'&tid='.$data['tid'].'&tp='.$data['tp']);
+        $str = 'aid='.$data['aid'].'&gid='.$data['gid'].'&tid='.$data['tid'].'&tp='.$data['tp'];
+        $code = md5($str);
+        Cache::set($code,$str);
+        return  $code;
     }
 
     /**
@@ -81,7 +84,10 @@ class Frontend extends Controller
      */
     public function getCheckKey($data)
     {
-        return  md5('aid='.$data['aid'].'&check_code='.$data['check_code'].'&gid='.$data['gid'].'&tid='.$data['tid'].'&tp='.$data['tp']);
+        $str = 'aid='.$data['aid'].'&check_code='.$data['check_code'].'&gid='.$data['gid'].'&tid='.$data['tid'].'&tp='.$data['tp'];
+        $code = md5($str);
+        Cache::set($code,$str);
+        return $code;
     }
 
     /**
@@ -118,11 +124,8 @@ class Frontend extends Controller
     public function getPayInfo($tid)
     {
         $userIp = $this->request->ip();
-
-        if (!Cache::has($userIp.'pay_config')) {
+        if (!Cache::has($userIp.'-pay_config')) {
             //设置缓存-本次记录好缓存，判断是否是支付配置信息记录
-//            $payInfo = $this->payModel->where(['team_id'=>$tid])->find()->toArray();
-//            Cache::set('pay_info_'.$tid,$payInfo,Env::get('redis.expire'));
             $allPayInfo = $this->payModel->where(['team_id'=>$tid,'is_forbidden'=>0])->select();
             if (count($allPayInfo) > 1) {
                 $userPayData = $allPayInfo[mt_rand(0,count($allPayInfo)-1)];
@@ -131,9 +134,9 @@ class Frontend extends Controller
                 $userPayData = $allPayInfo[0];
             }
             //绑定支付配置。如果该用户再次访问，如果有缓存则直接读取。如果没有缓存或者被封，则跳转其他支付
-            Cache::set($userIp.'pay_config',$userPayData);
+            Cache::set($userIp.'-pay_config',$userPayData);
         } else {
-            $userPayData = Cache::get($userIp.'pay_config');
+            $userPayData = Cache::get($userIp.'-pay_config');
         }
         return $userPayData;
     }
@@ -153,6 +156,7 @@ class Frontend extends Controller
         } else {
             //数据库获取
             $goodsData = $this->selectModel->where(['team_id'=>$tid,'production_id'=>$gid])->find();
+            Cache::set('pro_module?tid='.$tid.'&gid='.$gid,$goodsData);
         }
         return $goodsData;
     }
@@ -205,7 +209,7 @@ class Frontend extends Controller
         $newParams = $paramString.'&check_key='.$checkKey;
         //TODO:后期可以结合防封域名进行微信授权的跳转
 //        $redirect_url = 'http://api.ckjdsak.cn'.$this->request->baseFile().'/index/payorder/wechatgrant'.'?'.$newParams;
-        $redirect_url = $payInfo['grant_domain_'.mt_rand(0,2)].$this->request->baseFile().'/index/payorder/wechatgrant'.'?'.$newParams;
+        $redirect_url = $payInfo['grant_domain_'.mt_rand(1,3)].$this->request->baseFile().'/index/payorder/wechatgrant'.'?'.$newParams;
         // 实例接口
         $weChat = new Oauth($weChatConfig);
         // 执行操作

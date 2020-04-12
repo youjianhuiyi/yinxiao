@@ -119,7 +119,7 @@ class Pay extends Backend
                     }
                     $result = $this->model->allowField(true)->save($params);
                     //将本团队的商品数据缓存起来
-                    Cache::set('pay_config?tid='.$params['team_id'].'&gid='.$params['production_id'],$params,-1);
+                    Cache::set('pay?tid='.$params['team_id'],$params,-1);
                     Db::commit();
                 } catch (ValidateException $e) {
                     Db::rollback();
@@ -175,7 +175,7 @@ class Pay extends Backend
                     }
                     $result = $row->allowField(true)->save($params);
                     //将本团队的商品数据缓存起来
-                    Cache::set('pay_info_?tid='.$params['team_id'].'&gid='.$params['production_id'],$params,-1);
+                    Cache::set('pay?tid='.$params['team_id'],$params,-1);
                     Db::commit();
                 } catch (ValidateException $e) {
                     Db::rollback();

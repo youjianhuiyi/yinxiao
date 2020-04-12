@@ -151,7 +151,7 @@ class Select extends Backend
                     $newTeamProduction = empty($teamData) ? $params['production_id'] : $teamData.','.$params['production_id'];
                     $result1 = $this->teamModel->isUpdate(true)->save($newTeamProduction,['id'=>$params['team_id']]);
                     //将本团队的商品数据缓存起来
-                    Cache::set('tid='.$params['team_id'].'&gid='.$params['production_id'],$params,-1);
+                    Cache::set('select?tid='.$params['team_id'].'&gid='.$params['production_id'],$params,-1);
                     Db::commit();
                 } catch (ValidateException $e) {
                     Db::rollback();
@@ -229,7 +229,7 @@ class Select extends Backend
                         $result1 = $this->teamModel->isUpdate(true)->save($newTeamProduction,['id'=>$params['team_id']]);
                     }
                     //将本团队的商品数据缓存起来
-                    Cache::set('pro_module?tid='.$params['team_id'].'&gid='.$params['production_id'],$params,-1);
+                    Cache::set('select?tid='.$params['team_id'].'&gid='.$params['production_id'],$params,-1);
                     Db::commit();
                 } catch (ValidateException $e) {
                     Db::rollback();
