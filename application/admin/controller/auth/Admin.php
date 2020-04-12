@@ -178,7 +178,7 @@ class Admin extends Backend
                             'name'  => $params['nickname'].'团队',
                             'admin_id'  => 0,/*需要增加完用户后再补*/
                             'admin_username' => $params['nickname'],
-                            'phone'     =>  $params['phone'],
+//                            'phone'     =>  $params['phone'],
                             'team_productions'  => ''
                         ];
                         $hasName = $this->teamModel->where(['name'=>$params['nickname'].'团队'])->find();
