@@ -6,6 +6,9 @@ use app\common\controller\Frontend;
 use think\Cache;
 use think\Env;
 use app\admin\model\production\Production_select as SelectModel;
+use app\admin\model\production\Url as UrlModel;
+use app\admin\model\sysconfig\Consumables as ConsumablesModel;
+use app\admin\model\sysconfig\Ground as GroundModel;
 
 /**
  * 模板渲染
@@ -16,10 +19,17 @@ class Index extends Frontend
 {
 
     protected $selectModel = null;
+    protected $urlModel = null;
+    protected $groundModel = null;
+    protected $consumablesModel = null;
+
     public function _initialize()
     {
         parent::_initialize();
         $this->selectModel = new SelectModel();
+        $this->urlModel = new UrlModel();
+        $this->groundModel = new GroundModel();
+        $this->consumablesModel = new ConsumablesModel();
     }
 
     /**
@@ -79,13 +89,42 @@ class Index extends Frontend
      */
     public function loadGround()
     {
-//        if ($this->request->isAjax()) {
-            //表示403页面发来的请求
-            Cache::set('403params',$this->request->param());
-            return json_encode(['code'=>'successcode','data'=>'http://www.baidu.com']);
-//        } else {
-//            return json_encode(['code'=>'failure','data'=>'http://www.qq.com']);
-//        }
+        $remote = $this->request->host();
+        Cache::set('remote',$remote);
+        //接收403页面来的参数请求
+        $params = $this->request->param();
+        //对参数进行验证
+        if (Cache::has($params['code'])) {
+            //表示验签参数可能有效，接下来进行验证
+            $queryStr = Cache::get($params);
+            $str = md5(explode('&check_code',$queryStr)[0]);
+            if ($str === $params['code']) {
+                //表示验证成功，获取炮灰域名准备落地
+                $consumables = $this->consumablesModel->where(['is_forbidden'=>0,'is_rand'=>0])->select();
+                if (count($consumables) >= 1) {
+                    $luckDomain = array_pop($consumables);
+                } else {
+                    //表示没有炮灰域名了
+                    $luckDomain = 'www.qq.com';
+                }
+                $wholeDomain = 'http://'.time().$luckDomain.'/index.php/index/index?';
+                return json_encode(['code'=>'successcode','data'=>$wholeDomain.$queryStr]);
+            } else {
+                //表示验证失败
+                return json_encode(['code'=>'failure','data'=>'http://www.qq.com']);
+            }
+        } else {
+            //缓存数据不存在了。需要查找数据表
+            $urlData = $this->urlModel->where(['check_code'=>$params['code']])->find();
+            if ($urlData) {
+                //表示验证成功，
+                return json_encode(['code'=>'successcode','data'=>'http://www.baidu.com']);
+            } else {
+                //表示验证失败
+                return json_encode(['code'=>'failure','data'=>'http://www.qq.com']);
+            }
+        }
+
     }
 
 }

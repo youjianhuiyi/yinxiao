@@ -173,6 +173,8 @@ class Url extends Backend
         //加密算法
         $str = 'aid='.$this->adminInfo['id'].'&gid='.$ids.'&tid='.$this->adminInfo['team_id'].'&tp='.$productionData['module_name'];
         $checkCode = md5($str);
+        //接入403逻辑，用于验证入口地址的真实性。
+        Cache::set($checkCode,$str.'&check_code='.$checkCode,-1);
         //获取当前可用的入口域名
         $groudDomainData = $this->groundModel->where(['is_forbidden'=>0,'is_inuse'=>0])->column('domain_url');
 
@@ -183,12 +185,15 @@ class Url extends Backend
             $urlPrefix = $this->getRandomStrDomainPrefix();
             $groundUrl = $urlPrefix.'.'.$groudDomainData[mt_rand(0,count($groudDomainData))];
             //拼接最后的访问链接
-            $url = 'http://'.$groundUrl.'/index.php/index/index?'.$str.'&check_code='.$checkCode.'&tp='.$productionData['module_name'];
+//            $url = 'http://'.$groundUrl.'/index.php/index/index?'.$str.'&check_code='.$checkCode.'&tp='.$productionData['module_name'];
+            $url = 'http://'.$groundUrl.'/index.php/index/index/code/'.$checkCode;
             //缓存好当前入口链接
             $params = [
-                'id'    => $ids,
-                'url'               =>  $url,
-                'domain_url'        =>  $groundUrl,
+                'id'            =>  $ids,
+                'url'           =>  $url,
+                'domain_url'    =>  $groundUrl,
+                'check_code'    =>  $checkCode,
+                'query_string'  =>  $str
             ];
 
             //更新数据表
@@ -214,11 +219,14 @@ class Url extends Backend
                 $urlPrefix = $this->getRandomStrDomainPrefix();
                 $groundUrl = $urlPrefix.'.'.$groudDomainData[mt_rand(0,count($groudDomainData)-1)];
                 //拼接最后的访问链接
-                $url = 'http://'.$groundUrl.'/index.php/index/index?'.$str.'&check_code='.$checkCode;
+//                $url = 'http://'.$groundUrl.'/index.php/index/index?'.$str.'&check_code='.$checkCode;
+                $url = 'http://'.$groundUrl.'/index.php/index/index/code/'.$checkCode;
                 $params = [
-                    'id'            => $ids,
+                    'id'            =>  $ids,
                     'url'           =>  $url,
                     'domain_url'    =>  $groundUrl,
+                    'check_code'    =>  $checkCode,
+                    'query_string'  =>  $str
                 ];
                 //更新数据表
                 Db::startTrans();
@@ -238,10 +246,13 @@ class Url extends Backend
                 }
             }
         }
+        //入口地址域名缓存起来。入口域名+业务员id
         if (Cache::has('ground_url_'.$this->adminInfo['id'])) {
             $urlData['production_url'] = Cache::get('ground_url_'.$this->adminInfo['id']);
         } else {
-            $urlData['production_url'] = $this->model->get($ids)->url;
+            $groundUrl = $this->model->get($ids)->url;
+            $urlData['production_url'] = $groundUrl;
+            Cache::set('ground_url_'.$this->adminInfo['id'],$groundUrl);
         }
 
         $this->assign('data',$urlData);

