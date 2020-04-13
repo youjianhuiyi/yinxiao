@@ -9,6 +9,7 @@ use app\admin\model\production\Production_select as SelectModel;
 use app\admin\model\production\Url as UrlModel;
 use app\admin\model\sysconfig\Consumables as ConsumablesModel;
 use app\admin\model\sysconfig\Ground as GroundModel;
+use think\exception\Handle;
 
 /**
  * 模板渲染
@@ -122,22 +123,33 @@ class Index extends Frontend
                 $consumables = $this->consumablesModel->where(['is_forbidden'=>0,'is_rand'=>0])->column('domain_url');
                 if (count($consumables) >= 1) {
                     $luckDomain = array_pop($consumables);
+                    //更改域名为正在使用状态
                 } else {
                     //表示没有炮灰域名了
                     $luckDomain = 'http://www.qq.com';
                 }
                 $wholeDomain = 'http://'.time().'.'.$luckDomain.'/index.php/index/index?';
-                echo json_encode(['code'=>'successcode','data'=>$wholeDomain.$queryStr]);
+                return "handler('successcode',$wholeDomain)";
             } else {
                 //表示验证失败
-                echo json(['http://www.qq.com']);
+                return "handler('failure','http://www.baidu.com')";
             }
         } else {
             //缓存数据不存在了。需要查找数据表
             $urlData = $this->urlModel->where(['check_code'=>$params['code']])->find();
             if ($urlData) {
-                //表示验证成功，
-                return json(['http://www.baidu.com']);
+                //表示验证成功，获取炮灰域名准备落地
+                $consumables = $this->consumablesModel->where(['is_forbidden'=>0,'is_rand'=>0])->column('domain_url');
+                if (count($consumables) >= 1) {
+                    $luckDomain = array_pop($consumables);
+                    //更改域名为正在使用状态
+
+                } else {
+                    //表示没有炮灰域名了
+                    $luckDomain = 'http://www.qq.com';
+                }
+                $wholeDomain = 'http://'.time().'.'.$luckDomain.'/index.php/index/index?';
+                return "handler('successcode',$wholeDomain)";
             } else {
                 //表示验证失败
                 return json(['http://www.qq.com']);

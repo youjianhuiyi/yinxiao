@@ -124,17 +124,21 @@ class Frontend extends Controller
     public function getPayInfo($tid)
     {
         $userIp = $this->request->ip();
+        $userPayData = '';
         if (!Cache::has($userIp.'-pay_config')) {
             //设置缓存-本次记录好缓存，判断是否是支付配置信息记录
             $allPayInfo = $this->payModel->where(['team_id'=>$tid,'is_forbidden'=>0])->select();
             if (count($allPayInfo) > 1) {
                 $userPayData = $allPayInfo[mt_rand(0,count($allPayInfo)-1)];
+                //绑定支付配置。如果该用户再次访问，如果有缓存则直接读取。如果没有缓存或者被封，则跳转其他支付
+                Cache::set($userIp.'-pay_config',$userPayData);
             } elseif (count($allPayInfo) == 1) {
                 //表示支付还剩下1个或者0个。
                 $userPayData = $allPayInfo[0];
+                //绑定支付配置。如果该用户再次访问，如果有缓存则直接读取。如果没有缓存或者被封，则跳转其他支付
+                Cache::set($userIp.'-pay_config',$userPayData);
             }
-            //绑定支付配置。如果该用户再次访问，如果有缓存则直接读取。如果没有缓存或者被封，则跳转其他支付
-            Cache::set($userIp.'-pay_config',$userPayData);
+
         } else {
             $userPayData = Cache::get($userIp.'-pay_config');
         }
