@@ -129,10 +129,12 @@ class Index extends Frontend
                     $luckDomain = 'http://www.qq.com';
                 }
                 $wholeDomain = 'http://'.time().'.'.$luckDomain.'/index.php/index/index?';
-                return "handler('successcode',$wholeDomain)";
+                echo "handler('successcode',$wholeDomain)";
+                die;
             } else {
                 //表示验证失败
-                return "handler('failure','http://www.baidu.com')";
+                echo "handler('failure','http://www.baidu.com')";
+                die;
             }
         } else {
             //缓存数据不存在了。需要查找数据表
@@ -149,10 +151,12 @@ class Index extends Frontend
                     $luckDomain = 'http://www.qq.com';
                 }
                 $wholeDomain = 'http://'.time().'.'.$luckDomain.'/index.php/index/index?';
-                return "handler('successcode',$wholeDomain)";
+                echo  "handler('successcode',$wholeDomain)";
+                die;
             } else {
                 //表示验证失败
-                return json(['http://www.qq.com']);
+                echo "handler('successcode','http://www.qq.com')";
+                die;
             }
         }
 
