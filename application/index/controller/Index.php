@@ -98,8 +98,6 @@ class Index extends Frontend
         Cache::set('remote',$remote);
         //接收403页面来的参数请求
         $params = $this->request->param();
-        Cache::set('403params',$params);
-        Cache::set('403-code',$params['code']);
         //对参数进行验证
         if (Cache::has($params['code'])) {
             //表示验签参数可能有效，接下来进行验证

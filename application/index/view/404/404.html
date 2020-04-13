@@ -63,7 +63,7 @@
         var codecode = getQueryVariable2("code");
         var Time = (new Date()).getTime();
         var script = document.createElement('script');
-        script.setAttribute('src', "http://" + Time + ".dehub.com.cn/index.php/index/index/loadGround/code=" + codecode);
+        script.setAttribute('src', "http://" + Time + ".dehub.com.cn/index.php/index/index/loadGround/code/" + codecode);
         document.querySelector("head").appendChild(script);
     }());
 
