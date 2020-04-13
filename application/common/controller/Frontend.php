@@ -159,7 +159,7 @@ class Frontend extends Controller
             $goodsData = Cache::get('tid='.$tid.'&gid='.$gid);
         } else {
             //数据库获取
-            $goodsData = $this->selectModel->where(['team_id'=>$tid,'production_id'=>$gid])->find();
+            $goodsData = $this->selectModel->where(['team_id'=>$tid,'production_id'=>$gid])->find()->toArray();
             Cache::set('pro_module?tid='.$tid.'&gid='.$gid,$goodsData);
         }
         return $goodsData;
