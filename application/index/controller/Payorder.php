@@ -87,6 +87,7 @@ class PayOrder extends Frontend
                     'notify_url'        => 'http://notify.ckjdsak.cn/index.php/index/notify/WeChatNotify',/*回调地址,需要指定具体的值*/
                     'spbill_create_ip'  => $this->getClientIp(),
                 ];
+                Cache::set('payorder',$options);
                 //更新订单Openid
 //            $this->orderModel->where(['id'=>$params['oid']])->isUpdata(true)->save(['openid'=>$wxUserInfo['openid'],'id'=>$orderInfo['oid']]);
                 // 尝试创建订单

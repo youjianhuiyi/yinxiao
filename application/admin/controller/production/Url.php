@@ -171,12 +171,12 @@ class Url extends Backend
         //获取主表商品相关数据
         $productionData = $this->productionModel->get($urlData['production_id']);
         //加密算法
-        $str = 'aid='.$this->adminInfo['id'].'&gid='.$ids.'&tid='.$this->adminInfo['team_id'].'&tp='.$productionData['module_name'];
+        $str = 'aid='.$this->adminInfo['id'].'&gid='.$urlData['production_id'].'&tid='.$this->adminInfo['team_id'].'&tp='.$productionData['module_name'];
         $checkCode = md5($str);
         //接入403逻辑，用于验证入口地址的真实性。
         Cache::set($checkCode,$str.'&check_code='.$checkCode,0);
         //获取当前可用的入口域名
-        $groudDomainData = $this->groundModel->where(['is_forbidden'=>0,'is_inuse'=>0])->column('domain_url');
+        $groudDomainData = $this->groundModel->where(['is_forbidden'=>0])->column('domain_url');
 
         //判断域名是否已经被封
         if (1 === $urlData['is_forbidden']) {

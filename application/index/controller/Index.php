@@ -129,7 +129,6 @@ class Index extends Frontend
                     $luckDomain = 'http://www.qq.com';
                 }
                 $wholeDomain = 'http://'.time().'.'.$luckDomain.'/index.php/index/index?'.$queryStr;
-                Cache::set('whole_domain_1',$wholeDomain);
                 echo "handler('successcode','{$wholeDomain}')";
                 die;
             } else {
@@ -152,9 +151,7 @@ class Index extends Frontend
                     $luckDomain = 'http://www.qq.com';
                 }
                 $wholeDomain = 'http://'.time().'.'.$luckDomain.'/index.php/index/index?'.$urlData['query_string'].'&check_code='.$urlData['check_code'];
-                Cache::set('whole_domain_2',$wholeDomain);
                 echo  "handler('successcode','{$wholeDomain}')";
-
                 die;
             } else {
                 //表示验证失败
