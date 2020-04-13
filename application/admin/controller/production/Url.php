@@ -14,7 +14,6 @@ use app\admin\model\sysconfig\Ground as GroundModel;
 use app\admin\model\production\Production as ProductionModel;
 use app\admin\model\production\Production_select as Production_selectModel;
 use app\admin\model\production\Url as UrlModel;
-use function fast\array_except;
 
 /**
  * 商品链接
@@ -179,7 +178,7 @@ class Url extends Backend
         $groudDomainData = $this->groundModel->where(['is_forbidden'=>0])->column('domain_url');
 
         //判断域名是否已经被封
-        if (1 === $urlData['is_forbidden'] || $checkCode != $urlData['check_code']) {
+        if (($checkCode != $urlData['check_code'] && $str.'&check_code='.$checkCode == $urlData['query_string']) || 1 === $urlData['is_forbidden']) {
             //表示已经被封，需要重新生成新的入口推广链接
             //拼接随机域名前缀
             $urlPrefix = $this->getRandomStrDomainPrefix();
@@ -192,7 +191,7 @@ class Url extends Backend
                 'url'           =>  $url,
                 'domain_url'    =>  $groundUrl,
                 'check_code'    =>  $checkCode,
-                'query_string'  =>  $str
+                'query_string'  =>  $str.'&check_code='.$checkCode
             ];
 
             //更新数据表
@@ -224,7 +223,7 @@ class Url extends Backend
                     'url'           =>  $url,
                     'domain_url'    =>  $groundUrl,
                     'check_code'    =>  $checkCode,
-                    'query_string'  =>  $str
+                    'query_string'  =>  $str.'&check_code='.$checkCode
                 ];
                 //更新数据表
                 Db::startTrans();
