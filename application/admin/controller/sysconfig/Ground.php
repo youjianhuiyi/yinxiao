@@ -9,6 +9,7 @@ use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Reader\Csv;
 use PhpOffice\PhpSpreadsheet\Reader\Xls;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
+use think\Cache;
 use think\exception\PDOException;
 
 /**
@@ -165,6 +166,13 @@ class Ground extends Backend
                 }
             }
             $this->model->saveAll($insert);
+            //设置缓存
+            if (Cache::has('ground_domain')) {
+                Cache::set('ground_domain',$insert,0);
+            } else {
+                $newArr = array_merge(Cache::get('ground_domain'),$insert);
+                Cache::set('ground_domain',$newArr,0);
+            }
         } catch (PDOException $exception) {
             $msg = $exception->getMessage();
             if (preg_match("/.+Integrity constraint violation: 1062 Duplicate entry '(.+)' for key '(.+)'/is", $msg, $matches)) {
