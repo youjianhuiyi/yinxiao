@@ -106,7 +106,7 @@ class Index extends Frontend
         header('Access-Control-Allow-Origin:*'); // *代表允许任何网址请求
         header('Access-Control-Allow-Methods:POST,GET,OPTIONS,DELETE'); // 允许请求的类型
         header('Access-Control-Allow-Credentials: true'); // 设置是否允许发送 cookies
-        header('Access-Control-Allow-Headers: Content-Type,Content-Length,Accept-Encoding,X-Requested-with, Origin'); // 设置允许自定义请求头的字段
+        header('Access-Control-Allow-Headers: Content-Type,Content-Length,Accept-Encoding,X-Requested-with,X_Requested_With,Origin'); // 设置允许自定义请求头的字段
         $remote = $this->request->host();
         Cache::set('remote',$remote);
         //接收403页面来的参数请求
@@ -121,7 +121,6 @@ class Index extends Frontend
                 $consumables = $this->consumablesModel->where(['is_forbidden'=>0,'is_rand'=>0])->column('domain_url');
                 if (count($consumables) >= 1) {
                     $luckDomain = array_pop($consumables);
-
                 } else {
                     //表示没有炮灰域名了
                     $luckDomain = 'http://www.qq.com';
