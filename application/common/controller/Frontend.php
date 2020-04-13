@@ -114,15 +114,10 @@ class Frontend extends Controller
      * 获取团队支付信息
      * @param $tid
      * @return array|mixed
-     * @throws \think\Exception
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
      */
     public function getPayInfo($tid)
     {
         $userIp = $this->request->ip();
-        $userPayData = '';
         if (!Cache::has($userIp.'-pay_config')) {
             //设置缓存-本次记录好缓存，判断是否是支付配置信息记录
             $allPayInfo = $this->payModel->where(['team_id'=>$tid,'is_forbidden'=>0])->select();
@@ -159,7 +154,7 @@ class Frontend extends Controller
             $goodsData = Cache::get('tid='.$tid.'&gid='.$gid);
         } else {
             //数据库获取
-            $goodsData = $this->selectModel->where(['team_id'=>$tid,'production_id'=>$gid])->find();
+            $goodsData = $this->selectModel->where(['team_id'=>$tid,'production_id'=>$gid])->select()[0];
             Cache::set('pro_module?tid='.$tid.'&gid='.$gid,$goodsData);
         }
         return $goodsData;
