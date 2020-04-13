@@ -200,6 +200,7 @@ class Select extends Backend
             $params['team_name'] = $params['team_id'] == 0 ? '平台测试':$this->adminInfo['team_name'];
             $params['production_name'] = $this->productionModel->get($params['production_id'])->name;
             if ($params) {
+                //判断价格体系
                 $params['sales_price'] = $params['sales_price'] == 0 ? $this->productionModel->get($params['production_id'])->sales_price : $params['sales_price'];
                 $params['discount'] = $params['discount'] == 0 ? $this->productionModel->get($params['production_id'])->discount : $params['discount'];
                 $params['true_price'] = $params['true_price'] == 0 ? $this->productionModel->get($params['production_id'])->true_price : $params['true_price'];

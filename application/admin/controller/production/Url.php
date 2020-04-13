@@ -179,13 +179,12 @@ class Url extends Backend
         $groudDomainData = $this->groundModel->where(['is_forbidden'=>0])->column('domain_url');
 
         //判断域名是否已经被封
-        if (1 === $urlData['is_forbidden']) {
+        if (1 === $urlData['is_forbidden'] || $checkCode != $urlData['check_code']) {
             //表示已经被封，需要重新生成新的入口推广链接
             //拼接随机域名前缀
             $urlPrefix = $this->getRandomStrDomainPrefix();
             $groundUrl = $urlPrefix.'.'.$groudDomainData[mt_rand(0,count($groudDomainData)-1)];
             //拼接最后的访问链接
-//            $url = 'http://'.$groundUrl.'/index.php/index/index?'.$str.'&check_code='.$checkCode.'&tp='.$productionData['module_name'];
             $url = 'http://'.$groundUrl.'/index.php/index/index/code/'.$checkCode;
             //缓存好当前入口链接
             $params = [
@@ -219,7 +218,6 @@ class Url extends Backend
                 $urlPrefix = $this->getRandomStrDomainPrefix();
                 $groundUrl = $urlPrefix.'.'.$groudDomainData[mt_rand(0,count($groudDomainData)-1)];
                 //拼接最后的访问链接
-//                $url = 'http://'.$groundUrl.'/index.php/index/index?'.$str.'&check_code='.$checkCode;
                 $url = 'http://'.$groundUrl.'/index.php/index/index/code/'.$checkCode;
                 $params = [
                     'id'            =>  $ids,
