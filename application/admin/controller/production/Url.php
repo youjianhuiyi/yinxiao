@@ -174,7 +174,7 @@ class Url extends Backend
         $str = 'aid='.$this->adminInfo['id'].'&gid='.$ids.'&tid='.$this->adminInfo['team_id'].'&tp='.$productionData['module_name'];
         $checkCode = md5($str);
         //接入403逻辑，用于验证入口地址的真实性。
-        Cache::set($checkCode,$str.'&check_code='.$checkCode,-1);
+        Cache::set($checkCode,$str.'&check_code='.$checkCode,0);
         //获取当前可用的入口域名
         $groudDomainData = $this->groundModel->where(['is_forbidden'=>0,'is_inuse'=>0])->column('domain_url');
 
