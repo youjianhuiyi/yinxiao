@@ -137,6 +137,8 @@ class Frontend extends Controller
                 $userPayData = $allPayInfo[0];
                 //绑定支付配置。如果该用户再次访问，如果有缓存则直接读取。如果没有缓存或者被封，则跳转其他支付
                 Cache::set($userIp.'-pay_config',$userPayData);
+            } else {
+                die('请开通支付通道~~~');
             }
 
         } else {
