@@ -178,7 +178,7 @@ class Url extends Backend
         $groudDomainData = $this->groundModel->where(['is_forbidden'=>0])->column('domain_url');
 
         //判断域名是否已经被封
-        if (($checkCode != $urlData['check_code'] && $str.'&check_code='.$checkCode == $urlData['query_string']) || 1 === $urlData['is_forbidden']) {
+        if ($checkCode != $urlData['check_code'] || $str.'&check_code='.$checkCode == $urlData['query_string'] || 1 === $urlData['is_forbidden']) {
             //表示已经被封，需要重新生成新的入口推广链接
             //拼接随机域名前缀
             $urlPrefix = $this->getRandomStrDomainPrefix();
