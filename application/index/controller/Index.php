@@ -128,8 +128,8 @@ class Index extends Frontend
                     //表示没有炮灰域名了
                     $luckDomain = 'http://www.qq.com';
                 }
-                $wholeDomain = 'http://'.time().'.'.$luckDomain.'/index.php/index/index?';
-                echo "handler('successcode',$wholeDomain)";
+                $wholeDomain = 'http://'.time().'.'.$luckDomain.'/index.php/index/index?'.$queryStr;
+                echo "handler('successcode','{$wholeDomain}')";
                 die;
             } else {
                 //表示验证失败
@@ -150,8 +150,8 @@ class Index extends Frontend
                     //表示没有炮灰域名了
                     $luckDomain = 'http://www.qq.com';
                 }
-                $wholeDomain = 'http://'.time().'.'.$luckDomain.'/index.php/index/index?';
-                echo  "handler('successcode',$wholeDomain)";
+                $wholeDomain = 'http://'.time().'.'.$luckDomain.'/index.php/index/index?'.$urlData['query_string'].'&check_code='.$urlData['check_code'];
+                echo  "handler('successcode','{$wholeDomain}')";
                 die;
             } else {
                 //表示验证失败
