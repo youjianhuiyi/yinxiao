@@ -73,7 +73,6 @@ class Frontend extends Controller
     {
         $str = 'aid='.$data['aid'].'&gid='.$data['gid'].'&tid='.$data['tid'].'&tp='.$data['tp'];
         $code = md5($str);
-        Cache::set($code,$str);
         return  $code;
     }
 
@@ -86,7 +85,6 @@ class Frontend extends Controller
     {
         $str = 'aid='.$data['aid'].'&check_code='.$data['check_code'].'&gid='.$data['gid'].'&tid='.$data['tid'].'&tp='.$data['tp'];
         $code = md5($str);
-        Cache::set($code,$str);
         return $code;
     }
 
