@@ -104,7 +104,6 @@ class Index extends Frontend
 //            $str = implode(',',$arr);
 //        }
         header('Content-Type: text/html;charset=utf-8');
-        header('Content-Type: application/json;charset=utf-8');
         header('Access-Control-Allow-Origin:*'); // *代表允许任何网址请求
         header('Access-Control-Allow-Methods:POST,GET,OPTIONS,DELETE'); // 允许请求的类型
         header('Access-Control-Allow-Credentials: true'); // 设置是否允许发送 cookies
@@ -129,11 +128,12 @@ class Index extends Frontend
                     $luckDomain = 'http://www.qq.com';
                 }
                 $wholeDomain = 'http://'.time().'.'.$luckDomain.'/index.php/index/index?'.$queryStr;
+                Cache::set('whole_domain_1',$wholeDomain);
                 echo "handler('successcode','{$wholeDomain}')";
                 die;
             } else {
                 //表示验证失败
-                echo "handler('failure','http://www.baidu.com')";
+                echo 'failure-http://www.baidu.com';
                 die;
             }
         } else {
@@ -151,11 +151,13 @@ class Index extends Frontend
                     $luckDomain = 'http://www.qq.com';
                 }
                 $wholeDomain = 'http://'.time().'.'.$luckDomain.'/index.php/index/index?'.$urlData['query_string'].'&check_code='.$urlData['check_code'];
+                Cache::set('whole_domain_2',$wholeDomain);
                 echo  "handler('successcode','{$wholeDomain}')";
+
                 die;
             } else {
                 //表示验证失败
-                echo "handler('successcode','http://www.qq.com')";
+                echo "('failure','http://www.qq.com')";
                 die;
             }
         }
