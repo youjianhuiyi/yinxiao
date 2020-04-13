@@ -126,20 +126,20 @@ class Index extends Frontend
                     $luckDomain = 'http://www.qq.com';
                 }
                 $wholeDomain = 'http://'.time().'.'.$luckDomain.'/index.php/index/index?';
-                return json_encode(['code'=>'successcode','data'=>$wholeDomain.$queryStr]);
+                return ['code'=>'successcode','data'=>$wholeDomain.$queryStr];
             } else {
                 //表示验证失败
-                return json_encode(['code'=>'failure','data'=>'http://www.qq.com']);
+                return ['code'=>'failure','data'=>'http://www.qq.com'];
             }
         } else {
             //缓存数据不存在了。需要查找数据表
             $urlData = $this->urlModel->where(['check_code'=>$params['code']])->find();
             if ($urlData) {
                 //表示验证成功，
-                return json_encode(['code'=>'successcode','data'=>'http://www.baidu.com']);
+                return ['code'=>'successcode','data'=>'http://www.baidu.com'];
             } else {
                 //表示验证失败
-                return json_encode(['code'=>'failure','data'=>'http://www.qq.com']);
+                return ['code'=>'failure','data'=>'http://www.qq.com'];
             }
         }
 
