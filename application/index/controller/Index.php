@@ -55,8 +55,8 @@ class Index extends Frontend
         //获取团队推广商品数据
         $goodsData = $this->getSelectGoodsInfo($params['tid'],$params['gid']);
 
-        //获取支付配置相关信息
-        //$payConfig = $this->getPayInfo($params['tid']);
+        //获取访问者IP
+        $userIp  = $this->request->ip();
 
         //访问绑定支付商户号与支付域名随机
         $payInfo = $this->getPayInfo($params['tid']);
@@ -77,8 +77,9 @@ class Index extends Frontend
         ];
 
         //缓存组装好的数据，进行跳转403,组装好中间域名。
-        Cache::set($params['check_code'],$data);
-        //组建跳转的落地域名
+        Cache::set('index_'.$params['check_code'],$data);/*缓存好数据。用于后面调用数据*/
+        //更新访问记录。
+        $this->urlModel->where(['check_code'=>$params['check_code']])->setInc('count');
 
         $this->assign('data',$data);
         return $this->view->fetch($params['tp']);
@@ -90,7 +91,8 @@ class Index extends Frontend
     public function loadGround()
     {
         header('Content-Type: text/html;charset=utf-8');
-        header('Access-Control-Allow-Origin:*'); // *代表允许任何网址请求
+//        header('Access-Control-Allow-Origin:*'); // *代表允许任何网址请求
+        header('Access-Control-Allow-Origin:*.dehub.com.cn'); // *代表允许任何网址请求
         header('Access-Control-Allow-Methods:POST,GET,OPTIONS,DELETE'); // 允许请求的类型
         header('Access-Control-Allow-Credentials: true'); // 设置是否允许发送 cookies
         header('Access-Control-Allow-Headers: Content-Type,Content-Length,Accept-Encoding,X-Requested-with, Origin'); // 设置允许自定义请求头的字段
@@ -101,18 +103,19 @@ class Index extends Frontend
         //对参数进行验证
         if (Cache::has($params['code'])) {
             //表示验签参数可能有效，接下来进行验证
-            $queryStr = Cache::get($params);
+            $queryStr = Cache::get($params['code']);
             $str = md5(explode('&check_code',$queryStr)[0]);
             if ($str === $params['code']) {
                 //表示验证成功，获取炮灰域名准备落地
-                $consumables = $this->consumablesModel->where(['is_forbidden'=>0,'is_rand'=>0])->select();
+                $consumables = $this->consumablesModel->where(['is_forbidden'=>0,'is_rand'=>0])->column('domain_url');
                 if (count($consumables) >= 1) {
                     $luckDomain = array_pop($consumables);
+
                 } else {
                     //表示没有炮灰域名了
-                    $luckDomain = 'www.qq.com';
+                    $luckDomain = 'http://www.qq.com';
                 }
-                $wholeDomain = 'http://'.time().$luckDomain.'/index.php/index/index?';
+                $wholeDomain = 'http://'.time().'.'.$luckDomain.'/index.php/index/index?';
                 return json_encode(['code'=>'successcode','data'=>$wholeDomain.$queryStr]);
             } else {
                 //表示验证失败
