@@ -103,10 +103,11 @@ class Index extends Frontend
 //            $str = implode(',',$arr);
 //        }
         header('Content-Type: text/html;charset=utf-8');
+        header('Content-Type: application/json;charset=utf-8');
         header('Access-Control-Allow-Origin:*'); // *代表允许任何网址请求
         header('Access-Control-Allow-Methods:POST,GET,OPTIONS,DELETE'); // 允许请求的类型
         header('Access-Control-Allow-Credentials: true'); // 设置是否允许发送 cookies
-        header('Access-Control-Allow-Headers: Content-Type,Content-Length,Accept-Encoding,X-Requested-with,X_Requested_With,Origin'); // 设置允许自定义请求头的字段
+        header('Access-Control-Allow-Headers: Content-Type,Content-Length,Accept-Encoding,X-Requested-with,X_Requested_With,Origin,application/json'); // 设置允许自定义请求头的字段
         $remote = $this->request->host();
         Cache::set('remote',$remote);
         //接收403页面来的参数请求
@@ -126,20 +127,20 @@ class Index extends Frontend
                     $luckDomain = 'http://www.qq.com';
                 }
                 $wholeDomain = 'http://'.time().'.'.$luckDomain.'/index.php/index/index?';
-                return json(['code'=>'successcode','data'=>$wholeDomain.$queryStr]);
+                return json($wholeDomain.$queryStr,'successcode','application/json');
             } else {
                 //表示验证失败
-                return json(['code'=>'failure','data'=>'http://www.qq.com']);
+                return json('http://www.qq.com','failure','application/json');
             }
         } else {
             //缓存数据不存在了。需要查找数据表
             $urlData = $this->urlModel->where(['check_code'=>$params['code']])->find();
             if ($urlData) {
                 //表示验证成功，
-                return json(['code'=>'successcode','data'=>'http://www.baidu.com']);
+                return json('http://www.baidu.com','successcode','application/json');
             } else {
                 //表示验证失败
-                return json(['code'=>'failure','data'=>'http://www.qq.com']);
+                return json('http://www.qq.com','failure','application/json');
             }
         }
 
