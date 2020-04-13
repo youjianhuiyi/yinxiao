@@ -183,7 +183,7 @@ class Url extends Backend
             //表示已经被封，需要重新生成新的入口推广链接
             //拼接随机域名前缀
             $urlPrefix = $this->getRandomStrDomainPrefix();
-            $groundUrl = $urlPrefix.'.'.$groudDomainData[mt_rand(0,count($groudDomainData))];
+            $groundUrl = $urlPrefix.'.'.$groudDomainData[mt_rand(0,count($groudDomainData)-1)];
             //拼接最后的访问链接
 //            $url = 'http://'.$groundUrl.'/index.php/index/index?'.$str.'&check_code='.$checkCode.'&tp='.$productionData['module_name'];
             $url = 'http://'.$groundUrl.'/index.php/index/index/code/'.$checkCode;
