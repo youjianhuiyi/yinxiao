@@ -7,6 +7,7 @@ use think\Cache;
 use think\Db;
 use think\exception\PDOException;
 use think\exception\ValidateException;
+use app\admin\model\team\Team as TeamModel;
 
 /**
  * 支付设置
@@ -21,11 +22,23 @@ class Pay extends Backend
      * @var \app\admin\model\sysconfig\Pay
      */
     protected $model = null;
+    protected $teamModel = null;
 
     public function _initialize()
     {
         parent::_initialize();
+        $this->teamModel = new TeamModel();
         $this->model = new \app\admin\model\sysconfig\Pay;
+        //团队数据
+        $teamData = collection($this->teamModel->column('name','id'))->toArray();
+        if ($this->adminInfo['id'] == 1 ) {
+            $teamData[0] = '自动新增团队请选择我(新加老板账号),否则下拉选择(新加非老板账号)';
+            ksort($teamData);
+            $newTeamData = $teamData;
+        } else {
+            $newTeamData[$this->adminInfo['team_id']] = $teamData[$this->adminInfo['team_id']];
+        }
+        $this->view->assign('teamData', $newTeamData);
     }
 
     /**
@@ -43,13 +56,11 @@ class Pay extends Backend
             list($where, $sort, $order, $offset, $limit) = $this->buildparams();
             $total = $this->model
                 ->where($where)
-                ->where(['team_id'=>$this->adminInfo['team_id']])
                 ->order($sort, $order)
                 ->count();
 
             $list = $this->model
                 ->where($where)
-                ->where(['team_id'=>$this->adminInfo['team_id']])
                 ->order($sort, $order)
                 ->limit($offset, $limit)
                 ->select();
@@ -74,14 +85,12 @@ class Pay extends Backend
             $total = $this->model
                 ->onlyTrashed()
                 ->where($where)
-                ->where(['team_id'=>$this->adminInfo['team_id']])
                 ->order($sort, $order)
                 ->count();
 
             $list = $this->model
                 ->onlyTrashed()
                 ->where($where)
-                ->where(['team_id'=>$this->adminInfo['team_id']])
                 ->order($sort, $order)
                 ->limit($offset, $limit)
                 ->select();
@@ -100,8 +109,8 @@ class Pay extends Backend
     {
         if ($this->request->isPost()) {
             $params = $this->request->post("row/a");
-            $params['team_id'] = $this->adminInfo['team_id'];
-            $params['team_name'] = $this->adminInfo['team_name'];
+            $teamName = $this->teamModel->where('id',$params['team_id'])->find()['name'];
+            $params['team_name'] = $teamName ? $teamName :'未知团队';
             if ($params) {
                 $params = $this->preExcludeFields($params);
 
@@ -160,8 +169,8 @@ class Pay extends Backend
         }
         if ($this->request->isPost()) {
             $params = $this->request->post("row/a");
-            $params['team_id'] = $this->adminInfo['team_id'];
-            $params['team_name'] = $this->adminInfo['team_name'];
+            $teamName = $this->teamModel->where('id',$params['team_id'])->find()['name'];
+            $params['team_name'] = $teamName ? $teamName :'未知团队';
             if ($params) {
                 $params = $this->preExcludeFields($params);
                 $result = false;
