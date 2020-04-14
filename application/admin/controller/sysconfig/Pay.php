@@ -193,8 +193,8 @@ class Pay extends Backend
                     $result = $row->allowField(true)->save($params);
                     //同步更新微信配置表
                     $res = $this->editWechatDomain($params,$ids);
-                    $this->wxdomainModel->allowField(true)->isUpdate(true)->saveAll($res[0]);
-                    $this->wxdomainModel->allowField(true)->isUpdate(true)->saveAll($res[1]);
+                    $this->wxdomainModel->allowField(true)->saveAll($res[0]);
+                    $this->wxdomainModel->allowField(true)->saveAll($res[1]);
                     //将本团队的商品数据缓存起来
                     Cache::set('pay?tid='.$params['team_id'],$params,0);
                     Db::commit();
@@ -279,7 +279,7 @@ class Pay extends Backend
 
         for ($i = 1;$i<=5;$i++) {
             $newPay[$i-1] = [
-                'id'      => $oldDataPay[$i-1]['id'],
+                'id'      => isset($oldDataPay[$i-1]['id']) ? $oldDataPay[$i-1]['id'] : null,
                 'team_id' => $data['team_id'],
                 'pay_id'  => $ids,
                 'domain'  => $data['pay_domain'.$i],
@@ -291,7 +291,7 @@ class Pay extends Backend
 
         for ($i =1;$i <= 3;$i++) {
             $newGrant[$i-1] = [
-                'id'      => $oldDataGrant[$i-1]['id'],
+                'id'      => isset($oldDataGrant[$i-1]) ? $oldDataGrant[$i-1]['id'] : null,
                 'team_id' => $data['team_id'],
                 'pay_id'  => $ids,
                 'domain'  => $data['grant_domain_'.$i],
