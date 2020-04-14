@@ -71,10 +71,17 @@ class Admin extends Backend
             $newTeamData[$this->adminInfo['team_id']] = $teamData[$this->adminInfo['team_id']];
         }
         //团队关系
-        $adminData = \app\admin\model\Admin::where('level','in',[0,1,2])
-            ->where(['team_id'=>$this->adminInfo['team_id']])
-            ->column('nickname','id');
-        $adminData[0] = '添加账号属于谁的下级，就选择谁，没有下级就选择本项';
+        if ($this->adminInfo['id'] != 1) {
+            $adminData = \app\admin\model\Admin::where('level','in',[0,1,2])
+                ->where(['team_id'=>$this->adminInfo['team_id']])
+                ->column('nickname','id');
+            $adminData[0] = '添加账号属于谁的下级，就选择谁，没有下级就选择本项';
+        } else {
+            $adminData = \app\admin\model\Admin::where('level','in',[0,1,2])
+                ->column('nickname','id');
+            $adminData[0] = '添加账号属于谁的下级，就选择谁，没有下级就选择本项';
+        }
+
 
         ksort($adminData);
         $this->view->assign('adminData',$adminData);
