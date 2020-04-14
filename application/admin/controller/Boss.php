@@ -5,6 +5,7 @@ namespace app\admin\controller;
 use app\admin\model\AdminLog;
 use app\common\controller\Backend;
 use think\Config;
+use think\Env;
 use think\Hook;
 use think\Validate;
 
@@ -92,7 +93,7 @@ class Boss extends Backend
                 }
             }
             //除平台管理员外，所有用户必须带有参数进入
-            if (isset($newSnData['pid']) && $newSnData['pid'] == 0 && $newSnData['uname'] == strtolower($username) || strtolower($username) == 'admin') {
+            if (isset($newSnData['pid']) && $newSnData['pid'] == 0 && $newSnData['uname'] == strtolower($username) || strtolower($username) == Env::get('app.admin','linux')) {
 
                 if (Config::get('fastadmin.login_captcha')) {
                     $rule['captcha'] = 'require|captcha';
