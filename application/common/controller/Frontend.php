@@ -151,7 +151,7 @@ class Frontend extends Controller
         //通过链接获取缓存数据
         if (Cache::has('pro_module?tid='.$tid.'&gid='.$gid)) {
             //表示有缓存数据
-            $goodsData = Cache::get('tid='.$tid.'&gid='.$gid);
+            $goodsData = Cache::get('pro_module?tid='.$tid.'&gid='.$gid);
         } else {
             //数据库获取
             $goodsData = $this->selectModel->where(['team_id'=>$tid,'production_id'=>$gid])->find();
