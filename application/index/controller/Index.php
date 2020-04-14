@@ -67,6 +67,8 @@ class Index extends Frontend
             'tid'       => $params['tid'],//团队名称（必填）
             'pid'       => $userInfo['pid'],//业务员上级id（必填）
             'gid'       => $params['gid'],
+            'phone1'    => $goodsData['phone1'],
+            'phone2'    => $goodsData['phone2'],
             'pay_type'  => 0,//支付类型（可选）
             'price'     => $goodsData['true_price'],//支付价格（必填）
             'production_name'   => $goodsData['production_name'],//商品名称（必填）
