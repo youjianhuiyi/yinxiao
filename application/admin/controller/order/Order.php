@@ -22,6 +22,14 @@ class Order extends Backend
     {
         parent::_initialize();
         $this->model = new \app\admin\model\order\Order;
+        $pid = $this->adminInfo['pid'];
+        if ($pid == 0) {
+            //表示是老板级别，可以查看所有信息
+            $this->assignconfig('show_column',true);
+        } else {
+            //表示没权限，列表显示多少看多少
+            $this->assignconfig('show_column',false);
+        }
 
     }
 
@@ -42,7 +50,6 @@ class Order extends Backend
             //admin_id = 0 查看全站
             //假如admin_id = 3 是老板号 4是经理号，5是业务员号，
             //3可以查看所有 3为团队的订单。即以团队id=1.
-            //
             if ($this->adminInfo['id'] == 1) {
                 //表示当前用户为总平台管理层
                 $total = $this->model
@@ -52,6 +59,34 @@ class Order extends Backend
 
                 $list = $this->model
                     ->where($where)
+                    ->order($sort, $order)
+                    ->limit($offset, $limit)
+                    ->select();
+            } elseif ($this->adminInfo['pid'] == 0) {
+                //表示是老板级别账号。可以查看到平台下所有订单
+                $total = $this->model
+                    ->where($where)
+                    ->where(['team_id'=>$this->adminInfo['team_id']])
+                    ->order($sort, $order)
+                    ->count();
+
+                $list = $this->model
+                    ->where($where)
+                    ->where(['team_id'=>$this->adminInfo['team_id']])
+                    ->order($sort, $order)
+                    ->limit($offset, $limit)
+                    ->select();
+            } else {
+                //表示最低级别，就是只能查看自己的订单
+                $total = $this->model
+                    ->where($where)
+                    ->where(['admin_id'=>$this->adminInfo['id']])
+                    ->order($sort, $order)
+                    ->count();
+
+                $list = $this->model
+                    ->where($where)
+                    ->where(['admin_id'=>$this->adminInfo['id']])
                     ->order($sort, $order)
                     ->limit($offset, $limit)
                     ->select();

@@ -1,5 +1,6 @@
 define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefined, Backend, Table, Form) {
 
+    var show_column = Config.show_column;
     var Controller = {
         index: function () {
             // 初始化表格参数配置
@@ -22,6 +23,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                 pk: 'id',
                 sortName: 'id',
                 search:false,
+                showColumns: show_column,
                 columns: [
                     [
                         {checkbox: true},
@@ -36,7 +38,10 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {field: 'num', title: __('Num')},
                         {field: 'admin_id', title: __('Admin_id'),operate:false,visible:false},
                         {field: 'admin_name', title: __('Admin_name'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符',visible:false},
-                        {field: 'pay_type', title: __('Pay_type'),searchList: {"0":"微信支付", "1": "其他支付"},visible:false},
+                        {field: 'pay_type', title: __('Pay_type'),searchList: {"0":"微信支付", "1": "其他支付"},visible:false,formatter:function (value,row,index) {
+                                if (value ===0){return '微信支付';}
+                                if (value ===1){return '其他支付';}
+                            }},
                         {field: 'pay_status', title: __('Pay_status'),searchList: {"1": "已付款", "0": "未付款"},formatter:function (value,row,index) {
                             if (value ===0){return '未付款';}
                             if (value ===1){return '已付款';}
