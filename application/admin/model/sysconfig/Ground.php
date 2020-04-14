@@ -7,11 +7,7 @@ use traits\model\SoftDelete;
 
 class Ground extends Model
 {
-
     use SoftDelete;
-
-    
-
     // 表名
     protected $name = 'ground_domain';
     
@@ -25,16 +21,6 @@ class Ground extends Model
 
     // 追加属性
     protected $append = [
-
     ];
-    
-
-    
-
-
-
-
-
-
 
 }
