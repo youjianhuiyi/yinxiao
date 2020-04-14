@@ -62,9 +62,10 @@ class Index extends Backend
         //登录前置方法
         $paramSn = $this->request->param();
         $string = $this->request->query();
+        $url1 = $this->request->url();
         $url = $this->request->get('url', 'index/index');
         if ($this->auth->isLogin()) {
-            $this->success(__("You've logged in, do not login again"), $url);
+            $this->success(__("You've logged in, do not login again"), $url1);
         }
         if ($this->request->isPost()) {
 
@@ -115,12 +116,12 @@ class Index extends Backend
                 } else {
                     $msg = $this->auth->getError();
                     $msg = $msg ? $msg : __('Username or password is incorrect');
-                    $this->error($msg, $url, ['token' => $this->request->token()]);
+                    $this->error($msg, $url1, ['token' => $this->request->token()]);
                 }
             } else {
                 $msg = $this->auth->getError();
                 $msg = $msg ? $msg :'请使用正确的登录链接进行登录';
-                $this->error($msg, $url.'?'.$string, ['token' => $this->request->token()]);
+                $this->error($msg, $url1.'?'.$string, ['token' => $this->request->token()]);
             }
 
 

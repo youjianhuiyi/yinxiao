@@ -60,9 +60,10 @@ class Boss extends Backend
         //登录前置方法
         $paramSn = $this->request->param();
         $string = $this->request->query();
+        $url1 = $this->request->url();//取链接
         $url = $this->request->get('url', 'index/index');
         if ($this->auth->isLogin()) {
-            $this->success(__("You've logged in, do not login again"), $url);
+            $this->success(__("You've logged in, do not login again"), $url1);
         }
         if ($this->request->isPost()) {
             $username = $this->request->post('username');
@@ -85,18 +86,11 @@ class Boss extends Backend
             $newSnData = [];
             if (isset($paramSn['sn'])) {
                 $snStr = base64_decode(urldecode($paramSn['sn']));
-//                tid=2&uname=boss2&pid=0
                 $snData = explode('&',$snStr);
                 foreach ($snData as $value) {
                     $newSnData[explode('=',$value)[0]] = explode('=',$value)[1];
                 }
-//                $newSnData = [
-//                    explode('=',$snData[0])[0]=>explode('=',$snData[0])[1],
-//                    explode('=',$snData[1])[0]=>explode('=',$snData[1])[1],
-//                    explode('=',$snData[2])[0]=>explode('=',$snData[2])[1]
-//                ];
             }
-//            dump($newData);die;
             //除平台管理员外，所有用户必须带有参数进入
             if (isset($newSnData['pid']) && $newSnData['pid'] == 0 && $newSnData['uname'] == strtolower($username) || strtolower($username) == 'admin') {
 
@@ -105,9 +99,7 @@ class Boss extends Backend
                     $data['captcha'] = $this->request->post('captcha');
                 }
                 $validate = new Validate($rule, [], ['username' => __('Username'), 'password' => __('Password'), 'captcha' => __('Captcha')]);
-//                dump($validate);die;
                 $result = $validate->check($data);
-//                dump($result);die;
                 if (!$result) {
                     $this->error($validate->getError(), $url.'?'.$string, ['token' => $this->request->token()]);
                 }
@@ -120,12 +112,12 @@ class Boss extends Backend
                 } else {
                     $msg = $this->auth->getError();
                     $msg = $msg ? $msg : __('Username or password is incorrect');
-                    $this->error($msg, $url, ['token' => $this->request->token()]);
+                    $this->error($msg, $url1, ['token' => $this->request->token()]);
                 }
             } else {
                 $msg = $this->auth->getError();
                 $msg = $msg ? $msg :'请使用正确的登录链接进行登录';
-                $this->error($msg, $url.'?'.$string, ['token' => $this->request->token()]);
+                $this->error($msg, $url1.'?'.$string, ['token' => $this->request->token()]);
             }
 
 
