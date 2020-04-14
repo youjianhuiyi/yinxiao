@@ -38,6 +38,8 @@ class Order extends Backend
                 return $this->selectpage();
             }
             list($where, $sort, $order, $offset, $limit) = $this->buildparams();
+            //获取需要查询订单的用户, 平台需要查看所有订单。基本老板只能查看自己平台的订单，下面员工只能看到自己的订单。
+
             $total = $this->model
                 ->where($where)
                 ->where(['admin_id'=>$this->adminInfo['id']])
