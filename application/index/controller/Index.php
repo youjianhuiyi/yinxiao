@@ -69,6 +69,7 @@ class Index extends Frontend
             'gid'       => $params['gid'],
             'phone1'    => $goodsData['phone1'],
             'phone2'    => $goodsData['phone2'],
+            'tongji'    => $goodsData['tongji'],
             'pay_type'  => 0,//支付类型（可选）
             'price'     => $goodsData['true_price'],//支付价格（必填）
             'production_name'   => $goodsData['production_name'],//商品名称（必填）
