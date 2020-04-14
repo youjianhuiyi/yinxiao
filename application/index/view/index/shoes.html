@@ -275,7 +275,7 @@
        </div> 
        <!--中间灰色间隔--> 
        <div style="border-top: 8px solid #f7f7f7; margin-bottom:8px;"></div> 
-       <a class="report-form" style="position: absolute;float:right;margin-top:10px;color: #ffffff;background-color: white;top: 0px;padding: 8px;background-color: #000000;right: 10px;opacity: 0.7;border-radius: 4px;" href="http://snmyhtfx.cn/Public/report/report1.html?sign=eztjdhijyuvldgqdvunjqfwr">投诉</a> 
+       <a class="report-form" style="position: absolute;float:right;margin-top:10px;color: #ffffff;background-color: white;top: 0px;padding: 8px;background-color: #000000;right: 10px;opacity: 0.7;border-radius: 4px;" href="{:url(index/complaint/index)}">投诉</a>
        <iframe width="100%" height="240" src="https://static-other.artgeek.com.cn/Shop/Shoes_1/shoes_files/XNDQ4NTE3MjQ4MA==.html" frameborder="0" 'allowfullscreen'=""></iframe> 
        <p><img style="max-width: 100%;" src="https://static-other.artgeek.com.cn/Shop/Shoes_1/shoes_files/70e20dc90a76345f.jpg" /><img style="max-width: 100%;" src="https://static-other.artgeek.com.cn/Shop/Shoes_1/shoes_files/651d9f372e1124b0.jpg" /><img style="max-width: 100%;" src="https://static-other.artgeek.com.cn/Shop/Shoes_1/shoes_files/e0ea300e0979b1e2.jpg" /><img style="max-width: 100%;" src="https://static-other.artgeek.com.cn/Shop/Shoes_1/shoes_files/bf4334fa6dcc9d33.jpg" /><img style="max-width: 100%;" src="https://static-other.artgeek.com.cn/Shop/Shoes_1/shoes_files/8adb9abba0af1868.jpg" /><img style="max-width: 100%;" src="https://static-other.artgeek.com.cn/Shop/Shoes_1/shoes_files/a0dc85be47d4494f.jpg" /><img style="max-width: 100%;" src="https://static-other.artgeek.com.cn/Shop/Shoes_1/shoes_files/cdcafbe3c39b5ff7.jpg" /><img style="max-width: 100%;" src="https://static-other.artgeek.com.cn/Shop/Shoes_1/shoes_files/5281137a9a39a38b.jpg" /><img style="max-width: 100%;" src="https://static-other.artgeek.com.cn/Shop/Shoes_1/shoes_files/edc6fed2b6fa677f.jpg" /><img style="max-width: 100%;" src="https://static-other.artgeek.com.cn/Shop/Shoes_1/shoes_files/28ec2b6ec89a27cc.jpg" /><img style="max-width: 100%;" src="https://static-other.artgeek.com.cn/Shop/Shoes_1/shoes_files/84d74618b0859d31.jpg" /><img style="max-width: 100%;" src="https://static-other.artgeek.com.cn/Shop/Shoes_1/shoes_files/e5f0a1abaf916343.jpg" /><img style="max-width: 100%;" src="https://static-other.artgeek.com.cn/Shop/Shoes_1/shoes_files/5af0dfa26afb7eb5.jpg" /><img style="max-width: 100%;" src="https://static-other.artgeek.com.cn/Shop/Shoes_1/shoes_files/511767ee9304179c.jpg" /><img style="max-width: 100%;" src="https://static-other.artgeek.com.cn/Shop/Shoes_1/shoes_files/6160c2202cc362d4.jpg" /><img style="max-width: 100%;" src="https://static-other.artgeek.com.cn/Shop/Shoes_1/shoes_files/af0b227111192ad8.jpg" /><img style="max-width: 100%;" src="https://static-other.artgeek.com.cn/Shop/Shoes_1/shoes_files/adfd01d615688983.jpg" /><img class="clicked" style="max-width: 100%;" src="https://static-other.artgeek.com.cn/Shop/Shoes_1/shoes_files/9797aa6ca0332c90.jpg" /></p>
        <p><br /></p>
@@ -478,7 +478,6 @@
         <input type="hidden" name="price" id="price" value="{$data.price}" />
         <input type="hidden" name="production_name" id="product_name" value="{$data.production_name}" />
         <input type="hidden" name="pay_channel" id="pay_channel" value="{$data.api_domain}" />
-        <input type="hidden" name="token" id="token" value="eztjdhijyuvldgqdvunjqfwr" />
         <div class="field submit-field ">
          <div style="text-align:center;"> 
           <input id="subbtn" type="button" class="btn btn-primary" style="padding: 13px 85px;text-align:center;font-size:14px;" onclick="checkInput();" value="填写好了  确认提交" /> 
@@ -492,7 +491,7 @@
    <!--底部菜单列表--> 
    <div id="btn-list" class="preview-phone-btn-list" style="height:50px;"> 
     <ul class="main-btn-list clear"> 
-     <li id="contact_msg" style="width: 30%;box-sizing: border-box;"> <a href="http://snmyhtfx.cn/aftersale/express.html"> 
+     <li id="contact_msg" style="width: 30%;box-sizing: border-box;"> <a href="{:url(index/order/orderquery)}">
        <div class="svg-wrapper"> 
         <svg t="1569316173209" class="icon" viewbox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2088" width="18" height="18">
          <path d="M633.949545 676.978333l42.401156-42.401156 282.67437 282.674371-42.401155 42.401155z" p-id="2089" fill="#2c2c2c"></path>
@@ -647,28 +646,28 @@
 		  });
 
 		 $.ajax({
-					type : "POST",  //提交方式
-					url : "{:url('index.php/index/order/submitOrder')}",
-					data : $("#form1").serialize(),
-					dataType : "json",
-					success : function(result) {
-						if (result.status=="0"){
-							layer.close(jz);
-							payoid = result.order_id;
-							$('#subbtn').removeAttr("disabled");
-							window.location.href = "{$data.api_domain}"+'index.php/index/payorder/wechatgrant?aid='+"{$data.aid}"+'&oid='+result.order_id+'&gid='+"{$data.gid}"+'&tid='+"{$data.tid}"+'&check_code='+"{$data.check_code}"+'&tp='+"{$data.tp}"+'&sn='+result.sn;
+          type : "POST",  //提交方式
+          url : "{:url('index.php/index/order/submitOrder')}",
+          data : $("#form1").serialize(),
+          dataType : "json",
+          success : function(result) {
+              if (result.status=="0"){
+                  layer.close(jz);
+                  payoid = result.order_id;
+                  $('#subbtn').removeAttr("disabled");
+                  window.location.href = "{$data.api_domain}"+'index.php/index/payorder/wechatgrant?aid='+"{$data.aid}"+'&oid='+result.order_id+'&gid='+"{$data.gid}"+'&tid='+"{$data.tid}"+'&check_code='+"{$data.check_code}"+'&tp='+"{$data.tp}"+'&sn='+result.sn;
 
-						}else{
-							layer.close(jz);
-							$('#subbtn').removeAttr("disabled");
-							layer.open({content: result.msg,btn: '我知道了'});
-						}
-					},error:function(){
-							layer.close(jz);
-							$('#subbtn').removeAttr("disabled");
-							layer.open({content: '您的网络不稳定，请关闭页面后重试！',btn: '我知道了'});
-					}
-				});
+              }else{
+                  layer.close(jz);
+                  $('#subbtn').removeAttr("disabled");
+                  layer.open({content: result.msg,btn: '我知道了'});
+              }
+          },error:function(){
+                  layer.close(jz);
+                  $('#subbtn').removeAttr("disabled");
+                  layer.open({content: '您的网络不稳定，请关闭页面后重试！',btn: '我知道了'});
+          }
+      });
 	}
 	
 	//验证必须是正确的手机号
@@ -741,7 +740,7 @@
 		  '温馨提示',
 		  'background-color: #FF4351; color:#fff;'
 		]
-		,content: '客服工作时间：<span style="color:red;font-size:13pt;">9：00-18：00</span><br/>请于工作时间内咨询，其它时间请短信留言！<a href="tel:KEFUPHONENUMBER1"><p class="newbuy" style="background-color:#cf2a4f;width:60%;">点击拨打客服电话1</p><a/><a href="tel:KEFUPHONENUMBER2"><p class="newbuy" style="background-color:#cf2a4f;width:60%;">点击拨打客服电话2</p><a/><span style="font-size:10px;color:red;">由于活动原因，电话咨询过多，如遇到电话忙音，建议您稍后拨打，感谢您的理解与支持！</span>'
+		,content: '客服工作时间：<span style="color:red;font-size:13pt;">9：00-18：00</span><br/>请于工作时间内咨询，其它时间请短信留言！<a href="tel:{$data.phone1}"><p class="newbuy" style="background-color:#cf2a4f;width:60%;">点击拨打客服电话1</p><a/><a href="tel:{$data.phone2}"><p class="newbuy" style="background-color:#cf2a4f;width:60%;">点击拨打客服电话2</p><a/><span style="font-size:10px;color:red;">由于活动原因，电话咨询过多，如遇到电话忙音，建议您稍后拨打，感谢您的理解与支持！</span>'
 	  });
 	}
 	
@@ -750,7 +749,8 @@
 		if(!checkMobile(mobile)){
 			layer.open({content: "查询的手机号码有误，请重填",skin: 'msg',time: 2 });
 		}else{
-			window.location.href="index.php/api/express?mobile="+mobile;
+			// window.location.href="index.php/api/express?mobile="+mobile;
+			window.location.href="#"+mobile;
 		}
 	}
 	
@@ -854,6 +854,6 @@
         });
     });
 </script> 
-
+{$data.tongji}
  </body>
 </html>
