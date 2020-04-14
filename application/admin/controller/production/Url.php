@@ -6,6 +6,7 @@ use app\common\controller\Backend;
 use Endroid\QrCode\QrCode;
 use think\Cache;
 use think\Db;
+use think\Env;
 use think\exception\PDOException;
 use think\exception\ValidateException;
 use think\Response;
@@ -251,7 +252,8 @@ class Url extends Backend
             $urlData['production_url'] = $groundUrl;
             Cache::set('ground_url_'.$this->adminInfo['id'],$groundUrl);
         }
-
+//        $urlData['app-debug'] = Env::get('app.debug');
+        $urlData['app-debug'] = false;
         $this->assign('data',$urlData);
         return $this->view->fetch();
     }

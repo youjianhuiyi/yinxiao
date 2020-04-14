@@ -39,6 +39,10 @@ class Order extends Backend
             }
             list($where, $sort, $order, $offset, $limit) = $this->buildparams();
             //获取需要查询订单的用户, 平台需要查看所有订单。基本老板只能查看自己平台的订单，下面员工只能看到自己的订单。
+            //admin_id = 0 查看全站
+            //假如admin_id = 3 是老板号 4是经理号，5是业务员号，
+            //3可以查看所有 3为团队的订单。即以团队id=1.
+            //
 
             $total = $this->model
                 ->where($where)

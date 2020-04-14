@@ -32,10 +32,10 @@
                 <dd>
                     <li>商品推广链接</li>
                     <p>(长按保存图片用手机浏览器扫码进入)</p>
-                    {if Env::get('app.debug')}
+                    {if $data['app-debug']}
                     <p id='qrcodeurl'>{$data['production_url']}</p>
-                    {/if}
                     <ol class="copy_bsp">复制地址</ol>
+                    {/if}
                 </dd>
             </dl>
         </div>
