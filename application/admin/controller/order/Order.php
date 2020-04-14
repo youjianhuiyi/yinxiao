@@ -43,19 +43,22 @@ class Order extends Backend
             //假如admin_id = 3 是老板号 4是经理号，5是业务员号，
             //3可以查看所有 3为团队的订单。即以团队id=1.
             //
+            if ($this->adminInfo['id'] == 0) {
+                //表示当前用户为总平台管理层
+                $total = $this->model
+                    ->where($where)
+                    ->where(['admin_id'=>$this->adminInfo['id']])
+                    ->order($sort, $order)
+                    ->count();
 
-            $total = $this->model
-                ->where($where)
-                ->where(['admin_id'=>$this->adminInfo['id']])
-                ->order($sort, $order)
-                ->count();
+                $list = $this->model
+                    ->where($where)
+                    ->where(['admin_id'=>$this->adminInfo['id']])
+                    ->order($sort, $order)
+                    ->limit($offset, $limit)
+                    ->select();
+            }
 
-            $list = $this->model
-                ->where($where)
-                ->where(['admin_id'=>$this->adminInfo['id']])
-                ->order($sort, $order)
-                ->limit($offset, $limit)
-                ->select();
 
             $list = collection($list)->toArray();
             $result = array("total" => $total, "rows" => $list);

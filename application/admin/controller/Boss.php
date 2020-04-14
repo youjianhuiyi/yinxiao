@@ -5,8 +5,10 @@ namespace app\admin\controller;
 use app\admin\model\AdminLog;
 use app\common\controller\Backend;
 use think\Config;
+use think\Cookie;
 use think\Env;
 use think\Hook;
+use think\Session;
 use think\Validate;
 
 /**
@@ -141,9 +143,12 @@ class Boss extends Backend
      */
     public function logout()
     {
+        $loginUrl = $this->adminInfo['login_url'];
         $this->auth->logout();
+        Session::delete("admin");
+        Cookie::delete("keeplogin");
         Hook::listen("admin_logout_after", $this->request);
-        $this->success(__('Logout successful'), 'boss/login');
+        $this->success(__('Logout successful'), $loginUrl);
     }
 
 }

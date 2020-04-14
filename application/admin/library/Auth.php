@@ -78,8 +78,8 @@ class Auth extends \fast\Auth
             $admin->save();
         }
         $this->logined = false; //重置登录状态
-        Session::delete("admin");
-        Cookie::delete("keeplogin");
+//        Session::delete("admin");
+//        Cookie::delete("keeplogin");
         return true;
     }
 
@@ -184,6 +184,8 @@ class Auth extends \fast\Auth
             $my = Admin::get($admin['id']);
             if (!$my || $my['token'] != $admin['token']) {
                 $this->logout();
+                Session::delete("admin");
+                Cookie::delete("keeplogin");
                 return false;
             }
         }
@@ -191,6 +193,8 @@ class Auth extends \fast\Auth
         if (Config::get('fastadmin.loginip_check')) {
             if (!isset($admin['loginip']) || $admin['loginip'] != request()->ip()) {
                 $this->logout();
+                Session::delete("admin");
+                Cookie::delete("keeplogin");
                 return false;
             }
         }

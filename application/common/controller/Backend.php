@@ -145,11 +145,15 @@ class Backend extends Controller
                 Hook::listen('admin_nologin', $this);
                 $url = Session::get('referer');
                 $url = $url ? $url : $this->request->url();
+//                $loginUrl = $this->adminInfo['login_url'];
+                //判断当前用户的登录地址。如果登录过期，则重定向到正确的登录地址
                 if ($url == '/') {
                     $this->redirect('index/login', [], 302, ['referer' => $url]);
+//                    $this->redirect($loginUrl, [], 302, ['referer' => $loginUrl]);
                     exit;
                 }
                 $this->error(__('Please login first'), url('index/login', ['url' => $url]));
+//                $this->error(__('Please login first'), url($loginUrl, ['url' => $loginUrl]));
             }
             // 判断是否需要验证权限
             if (!$this->auth->match($this->noNeedRight)) {

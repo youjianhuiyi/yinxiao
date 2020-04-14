@@ -10,6 +10,7 @@ use Endroid\QrCode\QrCode;
 use fast\Random;
 use fast\Tree;
 use think\Response;
+use think\Session;
 use think\Validate;
 
 /**
@@ -375,11 +376,22 @@ class Admin extends Backend
         if ($data['pid'] == 0) {
             //这个是老板的
             $sn = urlencode(base64_encode('tid='.$data['team_id'].'&uname='.$data['username'].'&pid='.$data['pid']));
-            $data['login_url'] = $this->request->domain().$this->request->baseFile().'/boss/login?sn='.$sn;
-        } else {
+            $queryString = $this->request->baseFile().'/boss/login?sn='.$sn;
+            $data['login_url'] = $this->request->domain().$queryString;
+        } elseif ($data['pid'] != 0) {
+            //这种是团队成员
             $sn = urlencode(base64_encode('tid='.$data['team_id']));
-            $data['login_url'] = $this->request->domain().$this->request->baseFile().'/index/login?sn='.$sn;
+            $queryString = $this->request->baseFile().'/index/login?sn='.$sn;
+            $data['login_url'] = $this->request->domain().$queryString;
         }
+        //更新数据库。
+        $sqlData = [
+            'id'        => $ids,
+            'login_url' => $queryString
+        ];
+        //缓存登录链接
+        Session::set('login_url',$queryString);
+        $this->model->isUpdate(true)->save($sqlData);
         $this->assign('data',$data);
         return $this->view->fetch();
     }
