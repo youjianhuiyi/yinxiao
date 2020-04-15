@@ -5,6 +5,7 @@ return [
     'Team_name'       => '团队名称',
     'Sales_price'     => '销售价',
     'Discount'        => '优惠券',
+    'Own_name'        => '团队商品名称',
     'True_price'      => '实价',
     'Production_id'   => '产品ID',
     'Production_name' => '产品名称',

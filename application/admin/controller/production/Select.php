@@ -119,6 +119,7 @@ class Select extends Backend
             $params['team_id'] = $this->adminInfo['team_id'];
             $params['team_name'] = $params['team_id'] == 0 ? '平台测试':$this->adminInfo['team_name'];
             $params['production_name'] = $this->productionModel->get($params['production_id'])->name;
+            $params['own_name'] = $params['own_name'] == '' ? $params['production_name'] : $params['own_name'];
             if ($params) {
                 $params = $this->preExcludeFields($params);
                 $params['sales_price'] = $params['sales_price'] == 0 ? $this->productionModel->get($params['production_id'])->sales_price : $params['sales_price'];
@@ -199,6 +200,7 @@ class Select extends Backend
             $params['team_id'] = $this->adminInfo['team_id'];
             $params['team_name'] = $params['team_id'] == 0 ? '平台测试':$this->adminInfo['team_name'];
             $params['production_name'] = $this->productionModel->get($params['production_id'])->name;
+            $params['own_name'] = $params['own_name'] == '' ? $params['production_name'] : $params['own_name'];
             if ($params) {
                 //判断价格体系
                 $params['sales_price'] = $params['sales_price'] == 0 ? $this->productionModel->get($params['production_id'])->sales_price : $params['sales_price'];
@@ -238,7 +240,7 @@ class Select extends Backend
                 } catch (PDOException $e) {
                     Db::rollback();
                     $this->error($e->getMessage());
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     Db::rollback();
                     $this->error($e->getMessage());
                 }

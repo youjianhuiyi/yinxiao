@@ -26,12 +26,12 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                     [
                         {checkbox: true},
                         {field: 'id', title: __('Id'),operate:false},
+                        {field: 'own_name', title: __('Own_name'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
                         {field: 'team_id', title: __('Team_id'),operate:false,visible:false},
                         {field: 'team_name', title: __('Team_name'),operate:false,visible:false},
                         {field: 'sales_price', title: __('Sales_price'), operate:'BETWEEN'},
                         {field: 'discount', title: __('Discount'), operate:'BETWEEN'},
                         {field: 'true_price', title: __('True_price'), operate:'BETWEEN'},
-                        {field: 'production_name', title: __('Production_name'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
                         {field: 'phone1', title: __('Phone1'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
                         {field: 'phone2', title: __('Phone2'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
                         {field: 'createtime', title: __('Createtime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
