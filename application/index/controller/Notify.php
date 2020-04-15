@@ -120,4 +120,10 @@ class Notify extends Frontend
 
     }
 
+    public function xpayNotify()
+    {
+        $data = json_decode(file_get_contents('php://input'));
+        Cache::set('xpay_notify',$data,0);
+        return 'SUCCESS';
+    }
 }

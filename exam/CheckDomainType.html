@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>域名检测系统</title>
+    <meta name="keywords" content="H+后台主题,后台bootstrap框架,会员中心主题,后台HTML,响应式后台">
+    <meta name="description" content="H+是一个完全响应式，基于Bootstrap3最新版本开发的扁平化主题，她采用了主流的左右两栏式布局，使用了Html5+CSS3等现代技术">
+
+    <link rel="shortcut icon" href="favicon.ico"> <link href="/Public/layui/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="/Public/layui/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+
+    <link href="/Public/layui/css/animate.css" rel="stylesheet">
+    <link href="/Public/layui/css/style.css?v=4.1.0" rel="stylesheet">
+
+</head>
+
+<body class="gray-bg">
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-3">
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <!-- <span class="label label-primary pull-right">NEW</span> -->
+                        <h5>入口域名检测中....</h5>
+                    </div>
+                    <div class="ibox-content">
+<!--                         <div class="team-members">
+                            <h4>入口域名目前剩余<span id="have_rukou_muns"></span>个.<h4>
+                            <h4>入口域名正在使用<span id="isuse_rukou_domain_muns"></span>个.<h4>
+                            <h4>最近1小时屏蔽<span id="die_rukou_domain_muns"></span>个.<h4>
+                            <h4>最近24小时屏蔽<span id="die_rukou_domain_muns_day"></span>个.<h4>
+                        </div> -->
+                        <input type="hidden" id="nowid" value="0">
+                        <input type="hidden" id="maxid" value="0">
+                        <input type="hidden" id="minid" value="0">
+                        <!-- <h4>部门简介</h4> -->
+                        <p id="rukou">
+                            
+                        </p>
+                    </div>
+                </div>
+
+
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <!-- <span class="label label-primary pull-right">NEW</span> -->
+                        <h5>借权域名检测中....</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <!-- <h4>部门简介</h4> -->
+                        <div style="display: none;">
+                          <span id="kznowid"></span>
+                          <span id="kzmaxid"></span>
+                          <span id="kzminid"></span>
+                        </div>
+                        <p id="kzrukou">
+                            
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="col-sm-3">
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <h5>中间域名检测中....</h5>
+                    </div>
+                    <div class="ibox-content">
+<!--                         <div class="team-members">
+                            <h4>中间域名目前剩余<span id="have_middle_muns"></span>个.<h4>
+                            <h4>最近1小时屏蔽<span id="die_middle_domain_muns"></span>个.<h4>
+                            <h4>最近24小时屏蔽<span id="die_middle_domain_muns_day"></span>个.<h4>
+                        </div> -->
+                        <!-- <h4>部门简介</h4> -->
+                        <p id="middle_domain_show_res">
+                            
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+<?php foreach ($serverMuns as $serverMunsvalue): ?>
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <h5>落地<span style="color: #29b294;">服务器{$serverMunsvalue["server_id"]}</span>域名检测中....</h5>
+                    </div>
+                    <div class="ibox-content">
+<!--                         <div class="team-members">
+                            <h4><span style="color: #29b294;">服务器{$serverMunsvalue["server_id"]}</span>目前剩余<span id="have_luodi_muns{$serverMunsvalue['server_id']}"></span>个.<h4>
+                            <h4><span style="color: #29b294;">服务器{$serverMunsvalue["server_id"]}</span>最近1小时屏蔽<span id="die_luodi_domain_muns{$serverMunsvalue['server_id']}"></span>个.<h4>
+                            <h4><span style="color: #29b294;">服务器{$serverMunsvalue["server_id"]}</span>最近24小时屏蔽<span id="die_luodi_domain_muns_day{$serverMunsvalue['server_id']}"></span>个.<h4>
+                        </div> -->
+                        <p id="luodi{$serverMunsvalue['server_id']}">
+                            
+                        </p>
+                    </div>
+                </div>
+<?php endforeach ?>
+            </div>
+            <div class="col-sm-3">
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <h5>外链检测中....</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <input type="hidden" id="nowidoutlink" value="999">
+                        <input type="hidden" id="maxidoutlink" value="0">
+                        <input type="hidden" id="checkArr" value="0">
+                        <input type="hidden" id="shijiID" value="0">
+                        <p id="user_backup_link_muns"></p>
+                        <!-- <h4>部门简介</h4> -->
+                        <p id="outlink_domain_show_res">
+                            
+                        </p>
+                    </div>
+                </div>
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <h5>快站站点检测中....</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <!-- <h4>部门简介</h4> -->
+                        <p id="kuaizhan_domain_show_res">
+                            
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <!-- 全局js -->
+    <script src="/Public/layui/js/jquery.min.js?v=2.1.4"></script>
+    <script src="/Public/layui/js/bootstrap.min.js?v=3.3.6"></script>
+
+</body>
+<?php foreach ($serverMuns as $serverMunsvalue): ?>
+<script type="text/javascript">
+// //落地检测
+(function (){
+    var i_luodi = 0;
+    var  str_luodi= '';
+    var serverid = {$serverMunsvalue["server_id"]};
+  time = setInterval(function(){  //开启5秒检测一次
+      $.ajax({
+          url: '__CONTROLLER__/StartCheckLuodiDomain',
+          type: 'POST',
+          dataType: 'json',
+          data: {'serverid': serverid},
+          success:function(data){ 
+              if (data.code==0 || data.code==9) {   
+
+              $("#die_luodi_domain_muns_day"+serverid).html("<span style='color;#1bb394;'>"+data.die_luodi_domain_muns_day+"</span>");         //24
+              $("#die_luodi_domain_muns"+serverid).html("<span style='color;#1bb394;'>"+data.die_luodi_domain_muns+"</span>");         //1小时
+              $("#have_luodi_muns"+serverid).html("<span style='color;#1bb394;'>"+data.have_luodi_muns+"</span>");         //剩余
+                i_luodi = i_luodi+1;
+                str_luodi += '<span style="color:#1bb394;">'+data.msg+'----'+data.domain+'</span><br>' ;
+                $("#luodi"+serverid).html(str_luodi);
+                if (i_luodi - 2 > 0) {
+                    str_luodi = '';
+                    i_luodi =0;
+                }
+              }else{
+                setTimeout(function(){
+                    window.location.reload();
+                },500)
+              }
+          }
+      })
+  },5700)
+  }  ())  
+</script>
+<?php endforeach ?>
+<script type="text/javascript">
+//中间域名检测
+(function (){
+    var i_middle = 0;
+    var  str_middle= '';
+  time = setInterval(function(){  //开启5秒检测一次
+      $.ajax({
+          url: '__CONTROLLER__/StartCheckMiddleDomain',
+          type: 'POST',
+          dataType: 'json',
+          data: {'domain': 'middle'},
+          success:function(data){ 
+              if (data.code==0 || data.code==9) {        
+              $("#die_middle_domain_muns_day").html("<span style='color;#1bb394;'>"+data.die_middle_domain_muns_day+"</span>");         //24
+              $("#die_middle_domain_muns").html("<span style='color;#1bb394;'>"+data.die_middle_domain_muns+"</span>");         //1小时
+              $("#have_middle_muns").html("<span style='color;#1bb394;'>"+data.have_middle_muns+"</span>");         //剩余
+                i_middle = i_middle+1;
+                  // setTimeout(function(){
+                  //     window.location.reload();
+                  // },500)
+                str_middle += '<span style="color:#1bb394;">'+data.msg+'----'+data.domain+'</span><br>' ;
+                $("#middle_domain_show_res").html(str_middle);
+                if (i_middle - 5 > 0) {
+                    str_middle = '';
+                    i_middle =0;
+                }
+              }else{
+                setTimeout(function(){
+                    window.location.reload();
+                },500)
+              }
+          }
+      })
+  },6050)
+  }  ());
+
+
+
+// 入口域名检测
+(function (){
+    var i_rukou = 0;
+    var  str_rukou= '';
+    var nowid = 0;
+  time = setInterval(function(){  //开启5秒检测一次
+    var nowid = $("#nowid").val();
+    // var minid = $("#minid").val();
+    // var maxid = $("#maxid").val();
+    // console.log(nowid);
+    // console.log(minid);
+    // console.log(maxid);
+      $.ajax({
+          url: '__CONTROLLER__/StartCheckGetaDomain',
+          type: 'POST',
+          dataType: 'json',
+          data: {'nowid': nowid},
+          success:function(data){ 
+              if (data.code==0 || data.code==9) {     
+                $("#nowid").val(data.nowid);   
+                $("#minid").val(data.minid);   
+                $("#maxid").val(data.maxid);
+                // console.log(data.nowid);  
+                // console.log(data.minid);  
+                // console.log(data.maxid);  
+                $("#have_rukou_muns").html("<span style='color;#1bb394;'>"+data.have_rukou_muns+"</span>");         //剩余
+                $("#die_rukou_domain_muns_day").html("<span style='color;#1bb394;'>"+data.die_rukou_domain_muns_day+"</span>");         //24
+                $("#die_rukou_domain_muns").html("<span style='color;#1bb394;'>"+data.die_rukou_domain_muns+"</span>");         //1小时
+                $("#isuse_rukou_domain_muns").html("<span style='color;#1bb394;'>"+data.isuse_rukou_domain_muns+"</span>");         //已用
+                i_rukou = i_rukou+1;
+                  // setTimeout(function(){
+                  //     window.location.reload();
+                  // },500)
+                str_rukou += '<span style="color:#1bb394;">'+data.msg+'----'+data.domain+'</span><br>' ;
+                $("#rukou").html(str_rukou);
+                if (i_rukou - 5 > 0) {
+                    str_rukou = '';
+                    i_rukou =0;
+                }
+              }else{
+                    setTimeout(function(){
+                        window.location.reload();
+                    },500)
+              }
+          }
+      })
+  },7000)
+  }());
+
+//借权入口
+(function (){
+    var i_rukou = 0;
+    var  str_rukou= '';
+    var kznowid = 0;
+  time = setInterval(function(){  //开启5秒检测一次
+    var kznowid = $("#kznowid").val();
+    // var minid = $("#minid").val();
+    // var maxid = $("#maxid").val();
+    // console.log(nowid);
+    // console.log(minid);
+    // console.log(maxid);
+      $.ajax({
+          url: '__CONTROLLER__/KuaizhanDomain',
+          type: 'POST',
+          dataType: 'json',
+          data: {'kznowid': kznowid},
+          success:function(data){ 
+              if (data.code==0 || data.code==9) {     
+                $("#kznowid").val(data.kznowid);   
+                $("#kzminid").val(data.kzminid);   
+                $("#kzmaxid").val(data.kzmaxid);
+                // console.log(data.nowid);  
+                // console.log(data.minid);  
+                // console.log(data.maxid);  
+
+                i_rukou = i_rukou+1;
+                  // setTimeout(function(){
+                  //     window.location.reload();
+                  // },500)
+                str_rukou += '<span style="color:#1bb394;">'+data.msg+'----'+data.domain+'</span><br>' ;
+                $("#kzrukou").html(str_rukou);
+                if (i_rukou - 2 > 0) {
+                    str_rukou = '';
+                    i_rukou =0;
+                }
+              }else{
+                    setTimeout(function(){
+                        window.location.reload();
+                    },500)
+              }
+          }
+      })
+  },30000)
+  }());
+
+
+
+// 外链域名检测
+(function (){
+    var i_outlink = 0;
+    var  str_outlink= '';
+  time = setInterval(function(){  //开启5秒检测一次
+    var nowidoutlink = $("#nowidoutlink").val();
+    var checkArr = $("#checkArr").val();
+    var maxidoutlink = $("#maxidoutlink").val();
+    var shijiID = $("#shijiID").val();
+    console.log(nowidoutlink);
+    console.log(checkArr);
+    console.log(maxidoutlink);
+    console.log(shijiID);
+      $.ajax({
+          url: '__CONTROLLER__/OutLinkDomainCheck',
+          type: 'POST',
+          dataType: 'json',
+          data: {'nowidoutlink': nowidoutlink,"checkArr":checkArr,"maxidoutlink":maxidoutlink},
+          success:function(data){ 
+              if (data.code==0 || data.code==9) {     
+                $("#nowidoutlink").val(data.nowidoutlink);   
+                $("#checkArr").val(data.checkArr);   
+                $("#maxidoutlink").val(data.maxidoutlink);
+                $("#shijiID").val(data.shijiID);
+                // console.log(data.nowid);  
+                // console.log(data.minid);  
+                // console.log(data.maxid);  
+                $("#user_backup_link_muns").html("<span style='color;#1bb394;'>"+data.user_backup_link_muns+"</span>");         //没有没用链接的人.
+                $("#outlink_domain_muns").html("<span style='color;#1bb394;'>"+data.maxidoutlink+"</span>");         //共有外链域名个数
+                i_outlink = i_outlink+1;
+                  // setTimeout(function(){
+                  //     window.location.reload();
+                  // },500)
+                str_outlink += '<span style="color:#1bb394;">'+data.msg+'----'+data.domain+'</span><br>' ;
+                $("#outlink_domain_show_res").html(str_outlink);
+                if (i_outlink - 2 > 0) {
+                    str_outlink = '';
+                    i_outlink =0;
+                }
+              }else{
+                    setTimeout(function(){
+                        window.location.reload();
+                    },500)
+              }
+          }
+      })
+  },6000)
+  }  ())  ;
+//快站检测
+(function (){
+    var i_kuaizhan = 0;
+    var  str_kuaizhan= '';
+  time = setInterval(function(){  //开启5秒检测一次
+      $.ajax({
+          url: '__CONTROLLER__/StartCheckKuaizZhanDomain',
+          type: 'POST',
+          dataType: 'json',
+          data: {'domain': 'middle'},
+          success:function(data){ 
+              if (data.code==0 || data.code==9) {        
+                i_kuaizhan = i_kuaizhan+1;
+                  // setTimeout(function(){
+                  //     window.location.reload();
+                  // },500)
+                str_kuaizhan += '<span style="color:#1bb394;">'+data.msg+'----'+data.domain+'</span><br>' ;
+                $("#kuaizhan_domain_show_res").html(str_kuaizhan);
+                if (i_kuaizhan - 3 > 0) {
+                    str_kuaizhan = '';
+                    i_kuaizhan =0;
+                }
+              }else{
+                setTimeout(function(){
+                    window.location.reload();
+                },500)
+              }
+          }
+      })
+  },5020)
+  }  ());
+</script>
+</html>

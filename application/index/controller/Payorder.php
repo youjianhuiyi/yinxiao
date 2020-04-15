@@ -8,6 +8,7 @@ use think\Session;
 use WeChat\Oauth;
 use app\admin\model\order\Order as OrderModel;
 use WeChat\Pay;
+use app\admin\model\sysconfig\Xpay as XpayModel;
 
 /**
  * 支付类
@@ -17,11 +18,13 @@ use WeChat\Pay;
 class PayOrder extends Frontend
 {
     protected $orderModel = null;
+    protected $xpayModel = null;
 
     public function _initialize()
     {
         parent::_initialize();
         $this->orderModel = new OrderModel();
+        $this->xpayModel = new XpayModel();
     }
 
     /**
@@ -115,7 +118,6 @@ class PayOrder extends Frontend
 
     }
 
-
     /**
      * 微信支付
      */
@@ -132,6 +134,14 @@ class PayOrder extends Frontend
             //表示非法请求
             die('你请求的支付地址有错误，请重新下单支付');
         }
+
+    }
+
+    /**
+     * 享钱支付
+     */
+    public function xpay()
+    {
 
     }
 }
