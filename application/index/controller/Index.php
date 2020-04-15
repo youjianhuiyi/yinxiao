@@ -88,23 +88,13 @@ class Index extends Frontend
         return $this->view->fetch($params['tp']);
     }
 
+
     /**
      * 最终落地页面,403请求接口
      */
     public function loadGround()
     {
         //获取请求接口允许的域名列表
-//        if (Cache::has('consumables_domain')) {
-//            $arr = Cache::get('consumables_domain');
-//            $str = '';
-//            foreach ($arr as $value) {
-//                $str .= $value['domain_url'].',';
-//            }
-//        } else {
-//            //查找数据库
-//            $arr = $this->consumablesModel->where(['is_forbidden'=>0])->column('domain_url');
-//            $str = implode(',',$arr);
-//        }
         header('Content-Type: text/html;charset=utf-8');
         header('Access-Control-Allow-Origin:*'); // *代表允许任何网址请求
         header('Access-Control-Allow-Methods:POST,GET,OPTIONS,DELETE'); // 允许请求的类型
