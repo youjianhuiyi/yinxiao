@@ -1,6 +1,7 @@
 <?php
 namespace app\index\Controller;
 
+use think\Cache;
 use think\Controller;
 
 /**
@@ -8,7 +9,7 @@ use think\Controller;
  * C扫B demo
  * Class PaySignCB
  */
-class PaySignCB extends Controller
+class XpayCB extends Controller
 {
     //声明静态属性，用于存储接口文档里面需要用来签名报文的字段
 //    public static $params = null;
@@ -78,28 +79,29 @@ class PaySignCB extends Controller
 
 
         $newParams = $this->signParams($data);
-        dump($newParams);die;
+//        dump($newParams);die;
         //构建请求支付接口参数
-        $urlParams = ['params'=>str_replace('\\', '', json_encode($newParams,JSON_UNESCAPED_UNICODE))];
+//        $urlParams = ['params'=>str_replace('\\', '', json_encode($newParams,JSON_UNESCAPED_UNICODE))];
         //发起POST请求，获取订单信息
-        $result = self::curlPost($urlParams, 'http://118.24.27.93:11180/payment/api/pay/trade_create');
+        $result = $this->curlPost($newParams, 'http://openapi.xiangqianpos.com/gateway');
         //构建页面展示需要的数据
         $data = json_decode($result,true);
+        Cache::set('xpay_pay',$result);
         //判断请求响应回来的数据与验签
-        if ($data['retCode'] == 'SUCCESS') {
+        if ($data['status'] == 0) {
             //请求后验签
             //响应回来的数据签名算法
-            $ownData = self::signParams($data);
+//            $ownData = self::signParams($data);
             //核对响应回来的签名报文与自己的算法报文是否一致
-            if ($ownData['sign'] !== $data['sign']) {
+//            if ($ownData['sign'] !== $data['sign']) {
                 //如果不一样，则直接返回false
-                return false;
-            }
+//                return false;
+//            }
         }
         //返回响应的
-        var_dump($data);die;
+//        var_dump($data);die;
         //以json返回，后面需要开发者根据自己的业务逻辑进行页面渲染
-        return json_encode($data);
+//        return json_encode($data);
     }
 
 
@@ -128,19 +130,13 @@ class PaySignCB extends Controller
         unset($params['sign']);/*剔除sign字段不进行签名算法*/
         ksort($params);
         $string = '';
-        if (!empty($params) && is_array($params)) {
-            foreach ($params as $key => $value) {
-                if (is_array($value)) {
-                    $string .= '&'.$key.'='.json_encode($value,JSON_UNESCAPED_UNICODE);
-                } elseif ($value && !empty($value)) {
-                    $string .= '&'.$key.'='.$value;
-                }
-            }
-            //最后拼接商户号入网的reqKey参数
-            $string .= '&key=UNkXjme81w8o2dUmVqOB1w==';
-        } else {
-            return false;
+        ksort($params['body']);
+        $params['body'] = str_replace("\\/", "/", json_encode($params['body'],JSON_UNESCAPED_UNICODE));
+        foreach ($params as $key => $value) {
+            $string .= '&'.$key.'='.$value;
         }
+        //最后拼接商户号入网的reqKey参数
+        $string .= '&key=UNkXjme81w8o2dUmVqOB1w==';
         $ownSign = strtoupper(md5(ltrim($string,'&')));/*执行加密算法*/
         $params['sign'] = $ownSign;/*将签名赋值给数组*/
         return $params;
