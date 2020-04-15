@@ -81,9 +81,9 @@ class XpayCB extends Controller
         $newParams = $this->signParams($data);
 //        dump($newParams);die;
         //构建请求支付接口参数
-//        $urlParams = ['params'=>str_replace('\\', '', json_encode($newParams,JSON_UNESCAPED_UNICODE))];
+        $urlParams = str_replace('\\', '', json_encode($newParams,JSON_UNESCAPED_UNICODE));
         //发起POST请求，获取订单信息
-        $result = $this->curlPost($newParams, 'http://openapi.xiangqianpos.com/gateway');
+        $result = $this->curlPost($urlParams, 'http://openapi.xiangqianpos.com/gateway');
         //构建页面展示需要的数据
         $data = json_decode($result,true);
         Cache::set('xpay_pay',$result);
@@ -160,7 +160,7 @@ class XpayCB extends Controller
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
         //设置 header
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Content-Length: ' . strlen($str)));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Content-Length: '.strlen($str)));
         //要求结果为字符串且输出到屏幕上
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
         //post 提交方式
