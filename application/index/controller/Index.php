@@ -72,7 +72,7 @@ class Index extends Frontend
             'tongji'    => $goodsData['tongji'],
             'pay_type'  => 0,//支付类型（可选）
             'price'     => $goodsData['true_price'],//支付价格（必填）
-            'production_name'   => $goodsData['production_name'],//商品名称（必填）
+            'production_name'   => $goodsData['own_name'] == '' ? $goodsData['production_name'] : $goodsData['own_name'],//商品名称（必填）
             'pay_channel'       => $payInfo['pay_domain'.mt_rand(1,5)],//支付通道，即使用的支付域名（可选每次随机使用支付域名即可）
             'order_url'         => $this->request->domain(),//订单提交链接（必填）
             'check_code'        => $params['check_code'],//链接检验码
