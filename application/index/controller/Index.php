@@ -188,8 +188,8 @@ class Index extends Frontend
         } else {
             $queryStr = $this->urlModel->where(['check_code'=>$params['code']])->find()['query_string'];
         }
-        $condition = $this->do403Params($queryStr);
         $str = md5(explode('&check_code',$queryStr)[0]);
+        $condition = $this->do403Params($queryStr);
         //查询当前团队使用的是哪种支付方式,通过渲染方式不同，落地方法不一样，流程不一样。
         //根据推广链接403入口，来决定是走哪种支付方式，不同的支付方式，需要不同地流程与渲染，落地，成交，支付
         $payPool = collection($this->paysetModel->where(['team_id'=>$condition['tid']])->select())->toArray();
