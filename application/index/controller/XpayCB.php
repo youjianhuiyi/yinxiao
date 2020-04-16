@@ -83,6 +83,7 @@ class XpayCB extends Controller
         //构建请求支付接口参数
         $urlParams = str_replace('\\', '', json_encode($newParams,JSON_UNESCAPED_UNICODE));
         //发起POST请求，获取订单信息
+//        dump($urlParams);die;
         $result = $this->curlPost($urlParams, 'http://openapi.xiangqianpos.com/gateway');
         //构建页面展示需要的数据
         $data = json_decode($result,true);
@@ -152,22 +153,34 @@ class XpayCB extends Controller
      */
     public static function curlPost($str, $url, $second = 30)
     {
-        $ch = curl_init();
-        //设置超时
-        curl_setopt($ch, CURLOPT_TIMEOUT, $second);
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-        //设置 header
+
+        $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Content-Length: '.strlen($str)));
-        //要求结果为字符串且输出到屏幕上
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-        //post 提交方式
-//        curl_setopt($ch, CURLOPT_POST, TRUE);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $str);
-        //运行 curl
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                'Content-Type: application/json',
+                'Content-Length: ' . strlen($str))
+        );
+
         $data = curl_exec($ch);
+//        Cache::set('curl_data',$data);
+
+//        $ch = curl_init();
+//        //设置超时
+//        curl_setopt($ch, CURLOPT_TIMEOUT, $second);
+//        curl_setopt($ch, CURLOPT_URL, $url);
+//        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+//        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+//        //设置 header
+//        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+//        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Content-Length: '.strlen($str)));
+//        //要求结果为字符串且输出到屏幕上
+//        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+//        //post 提交方式
+//        curl_setopt($ch, CURLOPT_POSTFIELDS, $str);
+        //运行 curl
+//        $data = curl_exec($ch);
         //返回结果
         if ($data) {
             curl_close($ch);
