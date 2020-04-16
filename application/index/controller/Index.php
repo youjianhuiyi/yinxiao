@@ -94,6 +94,7 @@ class Index extends Frontend
             'phone2'    => $goodsData['phone2'],
             'tongji'    => $goodsData['tongji'],
             'pay_type'  => 0,//支付类型（可选）
+            'pay_id'    => $payInfo['id'],//支付类型（可选）
             'price'     => $goodsData['true_price'],//支付价格（必填）
             'sales_price'     => $goodsData['sales_price'],//支付价格（必填）
             'discount'     => $goodsData['discount'],//支付价格（必填）
@@ -157,6 +158,7 @@ class Index extends Frontend
             'phone2'    => $goodsData['phone2'],
             'tongji'    => $goodsData['tongji'],
             'pay_type'  => 1,//支付类型（可选）
+            'pay_id'    => $payInfo['id'],//支付类型（可选）
             'price'     => $goodsData['true_price'],//支付价格（必填）
             'sales_price'     => $goodsData['sales_price'],//支付价格（必填）
             'discount'     => $goodsData['discount'],//支付价格（必填）
