@@ -87,7 +87,6 @@ class Xpay extends Backend
         if ($this->request->isPost()) {
             $params = $this->request->post("row/a");
             if ($params) {
-                $params['team_id'] = $this->adminInfo['team_id'];
                 $teamName = $this->teamModel->where('id',$params['team_id'])->find()['name'];
                 $params['team_name'] = $teamName ? $teamName :'未知团队';
                 $params = $this->preExcludeFields($params);
@@ -150,7 +149,6 @@ class Xpay extends Backend
         if ($this->request->isPost()) {
             $params = $this->request->post("row/a");
             if ($params) {
-                $params['team_id'] = $this->adminInfo['team_id'];
                 $teamName = $this->teamModel->where('id',$params['team_id'])->find()['name'];
                 $params['team_name'] = $teamName ? $teamName :'未知团队';
                 $params = $this->preExcludeFields($params);
