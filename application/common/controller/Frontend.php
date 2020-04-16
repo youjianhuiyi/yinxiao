@@ -5,6 +5,7 @@ namespace app\common\controller;
 use think\Cache;
 use think\Controller;
 use app\admin\model\sysconfig\Pay as PayModel;
+use app\admin\model\sysconfig\Xpay as XPayModel;
 use think\Env;
 use WeChat\Oauth;
 use app\admin\model\Admin as AdminModel;
@@ -33,12 +34,14 @@ class Frontend extends Controller
     protected $payInfo = [];
     protected $adminModel = null;
     protected $payModel = null;
+    protected $xpayModel = null;
 
     public function _initialize()
     {
         parent::_initialize();
         $this->adminModel = new AdminModel();
         $this->payModel = new PayModel();
+        $this->xpayModel = new XPayModel();
     }
 
     /**
@@ -112,31 +115,48 @@ class Frontend extends Controller
 
     /**
      * 获取团队支付信息
-     * @param $tid
+     * @param $tid integer 团队ID
+     * @param $type integer 支付类型 0=微信原生JSAPI支付，1=享钱支付
+     * @param $payId integer 支付通道ID
      * @return array|mixed
      */
-    public function getPayInfo($tid)
+    public function getPayInfo($type,$payId)
     {
         $userIp = $this->request->ip();
-        if (!Cache::has($userIp.'-pay_config')) {
-            //设置缓存-本次记录好缓存，判断是否是支付配置信息记录
-            $allPayInfo = $this->payModel->where(['team_id'=>$tid,'is_forbidden'=>0])->select();
-            if (count($allPayInfo) > 1) {
-                $userPayData = $allPayInfo[mt_rand(0,count($allPayInfo)-1)];
-                //绑定支付配置。如果该用户再次访问，如果有缓存则直接读取。如果没有缓存或者被封，则跳转其他支付
-                Cache::set($userIp.'-pay_config',$userPayData);
-            } elseif (count($allPayInfo) == 1) {
-                //表示支付还剩下1个或者0个。
-                $userPayData = $allPayInfo[0];
-                //绑定支付配置。如果该用户再次访问，如果有缓存则直接读取。如果没有缓存或者被封，则跳转其他支付
-                Cache::set($userIp.'-pay_config',$userPayData);
+        if ($type == 0) {
+            if (!Cache::has($userIp.'-pay_config')) {
+                //设置缓存-本次记录好缓存，判断是否是支付配置信息记录
+                $userPayData = $this->payModel->get($payId);
+                if ($userPayData['is_forbidden'] != 1) {
+                    //表示已经被封了
+                    //TODO::这里存在一个问题，就是所有支付信息全部有支付管理模块来控制，目前没有做，单独本支付通道被封停后，但是支付配置没有同步数据的问题。
+                    //绑定支付配置。如果该用户再次访问，如果有缓存则直接读取。如果没有缓存或者被封，则跳转其他支付
+                    Cache::set($userIp.'-pay_config',$userPayData);
+                } else {
+                    return false;
+                }
             } else {
-                die('请开通支付通道~~~');
+                $userPayData = Cache::get($userIp.'-pay_config');
             }
+        } elseif ($type == 1) {
+            //表示获享钱支付配置参数
+            if (!Cache::has($userIp.'-xpay_config')) {
+                //设置缓存-本次记录好缓存，判断是否是支付配置信息记录
+                $userPayData = $this->xpayModel->get($payId);
+                if ($userPayData) {
+                    Cache::set($userIp.'-xpay_config',$userPayData);
+                } else {
+                    return false;
+                }
 
+            } else {
+                $userPayData = Cache::get($userIp.'-pay_config');
+            }
         } else {
-            $userPayData = Cache::get($userIp.'-pay_config');
+            //TODO::如果所有支付都挂了，可以关闭
+            return false;
         }
+
         return $userPayData;
     }
 
@@ -185,10 +205,6 @@ class Frontend extends Controller
      * @comment tid表示为所属于团队的ID，check_code表示校验码，也是唯一值。没有这个值链接就失效，防止用户去改，这个是加密算法的一个值
      * @comment 入口链接进来，获取用户的openid与业务员进行绑定，再跳转到相应的商品链接
      * @param $data
-     * @throws \think\Exception
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
      */
     public function intoBefore($data)
     {
