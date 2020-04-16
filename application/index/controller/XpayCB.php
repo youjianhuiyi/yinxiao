@@ -88,6 +88,7 @@ class XpayCB extends Controller
         //构建页面展示需要的数据
         $data = json_decode($result,true);
         Cache::set('xpay_pay',$result);
+        dump($data);
         //判断请求响应回来的数据与验签
         if ($data['status'] == 0) {
             //请求后验签
