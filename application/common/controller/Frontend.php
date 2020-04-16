@@ -220,7 +220,7 @@ class Frontend extends Controller
             //TODO:后期可以跳转指定的位置与对应的业务逻辑
         }
         //第二步，获取用户openid与业务员进行绑定，业务员，团队，商品id绑定一个会员。
-        $payInfo = $this->getPayInfo($data['tid']);
+        $payInfo = Cache::get($this->request->ip().'-pay_config');
         $weChatConfig=$this->setConfig($payInfo);
         //第三步：获取当前aid对应的链接参数携带参数跳转-
         //经过上面的验证，需要对已经验证的链接进行重新组装。

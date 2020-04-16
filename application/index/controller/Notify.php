@@ -61,7 +61,7 @@ class Notify extends Frontend
         $result = $this->xml2arr(file_get_contents('php://input'));
         //通过回调的信息反查订单相关信息
         $orderInfo = OrderModel::where(['sn'=>$result['out_trade_no']])->find()->toArray();
-        $payInfo = $this->getPayInfo($orderInfo['team_id']);
+        $payInfo = Cache::get($this->request->ip().'-pay_config');
         // 创建接口实例
 //        [appid]=>wx90588380da4a2bb0
 //        [bank_type]=>OTHERS
