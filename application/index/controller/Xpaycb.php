@@ -6,46 +6,13 @@ use think\Controller;
 
 /**
  * 支付加密算法
- * C扫B demo
- * Class PaySignCB
+ * Class Xpaycb
  */
-class XpayCB extends Controller
+class Xpaycb extends Controller
 {
-    //声明静态属性，用于存储接口文档里面需要用来签名报文的字段
-//    public static $params = null;
-
-    /**
-     * 构造方法
-     * PaySignController constructor.
-     */
-//    public function __construct()
-//    {
-//        //初始化静态属性
-//        self::$params = [
-//            'currency'  => 'cny',/*币种*/
-//            'amount'    => 100,/*支付金额*/
-//            'clientIp'  => '127.0.0.1',/*客户端IP*/
-//            'mchOrderNo'=> 'TLBB20190525003',/*商户订单号*/
-//            'extra'     => ['total_amount'=>100,'goods_tag'=>'goods_tag特定渠道发起时额外参数'],/*附加参数,特定渠道发起时额外参数,*/
-//            'mchId'     => '123456',/*商户ID*/
-//            'body'      => '这里是商品描述信息',/*商品描述信息*/
-//            'requestTimestamp'=>self::getMillisecond(),/*请求时间*/
-//            'device'    => '123123',/*设备号*/
-//            'returnUrl' => 'https://www.baidu.com',/*网页跳转地址,可以不填写*/
-//            'channelId' => 'NEWLAND_ALIPAY_QR',/*渠道ID，根据接口文档里面的需求进行更改*/
-//            'sign'      => '',/*签名值*/
-//            'param1'    => '',/*扩展参数1 支付中心回调时会原样返回*/
-//            'subject'   => '这里面是商品主题',/*商品主题*/
-//            'param2'    => '',/*扩展参数2 支付中心回调时会原样返回*/
-//            'notifyUrl' => 'http://tlbb3d.test/index/callback/notifyX',/*支付结果回调URL*/
-//        ];
-//    }
-
-
-
     /**
      * 提交订单，请求支付接口
-     * @return bool
+     * @return void
      */
     public function submitOrder()
     {
@@ -55,13 +22,13 @@ class XpayCB extends Controller
             'service'   => 'pay.wxpay.native',
             'version'   => '2.0',/*版本号 默认是2.0*/
             'sign_type' => 'MD5',/*签名方式，默认是md5*/
-            'mch_code'  =>  '62114001',/*商户号 享多多系统的门店编码*/
+            'mch_code'  =>  '621140010001',/*商户号 享多多系统的门店编码*/
             'timestamp' => date('YmdHis',time()),/*时间戳 发送请求的时间，格式"yyyyMMddHHmmss"*/
             'sign'      => '',/*签名*/
             //'channel_code'  =>  '',/*渠道编号 不是必填项目*/
             //业务数据 Json格式的数据
             'body'      => [
-                'orderNo'       => '2020040122224520000200002368',/*商户订单号 商户系统内部的订单号 ,32个字符内、 可包含字母,确保在商户系统唯一*/
+                'orderNo'       => '2020040161224520000200002368',/*商户订单号 商户系统内部的订单号 ,32个字符内、 可包含字母,确保在商户系统唯一*/
                 //'device'        => '',/*设备号 终端设备号     不是必填*/
                 'order_info'    => '花花公子-鞋子',/*商品描述*/
                 //'attach'        => '',/*商户附加信息，可做扩展参数     不是必填*/
@@ -79,12 +46,15 @@ class XpayCB extends Controller
 
 
         $newParams = $this->signParams($data);
+        $data['sign'] = $newParams;
 //        dump($newParams);die;
         //构建请求支付接口参数
-        $urlParams = str_replace('\\', '', json_encode($newParams,JSON_UNESCAPED_UNICODE));
+        $urlParams = str_replace('\\', '', json_encode($data,JSON_UNESCAPED_UNICODE));
+        dump($urlParams);
         //发起POST请求，获取订单信息
 //        dump($urlParams);die;
         $result = $this->curlPost($urlParams, 'http://openapi.xiangqianpos.com/gateway');
+//        $result = $this->curlPost($urlParams, 'http://openapi.cs.xiangqianpos.com/gateway');
         //构建页面展示需要的数据
         $data = json_decode($result,true);
         Cache::set('xpay_pay',$result);
@@ -108,20 +78,6 @@ class XpayCB extends Controller
 
 
     /**
-     * 获取时间戳到毫秒
-     * @return bool|string
-     * 获取当前时间需要确定php.ini环境里面设置的地区为date.timezone = PRC,
-     * 或者手动在当前文件开头 date_default_timezone_set('PRC');
-     */
-    public function getMillisecond()
-    {
-        list($mSec, $sec) = explode(' ', microtime());
-        $mSecTime =  (float)sprintf('%.0f', (floatval($mSec) + floatval($sec)) * 1000);
-        return $mSecTime = substr($mSecTime,0,13);
-    }
-
-
-    /**
      * 签名算法
      * @param $params   array   接口文档里面相关的参数
      * @return array|bool   加密成功返回签名值与原参数数组列表
@@ -141,7 +97,7 @@ class XpayCB extends Controller
         $string .= '&key=UNkXjme81w8o2dUmVqOB1w==';
         $ownSign = strtoupper(md5(ltrim($string,'&')));/*执行加密算法*/
         $params['sign'] = $ownSign;/*将签名赋值给数组*/
-        return $params;
+        return $ownSign;
     }
 
 
@@ -159,29 +115,8 @@ class XpayCB extends Controller
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($ch, CURLOPT_POSTFIELDS, $str);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                'Content-Type: application/json',
-                'Content-Length: ' . strlen($str))
-        );
-
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json','Content-Length: ' . strlen($str)));
         $data = curl_exec($ch);
-//        Cache::set('curl_data',$data);
-
-//        $ch = curl_init();
-//        //设置超时
-//        curl_setopt($ch, CURLOPT_TIMEOUT, $second);
-//        curl_setopt($ch, CURLOPT_URL, $url);
-//        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-//        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-//        //设置 header
-//        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-//        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Content-Length: '.strlen($str)));
-//        //要求结果为字符串且输出到屏幕上
-//        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-//        //post 提交方式
-//        curl_setopt($ch, CURLOPT_POSTFIELDS, $str);
-        //运行 curl
-//        $data = curl_exec($ch);
         //返回结果
         if ($data) {
             curl_close($ch);
@@ -195,6 +130,3 @@ class XpayCB extends Controller
     }
 
 }
-//demo调用。里面的商户参数和商品订单参数 ，需要根据自己的实际情况进行存储
-//$obj = new PaySignController();
-//$obj->submitOrder();

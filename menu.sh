@@ -22,3 +22,4 @@ php think menu -c sysconfig/pay
 php think menu -c sysconfig/consumables
 php think menu -c sysconfig/ground
 php think menu -c sysconfig/wxdomain
+php think menu -c sysconfig/payset

@@ -59,11 +59,13 @@ class Pay extends Backend
             list($where, $sort, $order, $offset, $limit) = $this->buildparams();
             $total = $this->model
                 ->where($where)
+                ->where('team_id',$this->adminInfo['team_id'])
                 ->order($sort, $order)
                 ->count();
 
             $list = $this->model
                 ->where($where)
+                ->where('team_id',$this->adminInfo['team_id'])
                 ->order($sort, $order)
                 ->limit($offset, $limit)
                 ->select();
@@ -75,7 +77,6 @@ class Pay extends Backend
         }
         return $this->view->fetch();
     }
-
     /**
      * 回收站
      */
