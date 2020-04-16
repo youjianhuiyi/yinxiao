@@ -63,8 +63,10 @@ class Order extends Frontend
                 'production_name'   => $params['production_name'],
                 'goods_info'=> '款式='.$params['pattern'].';性别='.$params['sex'].';属性='.$params['attr'],
                 'price'     => $params['price'],
-                'pay_id'    => '',
-                'sn'        => $sn
+                'pay_id'    => $params['pay_id'],
+                'pay_type'  => $params['pay_type'],
+                'sn'        => $sn,
+                'order_ip'  => $this->request->ip(),
             ];
 
             $result = false;
