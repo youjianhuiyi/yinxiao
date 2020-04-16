@@ -27,7 +27,11 @@
         "phpoffice/phpspreadsheet": "^1.2",
         "topthink/think-migration": "v1.1.1",
         "yansongda/pay": "v2.6.0",
-        "zoujingli/wechat-developer": "^1.2"
+        "zoujingli/wechat-developer": "^1.2",
+    },
+    "require-dev": {
+        "ext-json": "*",
+        "ext-curl": "*"
     },
     "config": {
         "preferred-install": "dist"

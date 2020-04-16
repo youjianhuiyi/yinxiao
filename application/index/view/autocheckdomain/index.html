@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>域名检测系统</title>
+    <meta name="keywords" content="H+后台主题,后台bootstrap框架,会员中心主题,后台HTML,响应式后台">
+    <meta name="description" content="H+是一个完全响应式，基于Bootstrap3最新版本开发的扁平化主题，她采用了主流的左右两栏式布局，使用了Html5+CSS3等现代技术">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="/Public/layui/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="/Public/layui/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="/Public/layui/css/animate.css" rel="stylesheet">
+    <link href="/Public/layui/css/style.css?v=4.1.0" rel="stylesheet">
+</head>
+
+<body class="gray-bg">
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-3">
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <h5>落地<span style="color: #29b294;">服务器{}</span>域名检测中....</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <p id="luodi">
+                            
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 全局js -->
+    <script src="/Public/layui/js/jquery.min.js?v=2.1.4"></script>
+    <script src="/Public/layui/js/bootstrap.min.js?v=3.3.6"></script>
+
+</body>
+<script type="text/javascript">
+// //落地检测
+(function (){
+    var i_luodi = 0;
+    var  str_luodi= '';
+    time = setInterval(function(){  //开启5秒检测一次
+        $.ajax({
+            url: '__CONTROLLER__/StartCheckLuodiDomain',
+            type: 'POST',
+            dataType: 'json',
+            data: {'serverid': serverid},
+            success:function(data){
+                if (data.code==0 || data.code==9) {
+                    $("#die_luodi_domain_muns_day"+serverid).html("<span style='color;#1bb394;'>"+data.die_luodi_domain_muns_day+"</span>");         //24
+                    $("#die_luodi_domain_muns"+serverid).html("<span style='color;#1bb394;'>"+data.die_luodi_domain_muns+"</span>");         //1小时
+                    $("#have_luodi_muns"+serverid).html("<span style='color;#1bb394;'>"+data.have_luodi_muns+"</span>");         //剩余
+                    i_luodi = i_luodi+1;
+                    str_luodi += '<span style="color:#1bb394;">'+data.msg+'----'+data.domain+'</span><br>' ;
+                    $("#luodi"+serverid).html(str_luodi);
+                    if (i_luodi - 2 > 0) {
+                        str_luodi = '';
+                        i_luodi =0;
+                    }
+                }else{
+                    setTimeout(function(){
+                        window.location.reload();
+                    },500)
+                }
+            }
+        })
+  },5700)
+  }  ())  
+</script>
+</html>

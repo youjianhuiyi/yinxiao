@@ -214,9 +214,6 @@
       })
   },6050)
   }  ());
-
-
-
 // 入口域名检测
 (function (){
     var i_rukou = 0;
@@ -265,7 +262,6 @@
       })
   },7000)
   }());
-
 //借权入口
 (function (){
     var i_rukou = 0;
@@ -311,9 +307,6 @@
       })
   },30000)
   }());
-
-
-
 // 外链域名检测
 (function (){
     var i_outlink = 0;
@@ -366,7 +359,7 @@
 (function (){
     var i_kuaizhan = 0;
     var  str_kuaizhan= '';
-  time = setInterval(function(){  //开启5秒检测一次
+    time = setInterval(function(){  //开启5秒检测一次
       $.ajax({
           url: '__CONTROLLER__/StartCheckKuaizZhanDomain',
           type: 'POST',
