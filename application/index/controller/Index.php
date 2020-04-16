@@ -164,6 +164,7 @@ class Index extends Frontend
             'pay_channel'       => $payInfo['api_url'],//支付通道，即使用的支付域名（可选每次随机使用支付域名即可）
             'order_url'         => $this->request->domain(),//订单提交链接（必填）
             'check_code'        => $params['check_code'],//链接检验码
+            'api_domain'        => $this->request->domain(),/*原微信请求授权地址*/
         ];
 
         //缓存组装好的数据，进行跳转403,组装好中间域名。
