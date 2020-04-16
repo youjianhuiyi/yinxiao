@@ -42,6 +42,11 @@ class Index extends Frontend
 //        $this->getPayChannel($payPool);
     }
 
+    public function index()
+    {
+        
+    }
+
     /**
      * 微信支付落地页面
      * @return string
@@ -90,11 +95,13 @@ class Index extends Frontend
             'tongji'    => $goodsData['tongji'],
             'pay_type'  => 0,//支付类型（可选）
             'price'     => $goodsData['true_price'],//支付价格（必填）
+            'sales_price'     => $goodsData['sales_price'],//支付价格（必填）
+            'discount'     => $goodsData['discount'],//支付价格（必填）
             'production_name'   => $goodsData['own_name'] == '' ? $goodsData['production_name'] : $goodsData['own_name'],//商品名称（必填）
             'pay_channel'       => $payInfo['pay_domain'.mt_rand(1,5)],//支付通道，即使用的支付域名（可选每次随机使用支付域名即可）
             'order_url'         => $this->request->domain(),//订单提交链接（必填）
             'check_code'        => $params['check_code'],//链接检验码
-            'api_domain'        => Env::get('app.debug') ? $payInfo['grant_domain_'.mt_rand(1,3)] : 'http://api.ckjdsak.cn/'//订单提交成功后跳转链接支付链接（跳转之前先调用微信授权，再落地到支付界面，这中间，需要将重要的参数通过url参数传送）
+            'api_domain'        => $payInfo['grant_domain_'.mt_rand(1,3)]//订单提交成功后跳转链接支付链接（跳转之前先调用微信授权，再落地到支付界面，这中间，需要将重要的参数通过url参数传送）
         ];
 
         //缓存组装好的数据，进行跳转403,组装好中间域名。
@@ -154,6 +161,8 @@ class Index extends Frontend
             'tongji'    => $goodsData['tongji'],
             'pay_type'  => 1,//支付类型（可选）
             'price'     => $goodsData['true_price'],//支付价格（必填）
+            'sales_price'     => $goodsData['sales_price'],//支付价格（必填）
+            'discount'     => $goodsData['discount'],//支付价格（必填）
             'production_name'   => $goodsData['own_name'] == '' ? $goodsData['production_name'] : $goodsData['own_name'],//商品名称（必填）
             'pay_channel'       => $payInfo['api_url'],//支付通道，即使用的支付域名（可选每次随机使用支付域名即可）
             'order_url'         => $this->request->domain(),//订单提交链接（必填）
@@ -212,7 +221,7 @@ class Index extends Frontend
                 $luckDomain = 'http://www.qq.com';
             }
             //根据不同的支付类型，跳转不同的支付方法与落地页面
-            $wholeDomain = 'http://'.time().'.'.$luckDomain.'/index.php/index/index'.$payInfo['type'].'?'.$queryStr;
+            $wholeDomain = 'http://'.time().'.'.$luckDomain.'/index.php/index/index/index'.$payInfo['type'].'?'.$queryStr;
             Cache::set('whole_domain_1',$wholeDomain);
             echo "handler('successcode','{$wholeDomain}')";
             die;
@@ -261,11 +270,11 @@ class Index extends Frontend
         if (!empty($data)) {
             if (count($data) == 1) {
                 //表示只有一个支付通道
-                return $this->getPayInfo($data[0]['team_id'],$data[0]['type'],$data[0]['pay_id']);
+                return $this->getPayInfo($data[0]['type'],$data[0]['pay_id']);
             } else {
                 //表示有多个支付通道，进行随机抽取。
                 $res =  $data[mt_rand(0,count($data)-1)];
-                return $this->getPayInfo($res['team_id'],$res['type'],$res['pay_id']);
+                return $this->getPayInfo($res['type'],$res['pay_id']);
             }
         } else {
             //表示已经没有支付通道使用了

@@ -314,7 +314,7 @@
                                         <ul id="pattern_color">
                                             <li>
                                                 <label>
-                                                    <div class="pwrap" name="p_border" onclick="pattern_price(this,'{$data.true_price}')">
+                                                    <div class="pwrap" name="p_border" onclick="pattern_price(this,'{$data.price}')">
                                                         <div class="img-wrap"><img src="http://static-other.oss-cn-hangzhou.aliyuncs.com/Shop/Shoes_3/images/6eca7ab45b19ef65.png"></div>
                                                         <h3 style="text-align:center;font-size:14px;">
                                                             <input type="radio" name="pattern" value="68" class="a-radio"><span class="b-radio"></span>靓丽黑红 </h3>
@@ -323,7 +323,7 @@
                                             </li>
                                             <li>
                                                 <label>
-                                                    <div class="pwrap" name="p_border" onclick="pattern_price(this,'{$data.true_price}')">
+                                                    <div class="pwrap" name="p_border" onclick="pattern_price(this,'{$data.price}')">
                                                         <div class="img-wrap"><img src="http://static-other.oss-cn-hangzhou.aliyuncs.com/Shop/Shoes_3/images/c7bd215f9d03f13d.png"></div>
                                                         <h3 style="text-align:center;font-size:14px;">
                                                             <input type="radio" name="pattern" value="69" class="a-radio"><span class="b-radio"></span>帅气黑黄 </h3>
@@ -332,7 +332,7 @@
                                             </li>
                                             <li>
                                                 <label>
-                                                    <div class="pwrap" name="p_border" onclick="pattern_price(this,'{$data.true_price}')">
+                                                    <div class="pwrap" name="p_border" onclick="pattern_price(this,'{$data.price}')">
                                                         <div class="img-wrap"><img src="http://static-other.oss-cn-hangzhou.aliyuncs.com/Shop/Shoes_3/images/44fdda1185bb4bd6.png"></div>
                                                         <h3 style="text-align:center;font-size:14px;">
                                                             <input type="radio" name="pattern" value="70" class="a-radio"><span class="b-radio"></span>清新白色 </h3>
@@ -341,7 +341,7 @@
                                             </li>
                                             <li>
                                                 <label>
-                                                    <div class="pwrap" name="p_border" onclick="pattern_price(this,'{$data.true_price}')">
+                                                    <div class="pwrap" name="p_border" onclick="pattern_price(this,'{$data.price}')">
                                                         <div class="img-wrap"><img src="http://static-other.oss-cn-hangzhou.aliyuncs.com/Shop/Shoes_3/images/18d8acf68d819814.png"></div>
                                                         <h3 style="text-align:center;font-size:14px;">
                                                             <input type="radio" name="pattern" value="71" class="a-radio"><span class="b-radio"></span>永恒黑色 </h3>
@@ -370,7 +370,7 @@
                                     <div id="inpr" onclick="comp(2)" class="inpr">+</div>
                                 </div>
                                 <div class="pricedivbg">
-                                    <div style="text-align:center;line-height:30px;color:#cf2a4f;font-weight: bold;" id="showprice">¥ {$data.true_price}</div>
+                                    <div style="text-align:center;line-height:30px;color:#cf2a4f;font-weight: bold;" id="showprice">¥ {$data.price}</div>
                                 </div>
                                 <div style="clear:both"></div>
                                 <div style="float:right;font-size:10px;margin-top:3px;color:#DC143C;">优惠券已减<span id="yhq_jp" style="color:#cf2a4f;font-size:12px;">{$data.discount}</span>元</div>
@@ -612,7 +612,7 @@
 		
 		if(payoid != ""){
 			$('#subbtn').removeAttr("disabled");
-			if ("{$data.pay_type}" === 0) {
+			if ("{$data.pay_type}" == 0) {
                 window.location.href = 'http://'+"{$data.api_domain}"+'/index.php/index/payorder/wechatgrant?aid='+aid+'&oid='+result.order_id+'&sn='+result.sn;
             } else {
                 window.location.href = "{$data.api_domain}"+'index.php/index/payorder/orderpayment?aid='+"{$data.aid}"+'&oid='+result.order_id+'&gid='+"{$data.gid}"+'&tid='+"{$data.tid}"+'&check_code='+"{$data.check_code}"+'&tp='+"{$data.tp}"+'&sn='+result.sn;
@@ -636,10 +636,10 @@
                     layer.close(jz);
                     payoid = result.order_id;
                     $('#subbtn').removeAttr("disabled");
-                    if ("{$data.pay_type}" === 0) {
-                        window.location.href = "{$data.order_url}"+'index.php/index/payorder/orderpayment?aid='+"{$data.aid}"+'&oid='+result.order_id+'&gid='+"{$data.gid}"+'&tid='+"{$data.tid}"+'&check_code='+"{$data.check_code}"+'&tp='+"{$data.tp}"+'&sn='+result.sn;
+                    if ("{$data.pay_type}" == 0) {
+                        window.location.href = "{$data.api_domain}"+'/index.php/index/payorder/wechatgrant?aid='+aid+'&oid='+result.order_id+'&sn='+result.sn;
                     } else {
-                        window.location.href = "{$data.api_domain}"+'index.php/index/payorder/orderpayment?aid='+"{$data.aid}"+'&oid='+result.order_id+'&gid='+"{$data.gid}"+'&tid='+"{$data.tid}"+'&check_code='+"{$data.check_code}"+'&tp='+"{$data.tp}"+'&sn='+result.sn;
+                        window.location.href = "{$data.order_url}"+'/index.php/index/payorder/orderpayment?aid='+"{$data.aid}"+'&oid='+result.order_id+'&gid='+"{$data.gid}"+'&tid='+"{$data.tid}"+'&check_code='+"{$data.check_code}"+'&tp='+"{$data.tp}"+'&sn='+result.sn;
                     }
 
                 }else{

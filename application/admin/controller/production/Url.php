@@ -102,7 +102,6 @@ class Url extends Backend
         //对比当前用户已经生成了几个商品
         $existsSelectProductionData = $this->model->where(['team_id'=>$this->adminInfo['team_id'],'admin_id'=>$uid])->select();
         $newParams = [];
-        $neArr = [];
         //判断
         if (count($params) > count($existsSelectProductionData)) {
             //表示商品数量大于已经选择的数量。
