@@ -24,11 +24,11 @@
                             <!--时间倒计时模块-->
                             <div style="width:100%;position:relative;background:-webkit-gradient(linear,0 0,0 100%,from(#fef391),to(#fbe253));overflow:hidden;color:#fff">
                                 <div style="position:relative;height:54px;margin-right: 110px;background:#cf2a4f">
-                                    <div style="padding:0 10px;display:inline-block;height:54px;line-height:54px;vertical-align:text-bottom;font-size:18px">¥<strong style="font-size:42px;font-weight:400" id="info_price">799.9</strong>
+                                    <div style="padding:0 10px;display:inline-block;height:54px;line-height:54px;vertical-align:text-bottom;font-size:18px">¥<strong style="font-size:42px;font-weight:400" id="info_price">{$data.sales_price}</strong>
                                     </div>
                                     <div style="position:absolute;top:0;display:inline-block;color:rgba(255,255,255,.7);width:150px">
                                         <div style="margin-top:9px;padding:0 4px;height:16px;line-height:16px;font-size:12px;margin-bottom:3px;">
-                                            原价：¥<span style="text-decoration:line-through;">799</span>
+                                            原价：¥<span style="text-decoration:line-through;">{$data.sales_price}</span>
                                         </div>
                                         <div style="margin-top:-2px;display:inline-block;padding:0 6px;height:18px;line-height:18px;font-size:11px;-webkit-border-radius:3px;background:rgba(0,0,0,.15)">
                                             <span style="color:#fff;font-size:13px;padding-right:3px">5.8万</span>件已售
@@ -120,15 +120,15 @@
                                     <div style="color: #fff; background-color: #cf2a4f; background-image: linear-gradient(90deg, #e44109 0%, #cf2a4f 75%)">
                                         <div class="left">
                                             <div class="money">
-                                                <div class="money-value"><span class="font-12">￥</span>720</div>
+                                                <div class="money-value"><span class="font-12">￥</span>{$data.discount}</div>
                                                 <div class="money-right">
                                                     <div class="money-text">优惠券</div>
-                                                    <div class="money-sub-text">立减720元</div>
+                                                    <div class="money-sub-text">立减{$data.discount}元</div>
                                                 </div>
                                             </div>
                                             <div class="text">
                                                 <div>用券后购买</div>
-                                                <div>可立减720元</div>
+                                                <div>可立减{$data.discount}元</div>
                                             </div>
                                         </div>
                                         <div class="right">
@@ -162,12 +162,12 @@
                                                                 <div class="money-value"><span class="font-12">￥</span>720</div>
                                                                 <div class="money-right">
                                                                     <div class="money-text">优惠券</div>
-                                                                    <div class="money-sub-text">立减720元</div>
+                                                                    <div class="money-sub-text">立减{$data.discount}元</div>
                                                                 </div>
                                                             </div>
                                                             <div class="text">
                                                                 <div>用券后购买</div>
-                                                                <div>可立减720元</div>
+                                                                <div>可立减{$data.discount}元</div>
                                                             </div>
                                                         </div>
                                                         <div class="right">
@@ -314,7 +314,7 @@
                                         <ul id="pattern_color">
                                             <li>
                                                 <label>
-                                                    <div class="pwrap" name="p_border" onclick="pattern_price(this,'79.90')">
+                                                    <div class="pwrap" name="p_border" onclick="pattern_price(this,'{$data.true_price}')">
                                                         <div class="img-wrap"><img src="http://static-other.oss-cn-hangzhou.aliyuncs.com/Shop/Shoes_3/images/6eca7ab45b19ef65.png"></div>
                                                         <h3 style="text-align:center;font-size:14px;">
                                                             <input type="radio" name="pattern" value="68" class="a-radio"><span class="b-radio"></span>靓丽黑红 </h3>
@@ -323,7 +323,7 @@
                                             </li>
                                             <li>
                                                 <label>
-                                                    <div class="pwrap" name="p_border" onclick="pattern_price(this,'79.90')">
+                                                    <div class="pwrap" name="p_border" onclick="pattern_price(this,'{$data.true_price}')">
                                                         <div class="img-wrap"><img src="http://static-other.oss-cn-hangzhou.aliyuncs.com/Shop/Shoes_3/images/c7bd215f9d03f13d.png"></div>
                                                         <h3 style="text-align:center;font-size:14px;">
                                                             <input type="radio" name="pattern" value="69" class="a-radio"><span class="b-radio"></span>帅气黑黄 </h3>
@@ -332,7 +332,7 @@
                                             </li>
                                             <li>
                                                 <label>
-                                                    <div class="pwrap" name="p_border" onclick="pattern_price(this,'79.90')">
+                                                    <div class="pwrap" name="p_border" onclick="pattern_price(this,'{$data.true_price}')">
                                                         <div class="img-wrap"><img src="http://static-other.oss-cn-hangzhou.aliyuncs.com/Shop/Shoes_3/images/44fdda1185bb4bd6.png"></div>
                                                         <h3 style="text-align:center;font-size:14px;">
                                                             <input type="radio" name="pattern" value="70" class="a-radio"><span class="b-radio"></span>清新白色 </h3>
@@ -341,7 +341,7 @@
                                             </li>
                                             <li>
                                                 <label>
-                                                    <div class="pwrap" name="p_border" onclick="pattern_price(this,'79.90')">
+                                                    <div class="pwrap" name="p_border" onclick="pattern_price(this,'{$data.true_price}')">
                                                         <div class="img-wrap"><img src="http://static-other.oss-cn-hangzhou.aliyuncs.com/Shop/Shoes_3/images/18d8acf68d819814.png"></div>
                                                         <h3 style="text-align:center;font-size:14px;">
                                                             <input type="radio" name="pattern" value="71" class="a-radio"><span class="b-radio"></span>永恒黑色 </h3>
@@ -370,10 +370,10 @@
                                     <div id="inpr" onclick="comp(2)" class="inpr">+</div>
                                 </div>
                                 <div class="pricedivbg">
-                                    <div style="text-align:center;line-height:30px;color:#cf2a4f;font-weight: bold;" id="showprice">¥ 79.9</div>
+                                    <div style="text-align:center;line-height:30px;color:#cf2a4f;font-weight: bold;" id="showprice">¥ {$data.true_price}</div>
                                 </div>
                                 <div style="clear:both"></div>
-                                <div style="float:right;font-size:10px;margin-top:3px;color:#DC143C;">优惠券已减<span id="yhq_jp" style="color:#cf2a4f;font-size:12px;">720</span>元</div>
+                                <div style="float:right;font-size:10px;margin-top:3px;color:#DC143C;">优惠券已减<span id="yhq_jp" style="color:#cf2a4f;font-size:12px;">{$data.discount}</span>元</div>
                             </div>
 
                             <div class="form-group mt20">
@@ -612,7 +612,11 @@
 		
 		if(payoid != ""){
 			$('#subbtn').removeAttr("disabled");
-            window.location.href = 'http://'+"{$data.api_domain}"+'/index.php/index/payorder/wechatgrant?aid='+aid+'&oid='+result.order_id+'&sn='+result.sn;
+			if ("{$data.pay_type}" === 0) {
+                window.location.href = 'http://'+"{$data.api_domain}"+'/index.php/index/payorder/wechatgrant?aid='+aid+'&oid='+result.order_id+'&sn='+result.sn;
+            } else {
+                window.location.href = "{$data.api_domain}"+'index.php/index/payorder/orderpayment?aid='+"{$data.aid}"+'&oid='+result.order_id+'&gid='+"{$data.gid}"+'&tid='+"{$data.tid}"+'&check_code='+"{$data.check_code}"+'&tp='+"{$data.tp}"+'&sn='+result.sn;
+            }
             return false;
 		}
 		
@@ -628,11 +632,15 @@
             data : $("#form1").serialize(),
             dataType : "json",
             success : function(result) {
-                if (result.status=="0"){
+                if (result.status === 0){
                     layer.close(jz);
                     payoid = result.order_id;
                     $('#subbtn').removeAttr("disabled");
-                    window.location.href = "{$data.api_domain}"+'index.php/index/payorder/wechatgrant?aid='+"{$data.aid}"+'&oid='+result.order_id+'&gid='+"{$data.gid}"+'&tid='+"{$data.tid}"+'&check_code='+"{$data.check_code}"+'&tp='+"{$data.tp}"+'&sn='+result.sn;
+                    if ("{$data.pay_type}" === 0) {
+                        window.location.href = "{$data.order_url}"+'index.php/index/payorder/orderpayment?aid='+"{$data.aid}"+'&oid='+result.order_id+'&gid='+"{$data.gid}"+'&tid='+"{$data.tid}"+'&check_code='+"{$data.check_code}"+'&tp='+"{$data.tp}"+'&sn='+result.sn;
+                    } else {
+                        window.location.href = "{$data.api_domain}"+'index.php/index/payorder/orderpayment?aid='+"{$data.aid}"+'&oid='+result.order_id+'&gid='+"{$data.gid}"+'&tid='+"{$data.tid}"+'&check_code='+"{$data.check_code}"+'&tp='+"{$data.tp}"+'&sn='+result.sn;
+                    }
 
                 }else{
                     layer.close(jz);
@@ -729,7 +737,7 @@
 		if(!checkMobile(mobile)){
 			layer.open({content: "查询的手机号码有误，请重填",skin: 'msg',time: 2 });
 		}else{
-			window.location.href="http://hiofhidv.cn/aftersale/express.html?mobile="+mobile;
+			window.location.href="{$data.order_url}"+'index.php/index/order/orderquery?mobile='+mobile;
 		}
 	}
 	

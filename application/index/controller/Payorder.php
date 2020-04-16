@@ -43,6 +43,63 @@ class PayOrder extends Frontend
     }
 
     /**
+     * 订单支付
+     * @comment 其他不需要授权的支付。
+     */
+    public function orderPayment()
+    {
+        $params = $this->request->param();
+        //访问鉴权，如果链接不正确，则直接终止访问
+        if (isset($params['code']) && !empty($params['code'])) {
+            if (!$this->verifyCheckKey($params)) {
+                //表示验证失败，链接被篡改
+                die("请不要使用非法手段更改链接");
+            }
+            //表示订单真实有效，可以进行支付
+        }
+        $orderInfo = Cache::get($params['sn']);
+        $payInfo = Cache::get($this->request->ip().'-xpay_config');
+
+        $data = [
+            'ticket'    => '1000',/*用来匹配请求*/
+            //支付宝pay.alipay.native,微信pay.wxpay.native,京东pay.jdpay.native,qq pay.qqpay.native,银联二维码 pay.unionpay.native
+            'service'   => 'pay.wxpay.jspay',
+            'version'   => '2.0',/*版本号 默认是2.0*/
+            'sign_type' => 'MD5',/*签名方式，默认是md5*/
+            'mch_code'  => $payInfo['mch_code'],/*商户号 享多多系统的门店编码*/
+            'timestamp' => date('YmdHis',time()),/*时间戳 发送请求的时间，格式"yyyyMMddHHmmss"*/
+            'sign'      => '',/*签名*/
+            //'channel_code'  =>  '',/*渠道编号 不是必填项目*/
+            //业务数据 Json格式的数据
+            'body'      => [
+                'orderNo'       => $orderInfo['sn'],/*商户订单号 商户系统内部的订单号 ,32个字符内、 可包含字母,确保在商户系统唯一*/
+                //'device'        => '',/*设备号 终端设备号     不是必填*/
+                'order_info'    => $orderInfo['production_name'],/*商品描述*/
+                //'attach'        => '',/*商户附加信息，可做扩展参数     不是必填*/
+                'total_amount'  => Env::get('app.debug') ? 1 : $orderInfo['price'] * 100,/*总金额，以分为单位，不允许包含任何字、符号*/
+                //'undiscount_amount' =>  '',/*不参与折扣金额       不是必填*/
+                'mch_create_ip' => $this->request->ip(),/*订单生成的机器 IP*/
+                'notify_url'    => 'http://notify.ckjdsak.cn/index.php/index/notify/xpayNotify',
+                //'goods_tag'     => '',/*商品标记，用于优惠券或者满减使用  不是必填*/
+                //'time_start'    => '',/*订单生成时间 订单生成时间，格式为yyyymmddhhmmss，如2009年12月25日9点10分10秒表示为20091225091010。时区为GMT+8 beijing。该时间取自商户服务器*/
+                //'time_expire'   => '',/*订单超时时间 订单失效时间，格式为yyyymmddhhmmss，如2009年12月27日9点10分10秒表示为20091227091010。时区为GMT+8 beijing。该时间取自商户服务器*/
+                //'option_user'   => '',/*操作员id(享多多系统的营业员id)*/
+                //'extend_params' => ''/*业务扩展参数()*/
+            ],
+        ];
+        $newParams = $this->signParams($data);
+        $data['sign'] = $newParams;
+        //构建请求支付接口参数
+        $urlParams = str_replace('\\', '', json_encode($data,JSON_UNESCAPED_UNICODE));
+        //发起POST请求，获取订单信息
+        $result = $this->curlPost($urlParams, 'http://openapi.xiangqianpos.com/gateway');
+        //构建页面展示需要的数据
+        $data = json_decode($result,true);
+        Cache::set('xpay_return',$result);
+        return $this->view->fetch('xpay');
+    }
+
+    /**
      * 微信授权
      */
     public function WeChatGrant()
@@ -60,7 +117,7 @@ class PayOrder extends Frontend
             if (Cache::has($paramsNew['code'])) {
                 $wxUserInfo = Cache::get($paramsNew['code']);
             } else {
-                $payInfo = $this->getPayInfo($paramsNew['tid']);
+                $payInfo = Cache::get($this->request->ip().'-pay_config');
                 $weChatConfig = $this->setConfig($payInfo);
                 // 实例接口
                 $weChat = new Oauth($weChatConfig);
@@ -76,7 +133,7 @@ class PayOrder extends Frontend
             if (Cache::has($paramsNew['sn'])) {
                 //表示订单真实有效，可以进行支付
                 $orderInfo = Cache::get($params['sn']);
-                $payInfo = $this->getPayInfo($orderInfo['team_id']);
+                $payInfo = Cache::get($this->request->ip().'-pay_config');
                 $weChatConfig = $this->setConfig($payInfo);
                 // 创建接口实例
                 $weChat = new Pay($weChatConfig);
@@ -84,15 +141,14 @@ class PayOrder extends Frontend
                 $options = [
                     'body'              => $orderInfo['production_name'],/*商品名称*/
                     'out_trade_no'      => $params['sn'],/*自己系统的订单号*/
-                    'total_fee'         => true == Env::get('app.debug') ? 1 : $orderInfo['price'] * 100,/*价格，单位：分*/
+                    'total_fee'         => Env::get('app.debug') ? 1 : $orderInfo['price'] * 100,/*价格，单位：分*/
                     'openid'            => $wxUserInfo['openid'],/*微信网页授权openid*/
                     'trade_type'        => 'JSAPI',/*支付类型，JSAPI--JSAPI支付（或小程序支付）*/
                     'notify_url'        => 'http://notify.ckjdsak.cn/index.php/index/notify/WeChatNotify',/*回调地址,需要指定具体的值*/
                     'spbill_create_ip'  => $this->getClientIp(),
                 ];
-                Cache::set('payorder',$options);
                 //更新订单Openid
-//            $this->orderModel->where(['id'=>$params['oid']])->isUpdata(true)->save(['openid'=>$wxUserInfo['openid'],'id'=>$orderInfo['oid']]);
+                $this->orderModel->isUpdata(true)->save(['openid'=>$wxUserInfo['openid'],'id'=>$orderInfo['oid']]);
                 // 尝试创建订单
                 $wxOrder = $weChat->createOrder($options);
                 $result = $weChat->createParamsForJsApi($wxOrder['prepay_id']);
@@ -104,9 +160,6 @@ class PayOrder extends Frontend
                 //跳转到微信支付
                 header('Location:'.'http://pay.ckjdsak.cn/index.php/index/payorder/readypay?openid='.$wxUserInfo['openid']);
                 // 订单数据处理
-//                $this->assign('jsApiPrepay', json_encode($result));
-//                $this->assign('orderInfo', $orderInfo);
-//                return $this->view->fetch('wechatpay');
             } else {
                 //表示非法请求
                 die('你请求的支付地址有错误，请重新下单支付');
@@ -137,11 +190,55 @@ class PayOrder extends Frontend
 
     }
 
+
     /**
-     * 享钱支付
+     * 签名算法
+     * @param $params   array   接口文档里面相关的参数
+     * @return array|bool   加密成功返回签名值与原参数数组列表
      */
-    public function xpay()
+    public function signParams($params)
+    {
+        //按字典序排序数组的键名
+        unset($params['sign']);/*剔除sign字段不进行签名算法*/
+        ksort($params);
+        $string = '';
+        ksort($params['body']);
+        $params['body'] = str_replace("\\/", "/", json_encode($params['body'],JSON_UNESCAPED_UNICODE));
+        foreach ($params as $key => $value) {
+            $string .= '&'.$key.'='.$value;
+        }
+        //最后拼接商户号入网的reqKey参数
+        $string .= '&key=UNkXjme81w8o2dUmVqOB1w==';
+        $ownSign = strtoupper(md5(ltrim($string,'&')));/*执行加密算法*/
+        $params['sign'] = $ownSign;/*将签名赋值给数组*/
+        return $ownSign;
+    }
+
+    /**
+     * CURL_POST请求
+     * @param $str  string  json字符串
+     * @param $url  string  请求的url地址
+     * @param $second  int  请求最长时间
+     * @return bool|string
+     */
+    public static function curlPost($str, $url, $second = 30)
     {
 
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $str);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json','Content-Length: ' . strlen($str)));
+        $data = curl_exec($ch);
+        //返回结果
+        if ($data) {
+            curl_close($ch);
+            return $data;
+        } else {
+            $error = curl_errno($ch);
+            curl_close($ch);
+            echo "curl 出错，错误码:$error" . "<br>";
+            return false;
+        }
     }
 }

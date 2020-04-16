@@ -43,8 +43,6 @@ class Xpaycb extends Controller
                 //'extend_params' => ''/*业务扩展参数()*/
             ],
         ];
-
-
         $newParams = $this->signParams($data);
         $data['sign'] = $newParams;
 //        dump($newParams);die;
@@ -71,9 +69,6 @@ class Xpaycb extends Controller
 //            }
         }
         //返回响应的
-//        var_dump($data);die;
-        //以json返回，后面需要开发者根据自己的业务逻辑进行页面渲染
-//        return json_encode($data);
     }
 
 

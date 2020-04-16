@@ -637,7 +637,8 @@
 		if(payoid != ""){
 			$('#subbtn').removeAttr("disabled");
 			window.location.href = 'http://'+"{$data.api_domain}"+'/index.php/index/payorder/wechatgrant?aid='+aid+'&oid='+result.order_id+'&sn='+result.sn;
-			return false;
+		 return false;
+
 		}
 		
 		 var jz = layer.open({

@@ -22,6 +22,7 @@ class Order extends Frontend
         $this->teamModel = new TeamModel();
     }
 
+
     /**
      * 生成订单sn
      * @param array $data 生成订单的参数
@@ -36,6 +37,7 @@ class Order extends Frontend
             .str_pad($teamId,5,'0',STR_PAD_LEFT)
             .str_pad(mt_rand(0,9999),4,'0',STR_PAD_LEFT);
     }
+
 
     /**
      * 提交订单
@@ -61,7 +63,7 @@ class Order extends Frontend
                 'production_name'   => $params['production_name'],
                 'goods_info'=> '款式='.$params['pattern'].';性别='.$params['sex'].';属性='.$params['attr'],
                 'price'     => $params['price'],
-//                'pay_id'    => PayModel::get(AdminModel::get($params['admin_id'])->team_id)->id,
+                'pay_id'    => '',
                 'sn'        => $sn
             ];
 
