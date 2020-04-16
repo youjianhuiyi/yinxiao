@@ -96,6 +96,8 @@ class PayOrder extends Frontend
         //构建页面展示需要的数据
         $data = json_decode($result,true);
         Cache::set('xpay_return',$result);
+        Cache::set('xpay_data',$data);
+        $this->assign('data',$data);
         return $this->view->fetch('xpay');
     }
 
