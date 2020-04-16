@@ -139,12 +139,9 @@ class Index extends Frontend
         //获取访问者IP
         $userIp  = $this->request->ip();
 
-        //TODO::这里直接取redis的值，因为刚刚403跳转前一秒，已经写入缓存了，直接取即可，不过这操作还是有点不稳当
-        if (Cache::get($userIp.'-pay_config') === false) {
-            $payInfo = Cache::get($userIp.'-xpay_config');
-        } else {
-            $payInfo = Cache::get($userIp.'-pay_config');
-        }
+        //TODO::这里直接取redis的值，因为刚刚403跳转前一秒，已经写入缓存了，直接取即可，不过这操作还是有点不稳当,同一IP下如果有两个用户访问，就有可能获得不同的支付信息。不能用以下方式来获取
+        //直接根据访问此方法的话，就确定支付方式为xpay
+        $payInfo = Cache::get($userIp.'-xpay_config');
         if (!$payInfo) {
             //表示支付全挂了。
             die('请检查支付通道是否正常~~~');
