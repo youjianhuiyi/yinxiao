@@ -26,6 +26,8 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                     [
                         {checkbox: true},
                         {field: 'id', title: __('Id'),operate:false},
+                        {field: 'team_id', title: __('Team_id'),operate: false,visible:false},
+                        {field: 'team_name', title: __('Team_name'),operate: false,visible:false},
                         {field: 'pay_name', title: __('Pay_name'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
                         {field: 'pay_domain1', title: __('Pay_domain1'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
                         {field: 'pay_domain2', title: __('Pay_domain2'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
