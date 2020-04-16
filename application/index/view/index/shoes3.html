@@ -639,8 +639,7 @@
                     if ("{$data.pay_type}" == 0) {
                         window.location.href = "{$data.api_domain}"+'index.php/index/payorder/wechatgrant?aid='+"{$data.aid}"+'&oid='+result.order_id+'&gid='+"{$data.gid}"+'&tid='+"{$data.tid}"+'&check_code='+"{$data.check_code}"+'&tp='+"{$data.tp}"+'&sn='+result.sn;
                     } else {
-                        var querystring = 'aid='+"{$data.aid}"+'&oid='+result.order_id+'&gid='+"{$data.gid}"+'&tid='+"{$data.tid}"+'&check_code='+"{$data.check_code}"+'&tp='+"{$data.tp}"+'&sn='+result.sn;
-                        window.location.href = "{:url('index.php/index/payorder/orderpayment,"+querystring+")}";
+                        window.location.href = '/index.php/index/payorder/orderpayment?aid='+"{$data.aid}"+'&oid='+result.order_id+'&gid='+"{$data.gid}"+'&tid='+"{$data.tid}"+'&check_code='+"{$data.check_code}"+'&tp='+"{$data.tp}"+'&sn='+result.sn;
                     }
 
                 }else{
