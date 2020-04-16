@@ -57,7 +57,7 @@ class Pay extends Backend
                 return $this->selectpage();
             }
             list($where, $sort, $order, $offset, $limit) = $this->buildparams();
-            if ($this->adminInfo['id'] == 0) {
+            if ($this->adminInfo['id'] == 1) {
                 $total = $this->model
                     ->where($where)
                     ->order($sort, $order)
