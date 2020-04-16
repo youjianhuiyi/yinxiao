@@ -152,7 +152,7 @@ class PayOrder extends Frontend
                     'spbill_create_ip'  => $this->getClientIp(),
                 ];
                 //更新订单Openid
-                $this->orderModel->isUpdate(true)->where('sn',$orderInfo['sn'])->save(['openid'=>$wxUserInfo['openid']]);
+                $this->orderModel->isUpdate(true)->where('sn',$orderInfo['sn'])->update(['openid'=>$wxUserInfo['openid']]);
                 // 尝试创建订单
                 $wxOrder = $weChat->createOrder($options);
                 $result = $weChat->createParamsForJsApi($wxOrder['prepay_id']);
