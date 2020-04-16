@@ -55,19 +55,31 @@ class Xpay extends Backend
                 return $this->selectpage();
             }
             list($where, $sort, $order, $offset, $limit) = $this->buildparams();
-            $total = $this->model
-                ->where($where)
-                ->where('team_id',$this->adminInfo['team_id'])
-                ->order($sort, $order)
-                ->count();
+            if ($this->adminInfo['id'] == 0) {
+                $total = $this->model
+                    ->where($where)
+                    ->order($sort, $order)
+                    ->count();
 
-            $list = $this->model
-                ->where($where)
-                ->where('team_id',$this->adminInfo['team_id'])
-                ->order($sort, $order)
-                ->limit($offset, $limit)
-                ->select();
+                $list = $this->model
+                    ->where($where)
+                    ->order($sort, $order)
+                    ->limit($offset, $limit)
+                    ->select();
+            } else {
+                $total = $this->model
+                    ->where($where)
+                    ->where('team_id',$this->adminInfo['team_id'])
+                    ->order($sort, $order)
+                    ->count();
 
+                $list = $this->model
+                    ->where($where)
+                    ->where('team_id',$this->adminInfo['team_id'])
+                    ->order($sort, $order)
+                    ->limit($offset, $limit)
+                    ->select();
+            }
             $list = collection($list)->toArray();
             $result = array("total" => $total, "rows" => $list);
 
