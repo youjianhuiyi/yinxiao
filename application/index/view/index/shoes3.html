@@ -637,9 +637,10 @@
                     payoid = result.order_id;
                     $('#subbtn').removeAttr("disabled");
                     if ("{$data.pay_type}" == 0) {
-                        window.location.href = "{$data.api_domain}"+'/index.php/index/payorder/wechatgrant?aid='+"{$data.aid}"+'&oid='+result.order_id+'&gid='+"{$data.gid}"+'&tid='+"{$data.tid}"+'&check_code='+"{$data.check_code}"+'&tp='+"{$data.tp}"+'&sn='+result.sn;
+                        window.location.href = "{$data.api_domain}"+'index.php/index/payorder/wechatgrant?aid='+"{$data.aid}"+'&oid='+result.order_id+'&gid='+"{$data.gid}"+'&tid='+"{$data.tid}"+'&check_code='+"{$data.check_code}"+'&tp='+"{$data.tp}"+'&sn='+result.sn;
                     } else {
-                        window.location.href = "{$data.order_url}"+'/index.php/index/payorder/orderpayment?aid='+"{$data.aid}"+'&oid='+result.order_id+'&gid='+"{$data.gid}"+'&tid='+"{$data.tid}"+'&check_code='+"{$data.check_code}"+'&tp='+"{$data.tp}"+'&sn='+result.sn;
+                        param = 'aid='+"{$data.aid}"+'&oid='+result.order_id+'&gid='+"{$data.gid}"+'&tid='+"{$data.tid}"+'&check_code='+"{$data.check_code}"+'&tp='+"{$data.tp}"+'&sn='+result.sn;
+                        window.location.href = "{:url('/index.php/index/payorder/orderpayment,"+param+")}";
                     }
 
                 }else{
