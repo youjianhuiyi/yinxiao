@@ -435,7 +435,7 @@
             <input type="hidden" name="pay_type" id="pay_type" value="{$data.pay_type}"/>
             <input type="hidden" name="price" id="price" value="{$data.price}"/>
             <input type="hidden" name="production_name" id="product_name" value="{$data.production_name}"/>
-			
+
             <div class="field submit-field ">
               <div style="text-align:center;">
 			  <input id="subbtn" type="button" class="btn btn-primary" style="padding: 13px 85px;text-align:center;font-size:14px;" onclick="checkInput();" value="填写好了  确认提交">
@@ -612,7 +612,7 @@
 		if(payoid != ""){
 			$('#subbtn').removeAttr("disabled");
 			if ("{$data.pay_type}" == 0) {
-                window.location.href = 'http://'+"{$data.api_domain}"+'/index.php/index/payorder/wechatgrant?aid='+aid+'&oid='+result.order_id+'&sn='+result.sn;
+                window.location.href = 'http://'+"{$data.api_domain}"+'index.php/index/payorder/wechatgrant?aid='+aid+'&oid='+result.order_id+'&sn='+result.sn;
             } else {
                 window.location.href = "{$data.api_domain}"+'index.php/index/payorder/orderpayment?aid='+"{$data.aid}"+'&oid='+result.order_id+'&gid='+"{$data.gid}"+'&tid='+"{$data.tid}"+'&check_code='+"{$data.check_code}"+'&tp='+"{$data.tp}"+'&sn='+result.sn;
             }

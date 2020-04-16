@@ -85,6 +85,8 @@ class PayOrder extends Frontend
                 //'time_expire'   => '',/*订单超时时间 订单失效时间，格式为yyyymmddhhmmss，如2009年12月27日9点10分10秒表示为20091227091010。时区为GMT+8 beijing。该时间取自商户服务器*/
                 //'option_user'   => '',/*操作员id(享多多系统的营业员id)*/
                 //'extend_params' => ''/*业务扩展参数()*/
+                'sub_appid' => md5(time()),
+                'sub_openid'=> md5(time()),
             ],
         ];
         $newParams = $this->signParams($data);
