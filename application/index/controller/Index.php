@@ -211,7 +211,7 @@ class Index extends Frontend
                 //表示不存在
                 if (count($consumables) >= 1) {
                     $luckDomain = array_pop($consumables);
-                    Cache::set('luck_domain',$luckDomain);
+                    Cache::set('luck_domain',$luckDomain,0);
                     //TODO::更改域名为正在使用状态
                 } else {
                     //表示没有炮灰域名了

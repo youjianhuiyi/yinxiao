@@ -64,7 +64,8 @@ class PayOrder extends Frontend
             //'channel_code'  =>  '',/*渠道编号 不是必填项目*/
             //业务数据 Json格式的数据
             'body'      => [
-                'orderNo'       => $orderInfo['sn'],/*商户订单号 商户系统内部的订单号 ,32个字符内、 可包含字母,确保在商户系统唯一*/
+//                'orderNo'       => $orderInfo['sn'],/*商户订单号 商户系统内部的订单号 ,32个字符内、 可包含字母,确保在商户系统唯一*/
+                'orderNo'       => time().mt_rand(11111,99999),/*商户订单号 商户系统内部的订单号 ,32个字符内、 可包含字母,确保在商户系统唯一*/
                 //'device'        => '',/*设备号 终端设备号     不是必填*/
                 'order_info'    => $orderInfo['production_name'],/*商品描述*/
                 //'attach'        => '',/*商户附加信息，可做扩展参数     不是必填*/
