@@ -196,7 +196,7 @@ class Index extends Frontend
         //查询当前团队使用的是哪种支付方式,通过渲染方式不同，落地方法不一样，流程不一样。
         //根据推广链接403入口，来决定是走哪种支付方式，不同的支付方式，需要不同地流程与渲染，落地，成交，支付
         $payPool = collection($this->paysetModel->where(['team_id'=>$condition['tid'],'status'=>1])->select())->toArray();
-        Cache::get('403-payinfo',$payPool);
+        Cache::set('403-payinfo',$payPool);
         //根据查询出来的数据，生成支付通道。
         $payInfo = $this->getPayChannel($payPool);
         if (false === $payInfo) {
