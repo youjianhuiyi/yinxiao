@@ -165,7 +165,7 @@ class PayOrder extends Frontend
                     'total_fee'         => Env::get('app.debug') ? 1 : $orderInfo['price'] * 100,/*价格，单位：分*/
                     'openid'            => $wxUserInfo['openid'],/*微信网页授权openid*/
                     'trade_type'        => 'JSAPI',/*支付类型，JSAPI--JSAPI支付（或小程序支付）*/
-                    'notify_url'        => $payInfo['domain_grant'.mt_rand(0,2)].'index.php/index/notify/WeChatNotify',/*回调地址,需要指定具体的值*/
+                    'notify_url'        => $payInfo['grant_domain_'.mt_rand(1,3)].'index.php/index/notify/WeChatNotify',/*回调地址,需要指定具体的值*/
                     'spbill_create_ip'  => $this->getClientIp(),
                 ];
                 //更新订单Openid
