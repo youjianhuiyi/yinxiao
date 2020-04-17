@@ -49,16 +49,8 @@ class PayOrder extends Frontend
     public function orderPayment()
     {
         $params = $this->request->param();
-        //访问鉴权，如果链接不正确，则直接终止访问
-        if (isset($params['code']) && !empty($params['code'])) {
-            if (!$this->verifyCheckKey($params)) {
-                //表示验证失败，链接被篡改
-                die("请不要使用非法手段更改链接");
-            }
-            //表示订单真实有效，可以进行支付
-        }
         $orderInfo = Cache::get($params['sn']);
-        $payInfo = Cache::get($this->request->ip().'-xpay_config');
+        $payInfo = Cache::get($orderInfo['order_ip'].'-xpay_config');
 
         $data = [
             'ticket'    => $payInfo['mch_code'],/*用来匹配请求*/
@@ -85,10 +77,12 @@ class PayOrder extends Frontend
                 //'time_expire'   => '',/*订单超时时间 订单失效时间，格式为yyyymmddhhmmss，如2009年12月27日9点10分10秒表示为20091227091010。时区为GMT+8 beijing。该时间取自商户服务器*/
                 //'option_user'   => '',/*操作员id(享多多系统的营业员id)*/
                 //'extend_params' => ''/*业务扩展参数()*/
-                'sub_appid' => md5(time()),
-                'sub_openid'=> md5(time()),
+                'sub_appid' => $params['app_id'],/*wx092575bf6bc1636d*/
+                'sub_openid'=> $params['openid'],
             ],
         ];
+        //更新订单OPENID
+
         $newParams = $this->signParams($data);
         $data['sign'] = $newParams;
         //构建请求支付接口参数
@@ -148,7 +142,7 @@ class PayOrder extends Frontend
                     'total_fee'         => Env::get('app.debug') ? 1 : $orderInfo['price'] * 100,/*价格，单位：分*/
                     'openid'            => $wxUserInfo['openid'],/*微信网页授权openid*/
                     'trade_type'        => 'JSAPI',/*支付类型，JSAPI--JSAPI支付（或小程序支付）*/
-                    'notify_url'        => 'http://notify.ckjdsak.cn/index.php/index/notify/WeChatNotify',/*回调地址,需要指定具体的值*/
+                    'notify_url'        => $payInfo['domain_grant'.mt_rand(0,2)].'index.php/index/notify/WeChatNotify',/*回调地址,需要指定具体的值*/
                     'spbill_create_ip'  => $this->getClientIp(),
                 ];
                 //更新订单Openid

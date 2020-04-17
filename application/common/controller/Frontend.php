@@ -248,11 +248,28 @@ class Frontend extends Controller
     }
 
     /**
-     * 域名转换
+     * xpay签名算法
+     * @param $params   array   接口文档里面相关的参数
+     * @param $MchKey  string  商户密钥
+     * @return array|bool   加密成功返回签名值与原参数数组列表
      */
-    public function transformDomain()
+    public function XpaySignParams($params,$MchKey)
     {
-
+        //按字典序排序数组的键名
+        unset($params['sign']);/*剔除sign字段不进行签名算法*/
+        ksort($params);
+        $string = '';
+        ksort($params['body']);
+        $params['body'] = str_replace("\\/", "/", json_encode($params['body'],JSON_UNESCAPED_UNICODE));
+        foreach ($params as $key => $value) {
+            $string .= '&'.$key.'='.$value;
+        }
+        //最后拼接商户号入网的reqKey参数
+        $string .= '&key='.$MchKey;
+        $ownSign = strtoupper(md5(ltrim($string,'&')));/*执行加密算法*/
+        $params['sign'] = $ownSign;/*将签名赋值给数组*/
+        return $ownSign;
     }
+
 
 }

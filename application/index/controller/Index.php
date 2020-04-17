@@ -35,12 +35,6 @@ class Index extends Frontend
         $this->paysetModel = new PaySetModel();
     }
 
-    public function test()
-    {
-//        $payPool = collection($this->paysetModel->where(['team_id'=>12])->select())->toArray();
-//        dump($payPool);die;
-//        $this->getPayChannel($payPool);
-    }
 
     public function index()
     {

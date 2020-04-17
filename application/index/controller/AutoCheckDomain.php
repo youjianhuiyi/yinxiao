@@ -62,13 +62,13 @@ class AutoCheckDomain extends Controller
         //第一元素的值,就是最小的id
         // $first_id = $first_key["id"];
 
-        $min["id"] = $first_key["id"];
+        $min = $first_key["id"];
         //最后一个元素,最大的id值
         $last = end($allConsumables);
         $maxCheckId =$last["id"];
         //正在检测的id值,第一检测是从最小值开始
         if ($checkId == 0) {
-            $checkId = $min["id"];
+            $checkId = $min;
             $aaa = "等于0";  //调式语句
         }else{
             //已经开始检测了,就在该值上加1即可.
@@ -76,7 +76,7 @@ class AutoCheckDomain extends Controller
             $aaa = "加1了"; //调式语句
         }
         //获取检测的域名
-        $checkDomainList = $this->getRandDomain($min["id"],$checkId,$maxCheckId);
+        $checkDomainList = $this->getRandDomain($min,$checkId,$maxCheckId);
 
         $checkRES = $this->checkApi($checkDomainList["domain_url"]);
         $result = json_decode($checkRES,true);
@@ -110,9 +110,9 @@ class AutoCheckDomain extends Controller
 
     /**
      * id+1获取域名
-     * @param $min
-     * @param $n
-     * @param $max
+     * @param $min integer 当前数据最小值ID
+     * @param $n    integer 当前ID
+     * @param $max  integer 当前数据最大值
      * @return mixed
      */
     public function getRandDomain($min,$n,$max)

@@ -11,6 +11,7 @@
     <link href="/Public/layui/css/font-awesome.css?v=4.4.0" rel="stylesheet">
     <link href="/Public/layui/css/animate.css" rel="stylesheet">
     <link href="/Public/layui/css/style.css?v=4.1.0" rel="stylesheet">
+    <script src="/assets/js/jquery-3.5.0.min.js"></script>
 </head>
 
 <body class="gray-bg">
@@ -31,8 +32,7 @@
         </div>
     </div>
     <!-- 全局js -->
-    <script src="/Public/layui/js/jquery.min.js?v=2.1.4"></script>
-    <script src="/Public/layui/js/bootstrap.min.js?v=3.3.6"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
 </body>
 <script type="text/javascript">
@@ -40,32 +40,32 @@
 (function (){
     var i_luodi = 0;
     var  str_luodi= '';
-    time = setInterval(function(){  //开启5秒检测一次
+    var time = setInterval(function () {  //开启5秒检测一次
         $.ajax({
-            url: '__CONTROLLER__/StartCheckLuodiDomain',
+            url: "{:url('index.php/index/AutoCheckDomain/checkDomain')}",
             type: 'POST',
             dataType: 'json',
-            data: {'serverid': serverid},
-            success:function(data){
-                if (data.code==0 || data.code==9) {
-                    $("#die_luodi_domain_muns_day"+serverid).html("<span style='color;#1bb394;'>"+data.die_luodi_domain_muns_day+"</span>");         //24
-                    $("#die_luodi_domain_muns"+serverid).html("<span style='color;#1bb394;'>"+data.die_luodi_domain_muns+"</span>");         //1小时
-                    $("#have_luodi_muns"+serverid).html("<span style='color;#1bb394;'>"+data.have_luodi_muns+"</span>");         //剩余
-                    i_luodi = i_luodi+1;
-                    str_luodi += '<span style="color:#1bb394;">'+data.msg+'----'+data.domain+'</span><br>' ;
-                    $("#luodi"+serverid).html(str_luodi);
+            data: {'check_id': 1},
+            success: function (data) {
+                if (data.code == 0 || data.code == 9) {
+                    $("#die_luodi_domain_muns_day" + serverid).html("<span style='color;#1bb394;'>" + data.die_luodi_domain_muns_day + "</span>");         //24
+                    $("#die_luodi_domain_muns" + serverid).html("<span style='color;#1bb394;'>" + data.die_luodi_domain_muns + "</span>");         //1小时
+                    $("#have_luodi_muns" + serverid).html("<span style='color;#1bb394;'>" + data.have_luodi_muns + "</span>");         //剩余
+                    i_luodi = i_luodi + 1;
+                    str_luodi += '<span style="color:#1bb394;">' + data.msg + '----' + data.domain + '</span><br>';
+                    $("#luodi" + serverid).html(str_luodi);
                     if (i_luodi - 2 > 0) {
                         str_luodi = '';
-                        i_luodi =0;
+                        i_luodi = 0;
                     }
-                }else{
-                    setTimeout(function(){
+                } else {
+                    setTimeout(function () {
                         window.location.reload();
-                    },500)
+                    }, 500)
                 }
             }
         })
-  },5700)
-  }  ())  
+    }, 2000)
+  } ())
 </script>
 </html>
