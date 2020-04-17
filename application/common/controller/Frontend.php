@@ -133,7 +133,7 @@ class Frontend extends Controller
                     //表示已经被封了
                     //TODO::这里存在一个问题，就是所有支付信息全部有支付管理模块来控制，目前没有做，单独本支付通道被封停后，但是支付配置没有同步数据的问题。
                     //绑定支付配置。如果该用户再次访问，如果有缓存则直接读取。如果没有缓存或者被封，则跳转其他支付
-                    Cache::set($userIp.'-pay_config',$userPayData);
+                    Cache::set($userIp.'-pay_config',$userPayData,1800);
                 } else {
                     return false;
                 }
@@ -148,7 +148,7 @@ class Frontend extends Controller
                 //将支付类型传送进去
                 $userPayData['type'] = 1;
                 if ($userPayData) {
-                    Cache::set($userIp.'-xpay_config',$userPayData);
+                    Cache::set($userIp.'-xpay_config',$userPayData,1800);
                 } else {
                     return false;
                 }
