@@ -38,27 +38,6 @@ class Order extends Frontend
             .str_pad(mt_rand(0,9999),4,'0',STR_PAD_LEFT);
     }
 
-
-    /**
-     * 享钱平台获取微信openid
-     * @param $payInfo array 传入支付参数
-     * @param $sn   string 订单编号
-     */
-    public function xpayGrant($payInfo,$sn)
-    {
-        $url = 'http://open.xiangqianpos.com/wxPayOauth/openid';
-        $data = [
-            'mch_code' => $payInfo['mch_code'],
-            'charset'   => 'UTF-8',
-            'nonce_str' => md5(time()),
-            'redirect'  => urlencode($this->request->domain().'index.php/index/payorder/orderpayment?sn='.$sn),
-            'sign'  => ''
-        ];
-        $data['sign'] = $this->XpaySignParams($data,$payInfo['mch_key']);
-        //跳转享钱平台获取openid
-        header('Location:'.$url.'?charset='.$data['charset'].'&mch_code='.$data['mch_code'].'&nonce_str='.$data['nonce_str'].'&redirect='.$data['redirect'].'&sign='.$data['sign']);
-    }
-
     /**
      * 提交订单
      */
@@ -106,12 +85,6 @@ class Order extends Frontend
                 $this->error($e->getMessage());
             }
 
-            //求出享钱url获取 openid链接 ，提交URL地址
-            if ($params['pay_type'] == 1) {
-                //支付类型为1，表示是享钱支付
-                $xpayReq = $this->xpayGrant(Cache::get($this->request->ip().'-xpay_config'));
-
-            }
             if ($result !== false) {
                 $data = array_merge($data,['id'=>$orderId]);
                 Cache::set($sn,$data);
