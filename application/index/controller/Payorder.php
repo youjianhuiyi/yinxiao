@@ -82,7 +82,7 @@ class PayOrder extends Frontend
             ],
         ];
         //更新订单OPENID
-        $this->orderModel->isUpdate(true)->where('sn',$orderInfo['sn'])->update(['openid'=>$payInfo['openid']]);
+        $this->orderModel->isUpdate(true)->where('sn',$orderInfo['sn'])->update(['openid'=>$params['openid']]);
         $newParams = $this->signParams($data);
         $data['sign'] = $newParams;
         //构建请求支付接口参数
