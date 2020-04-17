@@ -53,7 +53,7 @@ class PayOrder extends Frontend
         $payInfo = Cache::get($orderInfo['order_ip'].'-xpay_config');
 
         $data = [
-            'ticket'    => $payInfo['mch_code'],/*用来匹配请求*/
+            'ticket'    => time(),/*用来匹配请求*/
             //支付宝pay.alipay.native,微信pay.wxpay.native,京东pay.jdpay.native,qq pay.qqpay.native,银联二维码 pay.unionpay.native
             'service'   => 'pay.wxpay.jspay',
             'version'   => '2.0',/*版本号 默认是2.0*/
