@@ -198,7 +198,6 @@ class Index extends Frontend
         $payPool = collection($this->paysetModel->where(['team_id'=>$condition['tid'],'status'=>1])->select())->toArray();
         //根据查询出来的数据，生成支付通道。
         $payInfo = $this->getPayChannel($payPool);
-        Cache::set('403-payinfo',$payInfo);
         if (false === $payInfo) {
             //表示没有支付
             die("支付通道无效，请联系老板！！！");
@@ -217,7 +216,6 @@ class Index extends Frontend
             }
             //根据不同的支付类型，跳转不同的支付方法与落地页面
             $wholeDomain = 'http://'.time().'.'.$luckDomain.'/index.php/index/index/index'.$payInfo['type'].'?'.$queryStr;
-            Cache::set('pay-type',$payInfo['type']);
             echo "handler('successcode','{$wholeDomain}')";
             die;
         } else {

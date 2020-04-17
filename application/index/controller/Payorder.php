@@ -111,7 +111,7 @@ class PayOrder extends Frontend
             'mch_code'  => $payInfo['mch_code'],
             'charset'   => 'UTF-8',
             'nonce_str' => md5(time()),
-            'redirect'  => urlencode($this->request->domain().'index.php/index/payorder/orderpayment?sn='.$params['sn']),
+            'redirect'  => urlencode($this->request->domain().'/index.php/index/payorder/orderpayment?sn='.$params['sn']),
             'sign'      => '',
         ];
         $data['sign'] = $this->XpaySignParams($data,$payInfo['mch_key']);
