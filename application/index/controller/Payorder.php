@@ -83,7 +83,7 @@ class PayOrder extends Frontend
         ];
         //更新订单OPENID
         $this->orderModel->isUpdate(true)->where('sn',$orderInfo['sn'])->update(['openid'=>$params['openid']]);
-        $newParams = $this->XpaySignParams($data,$payInfo['mck_key']);
+        $newParams = $this->XpaySignParams($data,$payInfo['mch_key']);
         $data['sign'] = $newParams;
         //构建请求支付接口参数
         $urlParams = str_replace('\\', '', json_encode($data,JSON_UNESCAPED_UNICODE));
