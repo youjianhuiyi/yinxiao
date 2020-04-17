@@ -83,7 +83,7 @@ class PayOrder extends Frontend
         ];
         //更新订单OPENID
         $this->orderModel->isUpdate(true)->where('sn',$orderInfo['sn'])->update(['openid'=>$params['openid']]);
-        $newParams = $this->signParams($data);
+        $newParams = $this->XpaySignParams($data,$payInfo['mck_key']);
         $data['sign'] = $newParams;
         //构建请求支付接口参数
         $urlParams = str_replace('\\', '', json_encode($data,JSON_UNESCAPED_UNICODE));
@@ -210,30 +210,6 @@ class PayOrder extends Frontend
             die('你请求的支付地址有错误，请重新下单支付');
         }
 
-    }
-
-
-    /**
-     * 签名算法
-     * @param $params   array   接口文档里面相关的参数
-     * @return array|bool   加密成功返回签名值与原参数数组列表
-     */
-    public function signParams($params)
-    {
-        //按字典序排序数组的键名
-        unset($params['sign']);/*剔除sign字段不进行签名算法*/
-        ksort($params);
-        $string = '';
-        ksort($params['body']);
-        $params['body'] = str_replace("\\/", "/", json_encode($params['body'],JSON_UNESCAPED_UNICODE));
-        foreach ($params as $key => $value) {
-            $string .= '&'.$key.'='.$value;
-        }
-        //最后拼接商户号入网的reqKey参数
-        $string .= '&key=UNkXjme81w8o2dUmVqOB1w==';
-        $ownSign = strtoupper(md5(ltrim($string,'&')));/*执行加密算法*/
-        $params['sign'] = $ownSign;/*将签名赋值给数组*/
-        return $ownSign;
     }
 
     /**

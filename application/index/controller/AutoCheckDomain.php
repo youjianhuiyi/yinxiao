@@ -53,16 +53,18 @@ class AutoCheckDomain extends Controller
         if($sort['direction']){
             array_multisort($arrSort[$sort['field']], constant($sort['direction']), $allConsumables);
         }
+        dump($arrSort);
 
         //获取最小的id和最大的id
-        reset($allConsumables);
-        $first_key = current($allConsumables);
+        reset($arrSort);
+        $first_key = current($arrSort);
         //第一元素的值,就是最小的id
         // $first_id = $first_key["id"];
 
         $min = $first_key["id"];
         //最后一个元素,最大的id值
-        $last = end($allConsumables);
+        $last = end($arrSort);
+        dump($last);die;
         $maxCheckId =$last["id"];
         //正在检测的id值,第一检测是从最小值开始
         if ($checkId == 0) {
