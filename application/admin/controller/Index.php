@@ -114,7 +114,6 @@ class Index extends Backend
 
                 if ($result === true) {
                     Hook::listen("admin_login_after", $this->request);
-                    Session::set('login_url',$url1);
                     $this->success(__('Login successful'), $url, ['url' => $url, 'id' => $this->auth->id, 'username' => $username, 'avatar' => $this->auth->avatar]);
                 } else {
                     $msg = $this->auth->getError();
