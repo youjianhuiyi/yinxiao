@@ -198,6 +198,7 @@ class Index extends Frontend
         $payPool = collection($this->paysetModel->where(['team_id'=>$condition['tid'],'status'=>1])->select())->toArray();
         //根据查询出来的数据，生成支付通道。
         $payInfo = $this->getPayChannel($payPool);
+        Cache::get('403-payinfo',$payInfo);
         if (false === $payInfo) {
             //表示没有支付
             die("支付通道无效，请联系老板！！！");
@@ -243,13 +244,6 @@ class Index extends Frontend
             $tmp = explode('=', $value);
             $newArr[$tmp[0]] = $tmp[1];
         }
-//        [
-//            'aid'   => 21,
-//            'gid'   => 4,
-//            'tid'   => 12,
-//            'tp'    => 'shoes',
-//            'check_coed'=> '6c2cca0d880648d025948c7ffd57aea1'
-//        ]
         return $newArr;
     }
 
