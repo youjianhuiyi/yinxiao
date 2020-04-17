@@ -105,7 +105,7 @@ class PayOrder extends Frontend
         //判断访问链接，如果有微信授权链接参数，直接放行到落地页面。如果没有则进行微信授权认证
         $params = $this->request->param();
         $orderInfo = Cache::get($params['sn']);
-        $payInfo = Cache::get($params['order_ip'].'-xpay_config');
+        $payInfo = Cache::get($orderInfo['order_ip'].'-xpay_config');
         $url = 'http://open.xiangqianpos.com/wxPayOauth/openid';
         $data = [
             'mch_code'  => $payInfo['mch_code'],
