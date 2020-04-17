@@ -87,7 +87,6 @@ class PayOrder extends Frontend
         $data['sign'] = $newParams;
         //构建请求支付接口参数
         $urlParams = str_replace('\\', '', json_encode($data,JSON_UNESCAPED_UNICODE));
-        dump($urlParams);die;
         //发起POST请求，获取订单信息
         $result = $this->curlPost($urlParams, 'http://openapi.xiangqianpos.com/gateway');
         //构建页面展示需要的数据
