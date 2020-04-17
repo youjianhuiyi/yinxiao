@@ -126,11 +126,10 @@ class Frontend extends Controller
         if ($type == 0) {
             if (!Cache::has($userIp.'-pay_config')) {
                 //设置缓存-本次记录好缓存，判断是否是支付配置信息记录
-                $userPayData = $this->payModel->get($payId);
+                $userPayData = $this->payModel->get($payId)->toArray();
                 //将支付类型传送进去
                 $userPayData['type'] = 0;
                 if ($userPayData['is_forbidden'] != 1) {
-                    //表示已经被封了
                     //TODO::这里存在一个问题，就是所有支付信息全部有支付管理模块来控制，目前没有做，单独本支付通道被封停后，但是支付配置没有同步数据的问题。
                     //绑定支付配置。如果该用户再次访问，如果有缓存则直接读取。如果没有缓存或者被封，则跳转其他支付
                     Cache::set($userIp.'-pay_config',$userPayData,1440);
@@ -144,7 +143,7 @@ class Frontend extends Controller
             //表示获享钱支付配置参数
             if (!Cache::has($userIp.'-xpay_config')) {
                 //设置缓存-本次记录好缓存，判断是否是支付配置信息记录
-                $userPayData = $this->xpayModel->get($payId);
+                $userPayData = $this->xpayModel->get($payId)->toArray();
                 //将支付类型传送进去
                 $userPayData['type'] = 1;
                 if ($userPayData) {
@@ -154,7 +153,7 @@ class Frontend extends Controller
                 }
 
             } else {
-                $userPayData = Cache::get($userIp.'-pay_config');
+                $userPayData = Cache::get($userIp.'-xpay_config');
             }
         } else {
             //TODO::如果所有支付都挂了，可以关闭
