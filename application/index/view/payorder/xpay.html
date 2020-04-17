@@ -1,1 +1,114 @@
-{:var_dump($data);}
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>订单确认支付</title>
+    <script type="text/javascript">
+        //调用微信JS api 支付
+        function jsApiCall()
+        {
+            WeixinJSBridge.invoke(
+                'getBrandWCPayRequest', {
+                    "appId" : "{$data.appId}",           //公众号名称，由商户传入
+                    "timeStamp": "{$data.timeStamp}",    //时间戳，自1970年以来的秒数
+                    "nonceStr" : "{$data.nonceStr}",     //随机串
+                    "package" : "{$data.package}",
+                    "signType" : "MD5",               //微信签名方式:
+                    "paySign" : "{$data.paySign}"        //微信签名
+                },
+                function(res){
+                    if (res.err_msg == "get_brand_wcpay_request:ok" ) {
+                        window.location.href = "{:url('index.php/index/order/orderquery')}" + '?order_sn=' + "{$orderInfo['sn']}";//跳转到订单状态页面，查询订单页面
+                    } else if (res.err_msg == "get_brand_wcpay_request:cancel" ) {
+                        alert("支付取消");
+                    } else {
+                        alert("支付失败");
+                    }
+                }
+            );
+        }
+
+        function callpay()
+        {
+            if (typeof WeixinJSBridge == "undefined"){
+                if( document.addEventListener ){
+                    document.addEventListener('WeixinJSBridgeReady', jsApiCall, false);
+                }else if (document.attachEvent){
+                    document.attachEvent('WeixinJSBridgeReady', jsApiCall);
+                    document.attachEvent('onWeixinJSBridgeReady', jsApiCall);
+                }
+            }else{
+                jsApiCall();
+            }
+        }
+
+
+        // var count = 3;
+        // var t;
+        // function writeTip(){
+        //     document.getElementById("d").innerHTML = "<p>页面将在"+(count--)+"秒自动跳转支付</p>";
+        //     if( count === 0 ){
+        //         window.clearInterval(t);
+        //         callpay();
+        //         document.getElementById("d").innerHTML = "<p>正在支付，如果没弹出，请手动点击支付</p>";
+        //     }
+        // }
+        //
+        // t = window.setInterval("writeTip()",1000);
+        //
+        // window.onload=writeTip
+    </script>
+    <style media="screen">
+        table,th,tr,td{
+            border:1px solid #111111;
+            border-collapse: collapse;
+            word-wrap: normal;
+            padding: 2px;
+        }
+        #table {
+            padding-bottom: 20px;
+        }
+        button{
+            width:270px; height:50px; border-radius: 15px;
+            border:0px #0aba06 solid; cursor: pointer;  color:white;  font-size:16px;
+            background-color: #0aba06;
+            background-repeat: no-repeat;
+            background-size:60px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<h3 align="center">订单确认</h3>
+<div id="table">
+    <table width="100%">
+        <tr>
+            <th width="25%">订单编号：</th>
+            <td>{$orderInfo.sn}</td>
+        </tr>
+        <tr>
+            <th>订单金额：</th>
+            <td>{$orderInfo.price}</td>
+        </tr>
+        <tr>
+            <th colpan="2">收货地址：</th>
+            <td colpan="2" id="wrap">{$orderInfo.address}</td>
+        </tr>
+        <tr>
+            <th>收货人：</th>
+            <td>{$orderInfo.name}</td>
+        </tr>
+        <tr>
+            <th>联系电话：</th>
+            <td>{$orderInfo.phone}</td>
+        </tr>
+    </table>
+</div>
+<div align="center">
+    <button type="button" onclick="callpay()" >立即支付</button>
+    <div id="d">
+        <p>将在3秒自动跳转支付</p>
+    </div>
+</div>
+</body>
+</html>

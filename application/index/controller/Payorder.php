@@ -94,6 +94,7 @@ class PayOrder extends Frontend
         Cache::set('xpay_return',$result);
         Cache::set('xpay_data',$data);
         $this->assign('data',$data);
+        $this->assign('orderInfo',$orderInfo);
         return $this->view->fetch('xpay');
     }
 
