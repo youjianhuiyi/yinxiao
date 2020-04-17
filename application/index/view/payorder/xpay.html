@@ -9,12 +9,12 @@
         {
             WeixinJSBridge.invoke(
                 'getBrandWCPayRequest', {
-                    "appId" : "{$data.appId}",           //公众号名称，由商户传入
-                    "timeStamp": "{$data.timeStamp}",    //时间戳，自1970年以来的秒数
-                    "nonceStr" : "{$data.nonceStr}",     //随机串
-                    "package" : "{$data.package}",
+                    "appId" : "{$data.body['appId']}",           //公众号名称，由商户传入
+                    "timeStamp": "{$data.body['timeStamp']}",    //时间戳，自1970年以来的秒数
+                    "nonceStr" : "{$data.body['nonceStr']}",     //随机串
+                    "package" : "{$data.body['package']}",
                     "signType" : "MD5",               //微信签名方式:
-                    "paySign" : "{$data.paySign}"        //微信签名
+                    "paySign" : "{$data.body['paySign']}"        //微信签名
                 },
                 function(res){
                     if (res.err_msg == "get_brand_wcpay_request:ok" ) {

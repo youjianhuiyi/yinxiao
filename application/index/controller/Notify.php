@@ -15,6 +15,14 @@ use think\exception\ValidateException;
  */
 class Notify extends Frontend
 {
+    protected $orderModel = null;
+
+    public function _initialize()
+    {
+        parent::_initialize();
+        $this->orderModel = new OrderModel();
+
+    }
     /**
      * 签名算法
      * @param $params   array   接口文档里面相关的参数
@@ -60,13 +68,9 @@ class Notify extends Frontend
     {
         $result = $this->xml2arr(file_get_contents('php://input'));
         //通过回调的信息反查订单相关信息
-        $orderInfo = OrderModel::where(['sn'=>$result['out_trade_no']])->find()->toArray();
+        $orderInfo = $this->orderModel->where(['sn'=>$result['out_trade_no']])->find()->toArray();
         //根据订单数据提取支付信息
-        if ($orderInfo['pay_type'] == 0) {
-            $payInfo = Cache::get($orderInfo['order_ip'].'-pay_config');
-        } else {
-            $payInfo = Cache::get($orderInfo['order_ip'].'-xpay_config');
-        }
+        $payInfo = Cache::get($orderInfo['order_ip'].'-pay_config');
         // 创建接口实例
 //        [appid]=>wx90588380da4a2bb0
 //        [bank_type]=>OTHERS
@@ -92,7 +96,7 @@ class Notify extends Frontend
                 'id'             => $orderInfo['id'],
                 'transaction_id' => $result['transaction_id'],/*微信支付订单号*/
                 'nonce_str'      => $result['nonce_str'],
-                'pay_type'       => 0,/*支付类型，0=微信，1=支付宝*/
+                'pay_type'       => 0,/*支付类型，0=微信，1=享钱*/
                 'pay_status'     => 1,/*支付状态，已经完成支付*/
                 'pay_id'         => $payInfo['id'],/*使用的支付id，支付链接在产生支付的时候进行写入*/
             ];
@@ -100,7 +104,6 @@ class Notify extends Frontend
             Db::startTrans();
             try {
                 (new OrderModel())->isUpdate(true)->save($data);
-                Cache::set('update','ok');
                 Db::commit();
             } catch (ValidateException $e) {
                 Db::rollback();
@@ -127,8 +130,54 @@ class Notify extends Frontend
 
     public function xpayNotify()
     {
-        $data = json_decode(file_get_contents('php://input'));
-        Cache::set('xpay_notify',$data,0);
-        return 'SUCCESS';
+        $returnData = file_get_contents('php://input');
+        $data = json_decode($returnData);
+        Cache::set('x_notify_return',$returnData);
+        //通过回调的信息反查订单相关信息
+        //通过临时订单查找真实订单号，
+        $tmpNo = Cache::get($data['orderNo']);
+        $orderInfo = Cache::get($tmpNo);
+        //根据订单数据提取支付信息
+        $payInfo = Cache::get($orderInfo['order_ip'].'-xpay_config');
+        // 先回调验签
+        $newSign = $this->signParams($data,$payInfo['mch_key']);
+        if ($data['sign'] === $newSign) {
+            //表示验签成功
+            $data  = [
+                'id'             => $orderInfo['id'],
+                'transaction_id' => $data['trade_no'],/*微信支付订单号*/
+                'nonce_str'      => $data['nonce_str'],
+                'pay_type'       => 1,/*支付类型，0=微信，1=享钱*/
+                'pay_status'     => 1,/*支付状态，已经完成支付*/
+                'pay_id'         => $payInfo['id'],/*使用的支付id，支付链接在产生支付的时候进行写入*/
+                'xdd_trade_no'   => $data['xdd_trade_no'],/*使用的支付id，支付链接在产生支付的时候进行写入*/
+            ];
+            //更新数据
+            Db::startTrans();
+            try {
+                $this->orderModel->isUpdate(true)->save($data);
+                Cache::set('update','ok');
+                Db::commit();
+            } catch (ValidateException $e) {
+                Db::rollback();
+                $this->error($e->getMessage());
+            } catch (PDOException $e) {
+                Db::rollback();
+                $this->error($e->getMessage());
+            } catch (\Exception $e) {
+                Db::rollback();
+                $this->error($e->getMessage());
+            }
+            //返回成功
+            $str = '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+            echo $str;
+            return ;
+        } else {
+            //返回失败
+            $str = '<xml><return_code><![CDATA[fail]]></return_code><return_msg><![CDATA[fail]]></return_msg></xml>';
+            echo $str;
+            return ;
+        }
+
     }
 }

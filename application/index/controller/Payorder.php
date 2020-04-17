@@ -52,6 +52,9 @@ class PayOrder extends Frontend
         $orderInfo = Cache::get($params['sn']);
         $payInfo = Cache::get($orderInfo['order_ip'].'-xpay_config');
 
+        //由于下单逻辑和支付逻辑有冲突，这里需要生一个临时订单号，用于支付使用。与当前订单不一样，但需要建议绑定关系。
+        $tmpOrderNo = time().mt_rand(11111,99999);
+
         $data = [
             'ticket'    => time(),/*用来匹配请求*/
             //支付宝pay.alipay.native,微信pay.wxpay.native,京东pay.jdpay.native,qq pay.qqpay.native,银联二维码 pay.unionpay.native
@@ -65,7 +68,7 @@ class PayOrder extends Frontend
             //业务数据 Json格式的数据
             'body'      => [
 //                'orderNo'       => $orderInfo['sn'],/*商户订单号 商户系统内部的订单号 ,32个字符内、 可包含字母,确保在商户系统唯一*/
-                'orderNo'       => time().mt_rand(11111,99999),/*商户订单号 商户系统内部的订单号 ,32个字符内、 可包含字母,确保在商户系统唯一*/
+                'orderNo'       => $tmpOrderNo,/*商户订单号 商户系统内部的订单号 ,32个字符内、 可包含字母,确保在商户系统唯一*/
                 //'device'        => '',/*设备号 终端设备号     不是必填*/
                 'order_info'    => $orderInfo['production_name'],/*商品描述*/
                 //'attach'        => '',/*商户附加信息，可做扩展参数     不是必填*/
@@ -83,7 +86,9 @@ class PayOrder extends Frontend
             ],
         ];
         //更新订单OPENID
-        $this->orderModel->isUpdate(true)->where('sn',$orderInfo['sn'])->update(['openid'=>$params['openid']]);
+        $this->orderModel->where('sn',$params['sn'])->update(['xdd_tmp_no'=>$tmpOrderNo,'openid'=>$params['openid']]);
+        //缓存当前申请支付的临时订单与本订单之前的关系
+        Cache::set($tmpOrderNo,$params['sn']);
         $newParams = $this->XpaySignParams($data,$payInfo['mch_key']);
         $data['sign'] = $newParams;
         //构建请求支付接口参数
@@ -93,7 +98,6 @@ class PayOrder extends Frontend
         //构建页面展示需要的数据
         $data = json_decode($result,true);
         Cache::set('xpay_return',$result);
-        Cache::set('xpay_data',$data);
         $this->assign('data',$data);
         $this->assign('orderInfo',$orderInfo);
         return $this->view->fetch('xpay');
