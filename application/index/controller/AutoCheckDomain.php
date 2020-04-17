@@ -1,6 +1,7 @@
 <?php
 namespace app\index\Controller;
 
+use think\Cache;
 use think\Controller;
 use app\admin\model\sysconfig\Consumables as ConsumablesModel;
 
@@ -81,6 +82,7 @@ class AutoCheckDomain extends Controller
         //根据结果采取不同的措施
         if ($result["code"] == 1) { //域名被封了.
             $re = $this->consumablesModel->where('id',$checkDomainList['id'])->update(['is_forbidden' => 1]);
+            Cache::rm('luck_domain');
             if ($re) {
                 $msg = '<span style="color:#ff0000">域名被封,设置成功</span>';
             }else{

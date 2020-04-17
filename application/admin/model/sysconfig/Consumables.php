@@ -9,9 +9,6 @@ class Consumables extends Model
 {
 
     use SoftDelete;
-
-    
-
     // 表名
     protected $name = 'consumables_domain';
     

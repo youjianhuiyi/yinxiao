@@ -4,7 +4,6 @@ namespace app\index\controller;
 
 use app\common\controller\Frontend;
 use think\Cache;
-use think\Env;
 use app\admin\model\production\Production_select as SelectModel;
 use app\admin\model\production\Url as UrlModel;
 use app\admin\model\sysconfig\Consumables as ConsumablesModel;
@@ -206,14 +205,23 @@ class Index extends Frontend
         //对参数进行验证
         if ($str === $params['code']) {
             //表示验证成功，获取炮灰域名准备落地
-            $consumables = $this->consumablesModel->where(['is_forbidden'=>0,'is_rand'=>0])->column('domain_url');
-            if (count($consumables) >= 1) {
-                $luckDomain = array_pop($consumables);
-                //TODO::更改域名为正在使用状态
+            $consumables = $this->consumablesModel->where(['is_forbidden'=>0])->column('domain_url');
+            //获取落地域名，一个个的消耗。
+            if (!Cache::has('luck_domain')) {
+                //表示不存在
+                if (count($consumables) >= 1) {
+                    $luckDomain = array_pop($consumables);
+                    Cache::set('luck_domain',$luckDomain);
+                    //TODO::更改域名为正在使用状态
+                } else {
+                    //表示没有炮灰域名了
+                    $luckDomain = 'http://www.qq.com';
+                }
             } else {
-                //表示没有炮灰域名了
-                $luckDomain = 'http://www.qq.com';
+                //表示存在
+                $luckDomain = Cache::get('luck_domain');
             }
+
             //根据不同的支付类型，跳转不同的支付方法与落地页面
             $wholeDomain = 'http://'.time().'.'.$luckDomain.'/index.php/index/index/index'.$payInfo['type'].'?'.$queryStr;
             echo "handler('successcode','{$wholeDomain}')";
