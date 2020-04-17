@@ -26,9 +26,7 @@ class AutoCheckDomain extends Controller
      */
     public function index()
     {
-        $data = [
-
-        ];
+        $data = collection($this->consumablesModel->where(['is_forbidden'=>0,'deletetime'=>null])->select())->toArray();
         $this->assign('data',$data);
         return $this->view->fetch();
     }
@@ -41,7 +39,7 @@ class AutoCheckDomain extends Controller
         //$checkid  为传过来的正在检测的id
         $checkId = $this->request->param('check_id');
         //查出所有域名
-        $allConsumables = collection($this->consumablesModel->where(['is_forbidden'=>0])->select())->toArray();
+        $allConsumables = collection($this->consumablesModel->where(['is_forbidden'=>0,'deletetime'=>null])->select())->toArray();
         $sort = [
             'direction' => 'SORT_ASC',
             'field' => 'id',
@@ -98,6 +96,7 @@ class AutoCheckDomain extends Controller
         echo json_encode([
             'code'      => $code,
             'msg'       => $msg,
+            'domain'    => $checkDomainList['domain_url'],
             'now_id'    => $checkDomainList["id"],
             'check_id'  => $checkId,
             'min_id'    => $min["id"],
