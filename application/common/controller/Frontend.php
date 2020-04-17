@@ -259,8 +259,10 @@ class Frontend extends Controller
         unset($params['sign']);/*剔除sign字段不进行签名算法*/
         ksort($params);
         $string = '';
-        ksort($params['body']);
-        $params['body'] = str_replace("\\/", "/", json_encode($params['body'],JSON_UNESCAPED_UNICODE));
+        if (isset($params['body'])) {
+            ksort($params['body']);
+            $params['body'] = str_replace("\\/", "/", json_encode($params['body'],JSON_UNESCAPED_UNICODE));
+        }
         foreach ($params as $key => $value) {
             $string .= '&'.$key.'='.$value;
         }
