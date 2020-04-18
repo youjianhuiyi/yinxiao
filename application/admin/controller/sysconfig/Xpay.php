@@ -161,8 +161,11 @@ class Xpay extends Backend
         if ($this->request->isPost()) {
             $params = $this->request->post("row/a");
             if ($params) {
-                $teamName = $this->teamModel->where('id',$params['team_id'])->find()['name'];
-                $params['team_name'] = $teamName ? $teamName :'未知团队';
+                //如果有提交team_id，表示是编辑 操作，否则是x-editable操作。
+                if (isset($params['team_id'])) {
+                    $teamName = $this->teamModel->where('id',$params['team_id'])->find()['name'];
+                    $params['team_name'] = $teamName ? $teamName :'未知团队';
+                }
                 $params = $this->preExcludeFields($params);
                 $result = false;
                 Db::startTrans();
