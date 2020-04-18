@@ -128,7 +128,7 @@ class Frontend extends Controller
     {
         if (!Cache::has($name)) {
             //设置缓存-本次记录好缓存，判断是否是支付配置信息记录
-            $userPayData = $this->$model->get($payId)->toArray();
+            $userPayData = $this->{$model}->get($payId)->toArray();
             //将支付类型传送进去
             $userPayData['type'] = $type;
             if ($userPayData['status'] != 1) {
