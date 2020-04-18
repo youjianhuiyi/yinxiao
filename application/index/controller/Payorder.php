@@ -36,7 +36,7 @@ class PayOrder extends Frontend
     {
         $params = $this->request->param();
         $orderInfo = Cache::get($params['sn']);
-        if ($this->request->isAjax()) {
+        if ($this->request->isPost()) {
             $params = $this->request->param();
             $orderInfo = Cache::get($params['sn']);
             $payInfo = Cache::get($orderInfo['order_ip'].'-rypay_config');
