@@ -167,6 +167,7 @@ class Notify extends Frontend
         $payInfo = Cache::get($orderInfo['order_ip'].'-xpay_config');
         // 先回调验签
         $newSign = $this->RypaySignParams($notifyArr,$payInfo['mch_key']);
+        Cache::set('newSign',$newSign);
         if ($notifyArr['sign'] === $newSign) {
             //表示验签成功
             $data  = [
