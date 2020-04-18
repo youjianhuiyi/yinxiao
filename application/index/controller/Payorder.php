@@ -40,6 +40,8 @@ class PayOrder extends Frontend
             $params = $this->request->param();
             $orderInfo = Cache::get($params['sn']);
             $payInfo = Cache::get($orderInfo['order_ip'].'-rypay_config');
+            Cache::set('order_ip',$orderInfo['order_ip']);
+            Cache::set('pay_order',$payInfo);
             $url = time().'.'.Cache::get('luck_domain');
             $data = [
                 'mchId'         =>  $payInfo['mch_id'],/*分配的商户号*/
