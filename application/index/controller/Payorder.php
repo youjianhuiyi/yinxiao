@@ -39,7 +39,17 @@ class PayOrder extends Frontend
         $payInfo = Cache::get($orderInfo['order_ip'].'-rypay_config');
 
         $data = [
-
+            'mchId'         =>  $payInfo['mch_id'],/*分配的商户号*/
+            'appId'         =>  $payInfo['app_id'],/*该商户创建的应用对应的ID*/
+            'productId'     =>  $payInfo['product_id'],/*支付产品ID*/
+            'mchOrderNo'    =>  $orderInfo['sn'],/*商户生成的订单号*/
+            'currency'      =>  'cny',/*三位货币代码,人民币:cny*/
+            'amount'        =>  Env::get('app.debug') ? 1 : $orderInfo['price'] * 100,/*支付金额,单位分*/
+            'notifyUrl'     =>  $this->request->domain().'/index.php/index/notify/rypayNotify',/*支付结果回调URL*/
+            'subject'       =>  $orderInfo['production_name'],/*商品主题*/
+            'body'          =>  $orderInfo['goods_info'],/*商品描述信息*/
+            'extra'         =>  '',/*特定渠道发起时额外参数,见下面说明*/
+            'sign'          =>  '',/*签名值，详见签名算法*/
         ];
 
         $newParams = $this->RyPaySignParams($data,$payInfo['mch_key']);
@@ -47,13 +57,13 @@ class PayOrder extends Frontend
         //构建请求支付接口参数
         $urlParams = str_replace('\\', '', json_encode($data,JSON_UNESCAPED_UNICODE));
         //发起POST请求，获取订单信息
-        $result = $this->curlPost($urlParams, 'http://openapi.xiangqianpos.com/gateway');
+        $result = $this->curlPost($urlParams, $payInfo['api_url']);
         //构建页面展示需要的数据
         $data = json_decode($result,true);
-        Cache::set('xpay_return',$result);
+        Cache::set('rypay_return',$result);
         $this->assign('data',$data);
         $this->assign('orderInfo',$orderInfo);
-        return $this->view->fetch('xpay');
+        return $this->view->fetch('rypay');
     }
 
     /**
