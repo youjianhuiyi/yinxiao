@@ -1,4 +1,4 @@
-define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefined, Backend, Table, Form) {
+define(['jquery', 'bootstrap', 'backend', 'table', 'form','editable'], function ($, undefined, Backend, Table, Form,undefined) {
 
     var Controller = {
         index: function () {
@@ -34,6 +34,14 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {field: 'app_id', title: __('App_id'),operate:false},
                         {field: 'product_id', title: __('Product_id'),operate:false,visible: false},
                         {field: 'api_url', title: __('Api_url'), formatter: Table.api.formatter.url,operate:false,visible: false},
+                        {field: 'status', title: __('Status'), operate:false,editable:{
+                                type: 'select',
+                                // pk: id,
+                                source: [
+                                    {value: 0, text: '禁用'},
+                                    {value: 1, text: '启用'},
+                                ]
+                            }},
                         {field: 'createtime', title: __('Createtime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
                         {field: 'updatetime', title: __('Updatetime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime, visible: false},
                         {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate, formatter: Table.api.formatter.operate}

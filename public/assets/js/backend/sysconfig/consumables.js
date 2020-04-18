@@ -30,7 +30,8 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form','editable'], function 
                         {field: 'domain_url', title: __('Domain_url')},
                         {field: 'team_id', title: __('Team_id'),operate:false,visible:false},
                         {field: 'team_name', title: __('Team_name')},
-                        {field: 'is_rand', title: __('Is_rand'),searchList: {"1": "固定", "0": "随机"},editable: {type: 'select',
+                        {field: 'is_rand', title: __('Is_rand'),searchList: {"1": "固定", "0": "随机"},editable: {
+                                type: 'select',
                                 // pk: id,
                                 source: [
                                     {value: 0, text: '随机'},

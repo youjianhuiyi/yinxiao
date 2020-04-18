@@ -36,6 +36,14 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {field: 'app_secret', title: __('App_secret'),operate:false,visible:false},
                         {field: 'mch_id', title: __('Mch_id'),operate:false,visible:false},
                         {field: 'mch_key', title: __('Mch_key'),operate:false,visible:false},
+                        {field: 'status', title: __('Status'), operate:false,editable:{
+                                type: 'select',
+                                // pk: id,
+                                source: [
+                                    {value: 0, text: '禁用'},
+                                    {value: 1, text: '启用'},
+                                ]
+                            }},
                         {field: 'createtime', title: __('Createtime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
                         {field: 'updatetime', title: __('Updatetime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
                         {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate, formatter: Table.api.formatter.operate}
