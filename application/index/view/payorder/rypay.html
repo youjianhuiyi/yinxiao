@@ -73,9 +73,10 @@
             data : {'sn':sn},
             dataType : "json",
             success : function(result) {
-                console.log(result)
-                console.log(result.payParams.payUrl)
                 if (result.retCode == 'SUCCESS'){
+                    console.log(result)
+                    console.dir(result)
+                    console.log(result.payParams.payUrl)
                     window.location.href = result.payParams.payUrl;
                 }else{
                     alert(result.retMsg);
