@@ -59,8 +59,8 @@ class PayOrder extends Frontend
             //发起POST请求，获取订单信息
             $result = $this->curlPostForm($data, $payInfo['api_url']);
             //构建页面展示需要的数据
-//            $newData = json_decode($result,true);
-            return json($result);
+            $newData = json_decode($result,true);
+            return json_encode($newData);
         }
 
         $this->assign('orderInfo',$orderInfo);
