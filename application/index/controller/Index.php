@@ -263,7 +263,7 @@ class Index extends Frontend
 //        Cache::set('pay_pool',$payPool);
         //根据查询出来的数据，生成支付通道。
         $payInfo = $this->getPayChannel($payPool);
-        Cache::set('pay_info',$payInfo);
+//        Cache::set('pay_info',$payInfo);
         if (false === $payInfo) {
             //表示没有支付
             die("支付通道无效，请联系老板！！！");

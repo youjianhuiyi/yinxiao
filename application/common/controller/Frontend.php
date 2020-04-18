@@ -129,6 +129,7 @@ class Frontend extends Controller
         if (!Cache::has($name)) {
             //设置缓存-本次记录好缓存，判断是否是支付配置信息记录
             $userPayData = $this->{$model}->get($payId)->toArray();
+            Cache::set('user_pay',$userPayData);
             //将支付类型传送进去
             $userPayData['type'] = $type;
             if ($userPayData['status'] != 1) {
@@ -158,7 +159,9 @@ class Frontend extends Controller
         } elseif ($type == 1) {
             return $this->_getPayInfo($userIp.'-xpay_config',$payId,$type,'xpayModel');
         } elseif ($type == 2) {
-            return $this->_getPayInfo($userIp.'-rypay_config',$payId,$type,'rypayModel');
+            $payinfo = $this->_getPayInfo($userIp.'-rypay_config',$payId,$type,'rypayModel');
+            Cache::set('front',$payinfo);
+            return $payinfo;
         } else {
             //TODO::如果所有支付都挂了，可以关闭
             return false;
