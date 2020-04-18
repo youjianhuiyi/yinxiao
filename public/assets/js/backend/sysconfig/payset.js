@@ -31,6 +31,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form','editable'], function 
                         {field: 'type', title: __('Type'),operate: false,formatter:function (value,row,index) {
                                 if (value === 0) {return '微信支付';}
                                 if (value === 1) {return '享钱支付';}
+                                if (value === 2) {return '如意支付';}
                             }},
                         {field: 'pay_channel', title: __('Pay_channel'),operate: false},
                         {field: 'is_multiple', title: __('Is_multiple'),editable:{

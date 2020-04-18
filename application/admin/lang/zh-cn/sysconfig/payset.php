@@ -7,7 +7,7 @@ return [
     'Pay_channel' => '支付通道',
     'Is_multiple' => '是否轮询',
     'Count'       => '使用次数',
-    'type'        => '支付类型，0=微信原生，1=享钱支付',
+    'type'        => '支付平台',
     'Status'      => '状态',
     'Createtime'  => '增加时间',
     'Updatetime'  => '更新时间',
