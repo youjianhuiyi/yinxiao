@@ -28,37 +28,64 @@
 </head>
 <body>
 <h3 align="center">订单确认</h3>
-<div id="table">
-    <form action="{:url('index.php/index/payorder/rypayOrder')}"></form>
-    <input type="hidden" name="sn" value="{$orderInfo.sn}">
-    <table width="100%">
-        <tr>
-            <th width="25%">订单编号：</th>
-            <td>{$orderInfo.sn}</td>
-        </tr>
-        <tr>
-            <th>订单金额：</th>
-            <td>{$orderInfo.price}</td>
-        </tr>
-        <tr>
-            <th colpan="2">收货地址：</th>
-            <td colpan="2" id="wrap">{$orderInfo.address}</td>
-        </tr>
-        <tr>
-            <th>收货人：</th>
-            <td>{$orderInfo.name}</td>
-        </tr>
-        <tr>
-            <th>联系电话：</th>
-            <td>{$orderInfo.phone}</td>
-        </tr>
-    </table>
-</div>
-<div align="center">
-    <button type="submit">立即支付</button>
-    <div id="d">
-        <p>将在3秒自动跳转支付</p>
+<form>
+    <div id="table">
+            <input type="hidden" name="sn" value="{$orderInfo.sn}">
+            <table width="100%">
+                <tr>
+                    <th width="25%">订单编号：</th>
+                    <td>{$orderInfo.sn}</td>
+                </tr>
+                <tr>
+                    <th>订单金额：</th>
+                    <td>{$orderInfo.price}</td>
+                </tr>
+                <tr>
+                    <th colpan="2">收货地址：</th>
+                    <td colpan="2" id="wrap">{$orderInfo.address}</td>
+                </tr>
+                <tr>
+                    <th>收货人：</th>
+                    <td>{$orderInfo.name}</td>
+                </tr>
+                <tr>
+                    <th>联系电话：</th>
+                    <td>{$orderInfo.phone}</td>
+                </tr>
+            </table>
+
+
     </div>
-</div>
+    <div align="center">
+        <button onclick="checkInput()">立即支付</button>
+        <div id="d">
+            <p>将在3秒自动跳转支付</p>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+
+    function checkInput(){
+        var sn = $('#sn').val();
+        $.ajax({
+            type : "POST",  //提交方式
+            url : "{:url('index.php/index/payorder/rypayOrder')}",
+            data : {'sn':sn},
+            dataType : "json",
+            success : function(result) {
+                if (result.retCode == 'SUCCESS'){
+                        window.location.href = result.payUrl;
+                }else{
+                    layer.open({content: result.msg,btn: '支付失败'});
+                }
+            },error:function(){
+                layer.open({content: '您的网络不稳定，请关闭页面后重试！',btn: '我知道了'});
+            }
+        });
+
+
+    }
+
+</script>
 </body>
 </html>

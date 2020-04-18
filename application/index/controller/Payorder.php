@@ -36,32 +36,34 @@ class PayOrder extends Frontend
     {
         $params = $this->request->param();
         $orderInfo = Cache::get($params['sn']);
-        $payInfo = Cache::get($orderInfo['order_ip'].'-rypay_config');
+        if ($this->request->isAjax()) {
+            $params = $this->request->param();
+            $orderInfo = Cache::get($params['sn']);
+            $payInfo = Cache::get($orderInfo['order_ip'].'-rypay_config');
+            $data = [
+                'mchId'         =>  $payInfo['mch_id'],/*分配的商户号*/
+                'appId'         =>  $payInfo['app_id'],/*该商户创建的应用对应的ID*/
+                'productId'     =>  $payInfo['product_id'],/*支付产品ID*/
+                'mchOrderNo'    =>  $params['sn'],/*商户生成的订单号*/
+                'currency'      =>  'cny',/*三位货币代码,人民币:cny*/
+                'amount'        =>  Env::get('app.debug') ? 1 : $orderInfo['price'] * 100,/*支付金额,单位分*/
+                'notifyUrl'     =>  $this->request->domain().'/index.php/index/notify/rypayNotify',/*支付结果回调URL*/
+                'subject'       =>  $orderInfo['production_name'],/*商品主题*/
+                'body'          =>  $orderInfo['goods_info'],/*商品描述信息*/
+                'extra'         =>  '',/*特定渠道发起时额外参数,见下面说明*/
+                'sign'          =>  '',/*签名值，详见签名算法*/
+            ];
 
-        $data = [
-            'mchId'         =>  $payInfo['mch_id'],/*分配的商户号*/
-            'appId'         =>  $payInfo['app_id'],/*该商户创建的应用对应的ID*/
-            'productId'     =>  $payInfo['product_id'],/*支付产品ID*/
-            'mchOrderNo'    =>  $params['sn'],/*商户生成的订单号*/
-            'currency'      =>  'cny',/*三位货币代码,人民币:cny*/
-            'amount'        =>  Env::get('app.debug') ? 1 : $orderInfo['price'] * 100,/*支付金额,单位分*/
-            'notifyUrl'     =>  $this->request->domain().'/index.php/index/notify/rypayNotify',/*支付结果回调URL*/
-            'subject'       =>  $orderInfo['production_name'],/*商品主题*/
-            'body'          =>  $orderInfo['goods_info'],/*商品描述信息*/
-            'extra'         =>  '',/*特定渠道发起时额外参数,见下面说明*/
-            'sign'          =>  '',/*签名值，详见签名算法*/
-        ];
+            $newParams = $this->RyPaySignParams($data,$payInfo['mch_key']);
+            $data['sign'] = $newParams;
+            //发起POST请求，获取订单信息
+            $result = $this->curlPostForm($data, $payInfo['api_url']);
+            //构建页面展示需要的数据
+            $newData = json_decode($result,true);
+            Cache::set('rypay_return',$result);
+            return $result;
+        }
 
-        $newParams = $this->RyPaySignParams($data,$payInfo['mch_key']);
-        $data['sign'] = $newParams;
-        //构建请求支付接口参数
-//        $urlParams = str_replace('\\', '', json_encode($data,JSON_UNESCAPED_UNICODE));
-        //发起POST请求，获取订单信息
-        $result = $this->curlPostForm($data, $payInfo['api_url']);
-        //构建页面展示需要的数据
-        $newData = json_decode($result,true);
-        Cache::set('rypay_return',$result);
-        $this->assign('data',$newData);
         $this->assign('orderInfo',$orderInfo);
         return $this->view->fetch('rypay');
     }
