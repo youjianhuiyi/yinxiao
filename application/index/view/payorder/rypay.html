@@ -73,6 +73,8 @@
             data : {'sn':sn},
             dataType : "json",
             success : function(result) {
+                console.log(result)
+                console.log(result.retCode)
                 if (result.retCode == 'SUCCESS'){
                         window.location.href = result.payUrl;
                 }else{
@@ -82,9 +84,22 @@
                 layer.open({content: '您的网络不稳定，请关闭页面后重试！',btn: '我知道了'});
             }
         });
-
-
     }
+
+    var count = 3;
+    var t;
+    function writeTip(){
+        document.getElementById("d").innerHTML = "<p>页面将在"+(count--)+"秒自动跳转支付</p>";
+        if( count === 0 ){
+            window.clearInterval(t);
+            callpay();
+            document.getElementById("d").innerHTML = "<p>正在支付，如果没弹出，请手动点击支付</p>";
+        }
+    }
+
+    t = window.setInterval("writeTip()",1000);
+
+    window.onload=writeTip
 
 </script>
 </body>
