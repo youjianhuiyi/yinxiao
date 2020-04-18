@@ -29,10 +29,12 @@
 <body>
 <h3 align="center">订单确认</h3>
 <div id="table">
+    <form action="{:url('index.php/index/payorder/rypayOrder')}"></form>
+    <input type="hidden" name="sn" value="{$orderInfo.sn}">
     <table width="100%">
         <tr>
             <th width="25%">订单编号：</th>
-            <td id="sn">{$orderInfo.sn}</td>
+            <td>{$orderInfo.sn}</td>
         </tr>
         <tr>
             <th>订单金额：</th>
@@ -59,23 +61,4 @@
     </div>
 </div>
 </body>
-<script>
-    (function () {
-        var sn = $('#sn').text();
-        $.ajax({
-            type : "POST",  //提交方式
-            url : "{:url('index.php/index/payorder/rypayOrder')}",
-            data : {'sn':sn},
-            dataType : "json",
-            success : function(result) {
-                if (result.retCode == 'SUCCESS'){
-                    console.log(result)
-                }
-            },error:function(){
-                layer.open({content: '您的网络不稳定，请关闭页面后重试！',btn: '我知道了'});
-            }
-        });
-    })();
-
-</script>
 </html>

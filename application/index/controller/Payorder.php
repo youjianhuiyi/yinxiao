@@ -37,7 +37,7 @@ class PayOrder extends Frontend
         $params = $this->request->param();
         $orderInfo = Cache::get($params['sn']);
         $payInfo = Cache::get($orderInfo['order_ip'].'-rypay_config');
-        
+
         $data = [
             'mchId'         =>  $payInfo['mch_id'],/*分配的商户号*/
             'appId'         =>  $payInfo['app_id'],/*该商户创建的应用对应的ID*/
