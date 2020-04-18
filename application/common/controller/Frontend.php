@@ -351,13 +351,13 @@ class Frontend extends Controller
     }
 
     /**
-     * CURL_POST请求
+     * CURL_POST json请求
      * @param $str  string  json字符串
      * @param $url  string  请求的url地址
      * @param $second  int  请求最长时间
      * @return bool|string
      */
-    public static function curlPost($str, $url, $second = 30)
+    public static function curlPostJson($str, $url, $second = 30)
     {
 
         $ch = curl_init($url);
@@ -378,4 +378,41 @@ class Frontend extends Controller
         }
     }
 
+
+    /**
+     * CURL_POST普通请求
+     * @param $str  string  json字符串
+     * @param $url  string  请求的url地址
+     * @param $second  int  请求最长时间
+     * @return bool|string
+     */
+    public static function curlPostForm($str, $url, $second = 30)
+    {
+
+        $ch = curl_init();
+        //设置超时
+        curl_setopt($ch, CURLOPT_TIMEOUT, $second);
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        //设置 header
+        curl_setopt($ch, CURLOPT_HEADER, FALSE);
+        //要求结果为字符串且输出到屏幕上
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        //post 提交方式
+        curl_setopt($ch, CURLOPT_POST, TRUE);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $str);
+        //运行 curl
+        $data = curl_exec($ch);
+        //返回结果
+        if ($data) {
+            curl_close($ch);
+            return $data;
+        } else {
+            $error = curl_errno($ch);
+            curl_close($ch);
+            echo "curl 出错，错误码:$error" . "<br>";
+            return false;
+        }
+    }
 }
