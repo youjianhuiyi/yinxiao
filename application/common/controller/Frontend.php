@@ -129,10 +129,9 @@ class Frontend extends Controller
         if (!Cache::has($name)) {
             //设置缓存-本次记录好缓存，判断是否是支付配置信息记录
             $userPayData = $this->{$model}->get($payId)->toArray();
-            Cache::set('user_pay',$userPayData);
             //将支付类型传送进去
             $userPayData['type'] = $type;
-            if ($userPayData['status'] != 1) {
+            if ($userPayData['status'] == 1) {
                 //TODO::这里存在一个问题，就是所有支付信息全部有支付管理模块来控制，目前没有做，单独本支付通道被封停后，但是支付配置没有同步数据的问题。
                 //绑定支付配置。如果该用户再次访问，如果有缓存则直接读取。如果没有缓存或者被封，则跳转其他支付
                 Cache::set($name,$userPayData,1440);
@@ -159,9 +158,7 @@ class Frontend extends Controller
         } elseif ($type == 1) {
             return $this->_getPayInfo($userIp.'-xpay_config',$payId,$type,'xpayModel');
         } elseif ($type == 2) {
-            $payinfo = $this->_getPayInfo($userIp.'-rypay_config',$payId,$type,'rypayModel');
-            Cache::set('front',$payinfo);
-            return $payinfo;
+            return $this->_getPayInfo($userIp.'-rypay_config',$payId,$type,'rypayModel');
         } else {
             //TODO::如果所有支付都挂了，可以关闭
             return false;
