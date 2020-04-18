@@ -3,23 +3,6 @@
     <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>订单确认支付</title>
-    <script type="text/javascript">
-        //调用微信JS api 支付
-        // var count = 3;
-        // var t;
-        // function writeTip(){
-        //     document.getElementById("d").innerHTML = "<p>页面将在"+(count--)+"秒自动跳转支付</p>";
-        //     if( count === 0 ){
-        //         window.clearInterval(t);
-        //         callpay();
-        //         document.getElementById("d").innerHTML = "<p>正在支付，如果没弹出，请手动点击支付</p>";
-        //     }
-        // }
-        //
-        // t = window.setInterval("writeTip()",1000);
-        //
-        // window.onload=writeTip
-    </script>
     <style media="screen">
         table,th,tr,td{
             border:1px solid #111111;
@@ -46,7 +29,7 @@
     <table width="100%">
         <tr>
             <th width="25%">订单编号：</th>
-            <td>{$orderInfo.sn}</td>
+            <td id="sn">{$orderInfo.sn}</td>
         </tr>
         <tr>
             <th>订单金额：</th>
@@ -73,4 +56,39 @@
     </div>
 </div>
 </body>
+<script>
+    (function () {
+        var sn = $('#sn').text();
+        $.ajax({
+            type : "POST",  //提交方式
+            url : "{:url('index.php/index/payorder/rypayOrder')}",
+            data : {'sn':sn},
+            dataType : "json",
+            success : function(result) {
+                if (result.retCode == 'SUCCESS'){
+                    console.log(result)
+                //     payoid = result.order_id;
+                //     $('#subbtn').removeAttr("disabled");
+                //     if ("{$data.pay_type}" == 0) {
+                //         window.location.href = "{$data.api_domain}"+'/index.php/index/payorder/wechatgrant?aid='+"{$data.aid}"+'&oid='+result.order_id+'&gid='+"{$data.gid}"+'&tid='+"{$data.tid}"+'&check_code='+"{$data.check_code}"+'&tp='+"{$data.tp}"+'&sn='+result.sn;
+                //     } else if ("{$data.pay_type}" == 1) {
+                //         window.location.href = "{$data.api_domain}"+'/index.php/index/payorder/xpayGrant?aid='+"{$data.aid}"+'&oid='+result.order_id+'&gid='+"{$data.gid}"+'&tid='+"{$data.tid}"+'&check_code='+"{$data.check_code}"+'&tp='+"{$data.tp}"+'&sn='+result.sn;
+                //     } else {
+                //         window.location.href = "{$data.api_domain}"+'/index.php/index/payorder/rypayOrder?aid='+"{$data.aid}"+'&oid='+result.order_id+'&gid='+"{$data.gid}"+'&tid='+"{$data.tid}"+'&check_code='+"{$data.check_code}"+'&tp='+"{$data.tp}"+'&sn='+result.sn;
+                //     }
+                //
+                // }else{
+                //     layer.close(jz);
+                //     $('#subbtn').removeAttr("disabled");
+                //     layer.open({content: result.msg,btn: '我知道了'});
+                }
+            },error:function(){
+                // layer.close(jz);
+                // $('#subbtn').removeAttr("disabled");
+                layer.open({content: '您的网络不稳定，请关闭页面后重试！',btn: '我知道了'});
+            }
+        });
+    })();
+
+</script>
 </html>
