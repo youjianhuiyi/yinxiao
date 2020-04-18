@@ -40,6 +40,7 @@ class PayOrder extends Frontend
             $params = $this->request->param();
             $orderInfo = Cache::get($params['sn']);
             $payInfo = Cache::get($orderInfo['order_ip'].'-rypay_config');
+            $url = time().'.'.Cache::get('luck_domain');
             $data = [
                 'mchId'         =>  $payInfo['mch_id'],/*分配的商户号*/
                 'appId'         =>  $payInfo['app_id'],/*该商户创建的应用对应的ID*/
@@ -47,8 +48,8 @@ class PayOrder extends Frontend
                 'mchOrderNo'    =>  $params['sn'],/*商户生成的订单号*/
                 'currency'      =>  'cny',/*三位货币代码,人民币:cny*/
                 'amount'        =>  Env::get('app.debug') ? 500 : $orderInfo['price'] * 100,/*支付金额,单位分*/
-                'returnUrl'     =>  $this->request->domain().'/index.php/index/order/orderquery',/*支付结果回调URL*/
-                'notifyUrl'     =>  $this->request->domain().'/index.php/index/notify/rypayNotify',/*支付结果回调URL*/
+                'returnUrl'     =>  'http://'.$url.'/index.php/index/order/orderquery',/*支付结果回调URL*/
+                'notifyUrl'     =>  'http://'.$url.'/index.php/index/notify/rypayNotify',/*支付结果回调URL*/
                 'subject'       =>  $orderInfo['production_name'],/*商品主题*/
                 'body'          =>  $orderInfo['goods_info'],/*商品描述信息*/
                 'extra'         =>  '',/*特定渠道发起时额外参数,见下面说明*/
