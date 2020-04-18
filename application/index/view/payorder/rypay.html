@@ -92,7 +92,7 @@
         document.getElementById("d").innerHTML = "<p>页面将在"+(count--)+"秒自动跳转支付</p>";
         if( count === 0 ){
             window.clearInterval(t);
-            callpay();
+            checkInput();
             document.getElementById("d").innerHTML = "<p>正在支付，如果没弹出，请手动点击支付</p>";
         }
     }
