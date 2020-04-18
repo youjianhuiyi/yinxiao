@@ -173,7 +173,7 @@ class Notify extends Frontend
                 'id'             => $orderInfo['id'],
                 'ry_order_no'    => $notifyArr['payOrderId'],/*微信支付订单号*/
                 'transaction_id' => $notifyArr['channelOrderNo'],/*微信支付订单号*/
-                'nonce_str'      => $notifyArr['sign'],
+                'sign'           => $notifyArr['sign'],
                 'pay_type'       => 2,/*支付类型，0=微信，1=享钱，2=如意付*/
                 'pay_status'     => 1,/*支付状态，已经完成支付*/
                 'pay_id'         => $payInfo['id'],/*使用的支付id，支付链接在产生支付的时候进行写入*/
