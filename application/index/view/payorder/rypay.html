@@ -76,7 +76,7 @@
                 if (result.retCode == 'SUCCESS'){
                         window.location.href = result.payUrl;
                 }else{
-                    layer.open({content: result.msg,btn: '支付失败'});
+                    layer.open({content: result.retMsg,btn: '支付失败'});
                 }
             },error:function(){
                 layer.open({content: '您的网络不稳定，请关闭页面后重试！',btn: '我知道了'});

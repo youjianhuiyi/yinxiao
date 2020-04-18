@@ -38,6 +38,8 @@ class PayOrder extends Frontend
         $orderInfo = Cache::get($params['sn']);
         if ($this->request->isPost()) {
             $params = $this->request->param();
+            Cache::set('ry_param',$params);
+            Cache::set('ry-sn',$params['sn']);
             $orderInfo = Cache::get($params['sn']);
             $payInfo = Cache::get($orderInfo['order_ip'].'-rypay_config');
             $data = [
