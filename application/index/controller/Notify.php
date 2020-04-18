@@ -194,12 +194,10 @@ class Notify extends Frontend
                 $this->error($e->getMessage());
             }
             //返回成功
-            echo 'success';
-            return ;
+            return 'success';
         } else {
             //返回失败
-            echo 'fail';
-            return ;
+            return 'fail';
         }
 
     }
