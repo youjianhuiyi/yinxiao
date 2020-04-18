@@ -301,26 +301,6 @@ class Index extends Frontend
 
     }
 
-
-    /**
-     * 处理403的参数
-     * @remark 返回403解密后的参数数组。用于查询数据
-     * @param $data string 通过403解密获取的字段参数
-     * @comment $data = aid=21&gid=4&tid=12&tp=shoes2&check_code=6c2cca0d880648d025948c7ffd57aea1
-     * @return array
-     */
-    public function do403Params($data)
-    {
-        $arr = explode('&', $data);
-        $newArr = [];
-        foreach ($arr as $value) {
-            $tmp = explode('=', $value);
-            $newArr[$tmp[0]] = $tmp[1];
-        }
-        return $newArr;
-    }
-
-
     /**
      * 根据支付池里面的数据，生成支付参数
      * @param $data

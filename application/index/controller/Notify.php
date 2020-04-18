@@ -151,36 +151,37 @@ class Notify extends Frontend
     /**
      * 如意付支付回调，
      * @comment 由于业务原因。暂时没有接通付款通道到回调环节
+     * @comment income=465&payOrderId=P01202004182232415270068&amount=500&mchId=20000010&productId=8002
+     * mchOrderNo=2020041822323900019000069338&paySuccTime=1587220535000&sign=F042F1EE3AC470108DAB806A8A2FED18
+     * channelOrderNo=P01202004182232415270068&backType=2&param1=&param2=&appId=8ccfec053ab045288f369aeba0aa0fd4
+     * status=2
      */
     public function rypayNotify()
     {
         $returnData = file_get_contents('php://input');
-        $data = json_decode($returnData);
+        $notifyArr = $this->do403Params($returnData);
         Cache::set('ry_notify_return',$returnData);
-        //通过回调的信息反查订单相关信息
-        //通过临时订单查找真实订单号，
-        $tmpNo = Cache::get($data['orderNo']);
-        $orderInfo = Cache::get($tmpNo);
+        //通过订单号查找
+        $orderInfo = Cache::get($notifyArr['mchOrderNo']);
         //根据订单数据提取支付信息
         $payInfo = Cache::get($orderInfo['order_ip'].'-xpay_config');
         // 先回调验签
-        $newSign = $this->signParams($data,$payInfo['mch_key']);
-        if ($data['sign'] === $newSign) {
+        $newSign = $this->RypaySignParams($notifyArr,$payInfo['mch_key']);
+        if ($notifyArr['sign'] === $newSign) {
             //表示验签成功
             $data  = [
                 'id'             => $orderInfo['id'],
-                'transaction_id' => $data['trade_no'],/*微信支付订单号*/
-                'nonce_str'      => $data['nonce_str'],
-                'pay_type'       => 1,/*支付类型，0=微信，1=享钱*/
+                'ry_order_no'    => $notifyArr['payOrderId'],/*微信支付订单号*/
+                'transaction_id' => $notifyArr['channelOrderNo'],/*微信支付订单号*/
+                'nonce_str'      => $notifyArr['sign'],
+                'pay_type'       => 2,/*支付类型，0=微信，1=享钱，2=如意付*/
                 'pay_status'     => 1,/*支付状态，已经完成支付*/
                 'pay_id'         => $payInfo['id'],/*使用的支付id，支付链接在产生支付的时候进行写入*/
-                'xdd_trade_no'   => $data['xdd_trade_no'],/*使用的支付id，支付链接在产生支付的时候进行写入*/
             ];
             //更新数据
             Db::startTrans();
             try {
                 $this->orderModel->isUpdate(true)->save($data);
-                Cache::set('update','ok');
                 Db::commit();
             } catch (ValidateException $e) {
                 Db::rollback();
@@ -193,13 +194,11 @@ class Notify extends Frontend
                 $this->error($e->getMessage());
             }
             //返回成功
-            $str = '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
-            echo $str;
+            echo 'success';
             return ;
         } else {
             //返回失败
-            $str = '<xml><return_code><![CDATA[fail]]></return_code><return_msg><![CDATA[fail]]></return_msg></xml>';
-            echo $str;
+            echo 'fail';
             return ;
         }
 
