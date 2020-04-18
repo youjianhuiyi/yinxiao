@@ -67,24 +67,8 @@
             success : function(result) {
                 if (result.retCode == 'SUCCESS'){
                     console.log(result)
-                //     payoid = result.order_id;
-                //     $('#subbtn').removeAttr("disabled");
-                //     if ("{$data.pay_type}" == 0) {
-                //         window.location.href = "{$data.api_domain}"+'/index.php/index/payorder/wechatgrant?aid='+"{$data.aid}"+'&oid='+result.order_id+'&gid='+"{$data.gid}"+'&tid='+"{$data.tid}"+'&check_code='+"{$data.check_code}"+'&tp='+"{$data.tp}"+'&sn='+result.sn;
-                //     } else if ("{$data.pay_type}" == 1) {
-                //         window.location.href = "{$data.api_domain}"+'/index.php/index/payorder/xpayGrant?aid='+"{$data.aid}"+'&oid='+result.order_id+'&gid='+"{$data.gid}"+'&tid='+"{$data.tid}"+'&check_code='+"{$data.check_code}"+'&tp='+"{$data.tp}"+'&sn='+result.sn;
-                //     } else {
-                //         window.location.href = "{$data.api_domain}"+'/index.php/index/payorder/rypayOrder?aid='+"{$data.aid}"+'&oid='+result.order_id+'&gid='+"{$data.gid}"+'&tid='+"{$data.tid}"+'&check_code='+"{$data.check_code}"+'&tp='+"{$data.tp}"+'&sn='+result.sn;
-                //     }
-                //
-                // }else{
-                //     layer.close(jz);
-                //     $('#subbtn').removeAttr("disabled");
-                //     layer.open({content: result.msg,btn: '我知道了'});
                 }
             },error:function(){
-                // layer.close(jz);
-                // $('#subbtn').removeAttr("disabled");
                 layer.open({content: '您的网络不稳定，请关闭页面后重试！',btn: '我知道了'});
             }
         });
