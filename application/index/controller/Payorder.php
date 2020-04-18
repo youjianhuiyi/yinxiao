@@ -42,7 +42,7 @@ class PayOrder extends Frontend
             'mchId'         =>  $payInfo['mch_id'],/*分配的商户号*/
             'appId'         =>  $payInfo['app_id'],/*该商户创建的应用对应的ID*/
             'productId'     =>  $payInfo['product_id'],/*支付产品ID*/
-            'mchOrderNo'    =>  $orderInfo['sn'],/*商户生成的订单号*/
+            'mchOrderNo'    =>  $params['sn'],/*商户生成的订单号*/
             'currency'      =>  'cny',/*三位货币代码,人民币:cny*/
             'amount'        =>  Env::get('app.debug') ? 1 : $orderInfo['price'] * 100,/*支付金额,单位分*/
             'notifyUrl'     =>  $this->request->domain().'/index.php/index/notify/rypayNotify',/*支付结果回调URL*/
@@ -55,13 +55,13 @@ class PayOrder extends Frontend
         $newParams = $this->RyPaySignParams($data,$payInfo['mch_key']);
         $data['sign'] = $newParams;
         //构建请求支付接口参数
-        $urlParams = str_replace('\\', '', json_encode($data,JSON_UNESCAPED_UNICODE));
+//        $urlParams = str_replace('\\', '', json_encode($data,JSON_UNESCAPED_UNICODE));
         //发起POST请求，获取订单信息
-        $result = $this->curlPost($urlParams, $payInfo['api_url']);
+        $result = $this->curlPost($data, $payInfo['api_url']);
         //构建页面展示需要的数据
-        $data = json_decode($result,true);
+        $newData = json_decode($result,true);
         Cache::set('rypay_return',$result);
-        $this->assign('data',$data);
+        $this->assign('data',$newData);
         $this->assign('orderInfo',$orderInfo);
         return $this->view->fetch('rypay');
     }
