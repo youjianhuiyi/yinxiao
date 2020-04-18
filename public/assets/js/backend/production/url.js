@@ -45,10 +45,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                                     title: '获取商品推广链接',
                                     classname: 'btn btn-xs btn-primary btn-dialog',
                                     icon: 'fa fa-list',
-                                    url: 'production/url/url',
-                                    callback: function (data) {
-                                        Layer.alert("接收到回传数据：", {title: "回传数据"});
-                                    }
+                                    url: 'production/url/url'
                                 }],
                             formatter: Table.api.formatter.operate
                         }

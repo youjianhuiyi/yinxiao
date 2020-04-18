@@ -36,6 +36,7 @@ class PayOrder extends Frontend
     {
         $params = $this->request->param();
         $orderInfo = Cache::get($params['sn']);
+
         if ($this->request->isPost()) {
             $params = $this->request->param();
             $orderInfo = Cache::get($params['sn']);
@@ -58,8 +59,14 @@ class PayOrder extends Frontend
 
             $newParams = $this->RyPaySignParams($data,$payInfo['mch_key']);
             $data['sign'] = $newParams;
-            //发起POST请求，获取订单信息
-            $result = $this->curlPostForm($data, $payInfo['api_url']);
+            //发起请求之前判断当前是不是已经请求过一次了
+            if (!Cache::has('ry-'.$params['sn'])) {
+                //发起POST请求，获取订单信息
+                $result = $this->curlPostForm($data, $payInfo['api_url']);
+                Cache::set('ry-'.$params['sn'],$result,300);
+            } else {
+                $result = Cache::get('ry-'.$params['sn']);
+            }
             //构建页面展示需要的数据
             $newData = json_decode($result,true);
             $newResult = json_encode($newData);
