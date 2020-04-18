@@ -63,6 +63,7 @@ class PayOrder extends Frontend
             //构建页面展示需要的数据
             $newData = json_decode($result,true);
             Cache::set('rypay_return',$result);
+            Cache::set('rypay_data',$newData);
             return $result;
         }
 
