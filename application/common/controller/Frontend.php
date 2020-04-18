@@ -131,7 +131,7 @@ class Frontend extends Controller
             $userPayData = $this->$model->get($payId)->toArray();
             //将支付类型传送进去
             $userPayData['type'] = $type;
-            if ($userPayData['is_forbidden'] != 1) {
+            if ($userPayData['status'] != 1) {
                 //TODO::这里存在一个问题，就是所有支付信息全部有支付管理模块来控制，目前没有做，单独本支付通道被封停后，但是支付配置没有同步数据的问题。
                 //绑定支付配置。如果该用户再次访问，如果有缓存则直接读取。如果没有缓存或者被封，则跳转其他支付
                 Cache::set($name,$userPayData,1440);
@@ -141,13 +141,11 @@ class Frontend extends Controller
         } else {
             $userPayData = Cache::get($name);
         }
-
         return $userPayData;
     }
 
     /**
      * 获取团队支付信息
-     * @param $tid integer 团队ID
      * @param $type integer 支付类型 0=微信原生JSAPI支付，1=享钱支付
      * @param $payId integer 支付通道ID
      * @return array|mixed
@@ -156,59 +154,15 @@ class Frontend extends Controller
     {
         $userIp = $this->request->ip();
         if ($type == 0) {
-            if (!Cache::has($userIp.'-pay_config')) {
-                //设置缓存-本次记录好缓存，判断是否是支付配置信息记录
-                $userPayData = $this->payModel->get($payId)->toArray();
-                //将支付类型传送进去
-                $userPayData['type'] = 0;
-                if ($userPayData['is_forbidden'] != 1) {
-                    //TODO::这里存在一个问题，就是所有支付信息全部有支付管理模块来控制，目前没有做，单独本支付通道被封停后，但是支付配置没有同步数据的问题。
-                    //绑定支付配置。如果该用户再次访问，如果有缓存则直接读取。如果没有缓存或者被封，则跳转其他支付
-                    Cache::set($userIp.'-pay_config',$userPayData,1440);
-                } else {
-                    return false;
-                }
-            } else {
-                $userPayData = Cache::get($userIp.'-pay_config');
-            }
+            return $this->_getPayInfo($userIp.'-pay_config',$payId,$type,'payModel');
         } elseif ($type == 1) {
-            //表示获享钱支付配置参数
-            if (!Cache::has($userIp.'-xpay_config')) {
-                //设置缓存-本次记录好缓存，判断是否是支付配置信息记录
-                $userPayData = $this->xpayModel->get($payId)->toArray();
-                //将支付类型传送进去
-                $userPayData['type'] = 1;
-                if ($userPayData) {
-                    Cache::set($userIp.'-xpay_config',$userPayData,1440);
-                } else {
-                    return false;
-                }
-
-            } else {
-                $userPayData = Cache::get($userIp.'-xpay_config');
-            }
+            return $this->_getPayInfo($userIp.'-xpay_config',$payId,$type,'xpayModel');
         } elseif ($type == 2) {
-            //表示获如意支付配置参数
-            if (!Cache::has($userIp.'-rypay_config')) {
-                //设置缓存-本次记录好缓存，判断是否是支付配置信息记录
-                $userPayData = $this->rypayModel->get($payId)->toArray();
-                //将支付类型传送进去
-                $userPayData['type'] = 2;
-                if ($userPayData) {
-                    Cache::set($userIp.'-rypay_config',$userPayData,1440);
-                } else {
-                    return false;
-                }
-
-            } else {
-                $userPayData = Cache::get($userIp.'-rypay_config');
-            }
+            return $this->_getPayInfo($userIp.'-rypay_config',$payId,$type,'rypayModel');
         } else {
             //TODO::如果所有支付都挂了，可以关闭
             return false;
         }
-
-        return $userPayData;
     }
 
     /**
@@ -274,7 +228,6 @@ class Frontend extends Controller
         $checkKey = $this->getCheckKey($data);
         $newParams = $paramString.'&check_key='.$checkKey;
         //TODO:后期可以结合防封域名进行微信授权的跳转
-//        $redirect_url = 'http://api.ckjdsak.cn'.$this->request->baseFile().'/index/payorder/wechatgrant'.'?'.$newParams;
         $redirect_url = $payInfo['grant_domain_'.mt_rand(1,3)].$this->request->baseFile().'/index/payorder/wechatgrant'.'?'.$newParams;
         // 实例接口
         $weChat = new Oauth($weChatConfig);
@@ -284,15 +237,6 @@ class Frontend extends Controller
         //第四步：通过防封方式，将参数与页面进行跳转到落地页面
     }
 
-
-    /**
-     * 检测订单是否真实有效
-     * @param $data
-     */
-    public function checkOrderSn($data)
-    {
-        return ;
-    }
 
     /**
      * xpay签名算法
@@ -320,5 +264,118 @@ class Frontend extends Controller
         return $ownSign;
     }
 
+    /**
+     * 微信原生签名算法
+     * @param $params   array   接口文档里面相关的参数
+     * @param $mchKey  string  商户支付密钥Key值
+     * @return string   加密成功返回签名值与原参数数组列表
+     */
+    public function paySignParams($params,$mchKey)
+    {
+        //按字典序排序数组的键名
+        unset($params['sign']);/*剔除sign字段不进行签名算法*/
+        ksort($params);
+        $string = '';
+        if (!empty($params) && is_array($params)) {
+            foreach ($params as $key => $value) {
+                if (is_array($value)) {
+                    $string .= '&'.$key.'='.json_encode($value,JSON_UNESCAPED_UNICODE);
+                } elseif ($value && !empty($value)) {
+                    $string .= '&'.$key.'='.$value;
+                }
+            }
+            //最后拼接商户号入网的reqKey参数
+            $string .= '&key='.$mchKey;
+        } else {
+            return false;
+        }
+        return strtoupper(md5(ltrim($string,'&')));/*执行加密算法*/
+    }
+
+
+    /**
+     * 如意付签名算法
+     * @param $params   array   接口文档里面相关的参数
+     * @param $mchKey  string  商户支付密钥Key值
+     * @return string   加密成功返回签名值与原参数数组列表
+     */
+    public function rypaySignParams($params,$mchKey)
+    {
+        //按字典序排序数组的键名
+        unset($params['sign']);/*剔除sign字段不进行签名算法*/
+        ksort($params);
+        $string = '';
+        if (!empty($params) && is_array($params)) {
+            foreach ($params as $key => $value) {
+                if (is_array($value)) {
+                    $string .= '&'.$key.'='.json_encode($value,JSON_UNESCAPED_UNICODE);
+                } elseif ($value && !empty($value)) {
+                    $string .= '&'.$key.'='.$value;
+                }
+            }
+            //最后拼接商户号入网的reqKey参数
+            $string .= '&key='.$mchKey;
+        } else {
+            return false;
+        }
+        return strtoupper(md5(ltrim($string,'&')));/*执行加密算法*/
+    }
+
+
+    /**
+     * 解析XML内容到数组
+     * @param string $xml
+     * @return array
+     */
+    public function xml2arr($xml)
+    {
+        $entity = libxml_disable_entity_loader(true);
+        $data = (array)simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
+        libxml_disable_entity_loader($entity);
+        return json_decode(json_encode($data), true);
+    }
+
+
+    /**
+     * 获取客户端IP
+     */
+    public function getClientIp()
+    {
+        $cip = 'unknown';
+        if ($_SERVER['REMOTE_ADDR']) {
+            $cip = $_SERVER['REMOTE_ADDR'];
+        } elseif (getenv("REMOTE_ADDR")) {
+            $cip  = getenv("REMOTE_ADDR");
+        }
+        return $cip;
+    }
+
+    /**
+     * CURL_POST请求
+     * @param $str  string  json字符串
+     * @param $url  string  请求的url地址
+     * @param $second  int  请求最长时间
+     * @return bool|string
+     */
+    public static function curlPost($str, $url, $second = 30)
+    {
+
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $str);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json','Content-Length: ' . strlen($str)));
+        $data = curl_exec($ch);
+        //返回结果
+        if ($data) {
+            curl_close($ch);
+            return $data;
+        } else {
+            $error = curl_errno($ch);
+            curl_close($ch);
+            echo "curl 出错，错误码:$error" . "<br>";
+            return false;
+        }
+    }
 
 }

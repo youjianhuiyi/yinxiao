@@ -39,7 +39,8 @@ class Order extends Frontend
     }
 
     /**
-     * 提交订单
+     * 提交鞋子模板订单
+     * @return array
      */
     public function submitOrder()
     {

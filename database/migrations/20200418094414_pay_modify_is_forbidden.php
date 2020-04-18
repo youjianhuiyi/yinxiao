@@ -2,7 +2,6 @@
 
 use Phinx\Db\Adapter\MysqlAdapter;
 use think\migration\Migrator;
-use think\migration\db\Column;
 
 class PayModifyIsForbidden extends Migrator
 {

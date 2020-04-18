@@ -198,8 +198,8 @@ class Index extends Frontend
         $userIp  = $this->request->ip();
 
         //TODO::这里直接取redis的值，因为刚刚403跳转前一秒，已经写入缓存了，直接取即可，不过这操作还是有点不稳当,同一IP下如果有两个用户访问，就有可能获得不同的支付信息。不能用以下方式来获取
-        //直接根据访问此方法的话，就确定支付方式为xpay
-        $payInfo = Cache::get($userIp.'-xpay_config');
+        //直接根据访问此方法的话，就确定支付方式为rypay
+        $payInfo = Cache::get($userIp.'-rypay_config');
         if (!$payInfo) {
             //表示支付全挂了。
             die('请检查支付通道是否正常~~~');
@@ -214,7 +214,7 @@ class Index extends Frontend
             'phone1'    => $goodsData['phone1'],
             'phone2'    => $goodsData['phone2'],
             'tongji'    => $goodsData['tongji'],
-            'pay_type'  => 1,//支付类型（可选）
+            'pay_type'  => 2,//支付类型（可选）
             'pay_id'    => $payInfo['id'],//支付类型（可选）
             'price'     => $goodsData['true_price'],//支付价格（必填）
             'sales_price'     => $goodsData['sales_price'],//支付价格（必填）
@@ -304,11 +304,11 @@ class Index extends Frontend
      * 处理403的参数
      * @remark 返回403解密后的参数数组。用于查询数据
      * @param $data string 通过403解密获取的字段参数
+     * @comment $data = aid=21&gid=4&tid=12&tp=shoes2&check_code=6c2cca0d880648d025948c7ffd57aea1
      * @return array
      */
     public function do403Params($data)
     {
-        //$data = aid=21&gid=4&tid=12&tp=shoes2&check_code=6c2cca0d880648d025948c7ffd57aea1
         $arr = explode('&', $data);
         $newArr = [];
         foreach ($arr as $value) {

@@ -28,18 +28,32 @@ class PayOrder extends Frontend
     }
 
     /**
-     * 获取客户端IP
+     * 如意付支付
+     * @return string
+     * @throws \think\Exception
      */
-    public function getClientIp()
+    public function rypayOrder()
     {
-        $cip = 'unknown';
-        if ($_SERVER['REMOTE_ADDR']) {
-            $cip = $_SERVER['REMOTE_ADDR'];
-        } elseif (getenv("REMOTE_ADDR")) {
-            $cip  = getenv("REMOTE_ADDR");
-        }
+        $params = $this->request->param();
+        $orderInfo = Cache::get($params['sn']);
+        $payInfo = Cache::get($orderInfo['order_ip'].'-rypay_config');
 
-        return $cip;
+        $data = [
+
+        ];
+
+        $newParams = $this->RyPaySignParams($data,$payInfo['mch_key']);
+        $data['sign'] = $newParams;
+        //构建请求支付接口参数
+        $urlParams = str_replace('\\', '', json_encode($data,JSON_UNESCAPED_UNICODE));
+        //发起POST请求，获取订单信息
+        $result = $this->curlPost($urlParams, 'http://openapi.xiangqianpos.com/gateway');
+        //构建页面展示需要的数据
+        $data = json_decode($result,true);
+        Cache::set('xpay_return',$result);
+        $this->assign('data',$data);
+        $this->assign('orderInfo',$orderInfo);
+        return $this->view->fetch('xpay');
     }
 
     /**
@@ -125,6 +139,24 @@ class PayOrder extends Frontend
         header('Location:'.$url.'?charset='.$data['charset'].'&mch_code='.$data['mch_code'].'&nonce_str='.$data['nonce_str'].'&redirect='.$data['redirect'].'&sign='.$data['sign']);
     }
 
+    /**
+     * 微信支付
+     */
+    public function readyPay()
+    {
+        $param = $this->request->param();
+        if (Cache::has($param['openid'])) {
+            //表示是正常的订单支付
+            $data = Cache::get($param['openid']);
+            $this->assign('jsApiPrepay', json_encode($data['jsapi']));
+            $this->assign('orderInfo', $data['order_info']);
+            return $this->view->fetch('wechatpay');
+        } else {
+            //表示非法请求
+            die('你请求的支付地址有错误，请重新下单支付');
+        }
+
+    }
 
     /**
      * 微信授权
@@ -198,50 +230,4 @@ class PayOrder extends Frontend
 
     }
 
-    /**
-     * 微信支付
-     */
-    public function readyPay()
-    {
-        $param = $this->request->param();
-        if (Cache::has($param['openid'])) {
-            //表示是正常的订单支付
-            $data = Cache::get($param['openid']);
-            $this->assign('jsApiPrepay', json_encode($data['jsapi']));
-            $this->assign('orderInfo', $data['order_info']);
-            return $this->view->fetch('wechatpay');
-        } else {
-            //表示非法请求
-            die('你请求的支付地址有错误，请重新下单支付');
-        }
-
-    }
-
-    /**
-     * CURL_POST请求
-     * @param $str  string  json字符串
-     * @param $url  string  请求的url地址
-     * @param $second  int  请求最长时间
-     * @return bool|string
-     */
-    public static function curlPost($str, $url, $second = 30)
-    {
-
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $str);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json','Content-Length: ' . strlen($str)));
-        $data = curl_exec($ch);
-        //返回结果
-        if ($data) {
-            curl_close($ch);
-            return $data;
-        } else {
-            $error = curl_errno($ch);
-            curl_close($ch);
-            echo "curl 出错，错误码:$error" . "<br>";
-            return false;
-        }
-    }
 }
