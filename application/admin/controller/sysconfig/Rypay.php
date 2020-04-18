@@ -197,5 +197,4 @@ class Rypay extends Backend
         return $this->view->fetch();
     }
 
-
 }

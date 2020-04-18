@@ -27,11 +27,15 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {checkbox: true},
                         {field: 'id', title: __('Id'),operate:false},
                         {field: 'team_id', title: __('Team_id'),operate:false,visible:false},
-                        {field: 'team_name', title: __('Team_name'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符',visible:false},
+                        {field: 'team_name', title: __('Team_name'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
                         {field: 'pay_name', title: __('Pay_name'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
-                        {field: 'pay_channel', title: __('Pay_channel'),operate:false},
+                        {field: 'mch_id', title: __('Mch_id'),operate:false},
+                        {field: 'mch_key', title: __('Mch_key'),operate:false,visible: false},
+                        {field: 'app_id', title: __('App_id'),operate:false},
+                        {field: 'product_id', title: __('Product_id'),operate:false,visible: false},
+                        {field: 'api_url', title: __('Api_url'), formatter: Table.api.formatter.url,operate:false,visible: false},
                         {field: 'createtime', title: __('Createtime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
-                        {field: 'updatetime', title: __('Updatetime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime,visible:false},
+                        {field: 'updatetime', title: __('Updatetime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime, visible: false},
                         {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate, formatter: Table.api.formatter.operate}
                     ]
                 ]

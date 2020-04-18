@@ -1,5 +1,6 @@
 <?php
 
+use Phinx\Db\Adapter\MysqlAdapter;
 use think\migration\Migrator;
 use think\migration\db\Column;
 
@@ -34,10 +35,11 @@ class RyPayCrate extends Migrator
             ->addColumn('team_name','string',['limit'=>30,'null'=>false,'default'=>'','comment'=>'团队名称'])
             ->addColumn('pay_name','string',['limit'=>30,'null'=>false,'default'=>'','comment'=>'支付名称'])
             ->addColumn('mch_id','string',['limit'=>30,'null'=>false,'default'=>'','comment'=>'商户ID'])
-            ->addColumn('mch_key','string',['limit'=>100,'null'=>false,'default'=>'','comment'=>'商户密钥'])
+            ->addColumn('mch_key','string',['limit'=>255,'null'=>false,'default'=>'','comment'=>'商户密钥'])
             ->addColumn('app_id','string',['limit'=>50,'null'=>false,'default'=>'','comment'=>'应用id'])
             ->addColumn('product_id','string',['limit'=>50,'null'=>false,'default'=>'','comment'=>'支付产品ID'])
             ->addColumn('api_url','string',['limit'=>255,'null'=>false,'default'=>'','comment'=>'接口地址'])
+            ->addColumn('status','integer',['limit'=>MysqlAdapter::INT_TINY,'after'=>'api_url','signed'=>false,'null'=>false,'default'=>0,'comment'=>'是否启用，0=否，1=是'])
             ->addColumn('createtime','integer',['limit'=>10,'signed'=>false,'null'=>false,'default'=>0,'comment'=>'增加时间'])
             ->addColumn('updatetime','integer',['limit'=>10,'signed'=>false,'null'=>false,'default'=>0,'comment'=>'更新时间'])
             ->addColumn('deletetime','integer',['limit'=>10,'signed'=>false,'null'=>true,'comment'=>'删除时间'])

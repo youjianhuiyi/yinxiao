@@ -6,7 +6,7 @@ use think\Cache;
 use think\Controller;
 use app\admin\model\sysconfig\Pay as PayModel;
 use app\admin\model\sysconfig\Xpay as XPayModel;
-use think\Env;
+use app\admin\model\sysconfig\Rypay as RyPayModel;
 use WeChat\Oauth;
 use app\admin\model\Admin as AdminModel;
 
@@ -35,6 +35,7 @@ class Frontend extends Controller
     protected $adminModel = null;
     protected $payModel = null;
     protected $xpayModel = null;
+    protected $rypayModel = null;
 
     public function _initialize()
     {
@@ -42,6 +43,7 @@ class Frontend extends Controller
         $this->adminModel = new AdminModel();
         $this->payModel = new PayModel();
         $this->xpayModel = new XPayModel();
+        $this->rypayModel = new RyPayModel();
     }
 
     /**
@@ -113,6 +115,36 @@ class Frontend extends Controller
         return $data['check_key'] == $newKey ? true : false;
     }
 
+
+    /**
+     * 获取支付配置私有处理方法
+     * @param $name string 支付缓存名称
+     * @param $payId    integer     支付id，需要配合type值去取
+     * @param $type     integer     支付类型，0 = 微信原生商户，1=享钱支付，2=如意付
+     * @param $model    string      支付模型名称
+     * @return bool|array
+     */
+    private function _getPayInfo($name,$payId,$type,$model)
+    {
+        if (!Cache::has($name)) {
+            //设置缓存-本次记录好缓存，判断是否是支付配置信息记录
+            $userPayData = $this->$model->get($payId)->toArray();
+            //将支付类型传送进去
+            $userPayData['type'] = $type;
+            if ($userPayData['is_forbidden'] != 1) {
+                //TODO::这里存在一个问题，就是所有支付信息全部有支付管理模块来控制，目前没有做，单独本支付通道被封停后，但是支付配置没有同步数据的问题。
+                //绑定支付配置。如果该用户再次访问，如果有缓存则直接读取。如果没有缓存或者被封，则跳转其他支付
+                Cache::set($name,$userPayData,1440);
+            } else {
+                return false;
+            }
+        } else {
+            $userPayData = Cache::get($name);
+        }
+
+        return $userPayData;
+    }
+
     /**
      * 获取团队支付信息
      * @param $tid integer 团队ID
@@ -154,6 +186,22 @@ class Frontend extends Controller
 
             } else {
                 $userPayData = Cache::get($userIp.'-xpay_config');
+            }
+        } elseif ($type == 2) {
+            //表示获如意支付配置参数
+            if (!Cache::has($userIp.'-rypay_config')) {
+                //设置缓存-本次记录好缓存，判断是否是支付配置信息记录
+                $userPayData = $this->rypayModel->get($payId)->toArray();
+                //将支付类型传送进去
+                $userPayData['type'] = 2;
+                if ($userPayData) {
+                    Cache::set($userIp.'-rypay_config',$userPayData,1440);
+                } else {
+                    return false;
+                }
+
+            } else {
+                $userPayData = Cache::get($userIp.'-rypay_config');
             }
         } else {
             //TODO::如果所有支付都挂了，可以关闭

@@ -7,6 +7,7 @@ use think\exception\PDOException;
 use think\exception\ValidateException;
 use app\admin\model\sysconfig\Pay as PayModel;
 use app\admin\model\sysconfig\Xpay as XPayModel;
+use app\admin\model\sysconfig\Rypay as RyPayModel;
 
 /**
  * 支付管理
@@ -23,6 +24,7 @@ class Payset extends Backend
     protected $model = null;
     protected $payModel = null;
     protected $xpayModel = null;
+    protected $rypayModel = null;
 
     public function _initialize()
     {
@@ -30,6 +32,7 @@ class Payset extends Backend
         $this->model = new \app\admin\model\sysconfig\Payset;
         $this->payModel = new PayModel();
         $this->xpayModel = new XPayModel();
+        $this->rypayModel = new RyPayModel();
 
     }
 
@@ -78,8 +81,9 @@ class Payset extends Backend
     {
         $uid = $this->adminInfo['id'];
         //查找出当前团队所选择的产品模板数据
-        $payData = $this->payModel->where(['team_id'=>$this->adminInfo['team_id'],'is_forbidden'=>0])->select();
-        $xpayata = $this->xpayModel->where(['team_id'=>$this->adminInfo['team_id'],'status'=>0])->select();
+        $payData = $this->payModel->where(['team_id'=>$this->adminInfo['team_id'],'status'=>1])->select();
+        $xpayata = $this->xpayModel->where(['team_id'=>$this->adminInfo['team_id'],'status'=>1])->select();
+        $rypayata = $this->rypayModel->where(['team_id'=>$this->adminInfo['team_id'],'status'=>1])->select();
         $params = [];
         foreach ($payData as $value) {
             $params[] = [
@@ -94,6 +98,16 @@ class Payset extends Backend
         foreach ($xpayata as $value) {
             $params[] = [
                 'type'              =>  1,
+                'pay_id'            =>  $value['id'],
+                'pay_channel'       =>  $value['pay_name'],
+                'team_id'           =>  $this->adminInfo['team_id'],
+                'team_name'         =>  $this->adminInfo['team_name'],
+            ];
+        }
+
+        foreach ($rypayata as $value) {
+            $params[] = [
+                'type'              =>  2,
                 'pay_id'            =>  $value['id'],
                 'pay_channel'       =>  $value['pay_name'],
                 'team_id'           =>  $this->adminInfo['team_id'],
