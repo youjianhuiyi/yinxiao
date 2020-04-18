@@ -4,7 +4,7 @@ return [
     'Team_id'     => '团队ID',
     'Team_name'   => '团队名称',
     'Pay_name'    => '支付名称',
-    'App_id'      => '应用id',
+    'App_id'      => 'APPID',
     'Pay_channel' => '支付产品ID',
     'Mch_code'    => '商户号',
     'Mch_key'     => '商户密钥',
