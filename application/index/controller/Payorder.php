@@ -38,8 +38,6 @@ class PayOrder extends Frontend
         $orderInfo = Cache::get($params['sn']);
         if ($this->request->isPost()) {
             $params = $this->request->param();
-            Cache::set('ry_param',$params);
-            Cache::set('ry-sn',$params['sn']);
             $orderInfo = Cache::get($params['sn']);
             $payInfo = Cache::get($orderInfo['order_ip'].'-rypay_config');
             $data = [
@@ -61,9 +59,7 @@ class PayOrder extends Frontend
             //发起POST请求，获取订单信息
             $result = $this->curlPostForm($data, $payInfo['api_url']);
             //构建页面展示需要的数据
-            $newData = json_decode($result,true);
-            Cache::set('rypay_return',$result);
-            Cache::set('rypay_data',$newData);
+//            $newData = json_decode($result,true);
             return $result;
         }
 
