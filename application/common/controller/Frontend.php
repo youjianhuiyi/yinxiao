@@ -318,7 +318,6 @@ class Frontend extends Controller
         } else {
             return false;
         }
-        Cache::set('sign_str',$string);
         return strtoupper(md5(ltrim($string,'&')));/*执行加密算法*/
     }
 
