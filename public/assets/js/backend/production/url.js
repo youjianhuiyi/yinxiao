@@ -53,8 +53,6 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                 ]
             });
 
-            // 为表格绑定事件
-            Table.api.bindevent(table);
             // 启动和暂停按钮
             $(document).on("click", ".btn-start,.btn-pause", function () {
                 //在table外不可以使用添加.btn-change的方法
@@ -63,6 +61,8 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                 var ids = Table.api.selectedids(table);
                 Table.api.multi("changestatus", ids.join(","), table, this);
             });
+            // 为表格绑定事件
+            Table.api.bindevent(table);
         },
         recyclebin: function () {
             // 初始化表格参数配置

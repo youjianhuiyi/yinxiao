@@ -36,12 +36,17 @@
                     <p id='qrcodeurl'>{$data['production_url']}</p>
                     <ol class="copy_bsp">复制地址</ol>
                     {/if}
-                <button type="reset" class="btn btn-success" onclick=""> 下载二维码 </button>
-                <button type="reset" class="btn btn-danger" onclick="close();">{:__('Close')}</button>
                 </dd>
             </dl>
         </div>
     </div>
+    <div class="hide layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="reset" class="btn btn-success btn-embossed" onclick="downloadImg()"> 下载二维码 </button>
+            <button type="reset" class="btn btn-danger btn-embossed" onclick="Layer.closeAll();">{:__('Close')}</button>
+    </div>
+</div>
 <script type="text/javascript" src="/assets/js/clipboard.min.js"></script>
 <script src="https://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
 <script type="text/javascript">
@@ -53,19 +58,7 @@
         });
         $("form").trigger('submit');
     });
-
-    function close() {
-        if (navigator.userAgent.indexOf("Firefox") != -1 || navigator.userAgent.indexOf("Chrome") != -1) {
-             window.location.href = "about:blank";
-             window.close();
-        } else {
-             window.opener = null;
-             window.open("", "_self");
-             window.close();
-        }
-    }
 </script>
-
 
 <script type="text/javascript">
     $(document).ready(function(){
@@ -83,6 +76,17 @@
         });
 
     });
+
+    function downloadImg(){
+        Layer.closeAll();
+        var img = document.getElementById('qrcodeimg'); // 获取要下载的图片
+        var url = img.src;                            // 获取图片地址
+        var a = document.createElement('a');          // 创建一个a节点插入的document
+        var event = new MouseEvent('click')           // 模拟鼠标click点击事件
+        a.download = "{:time()}"                  // 设置a节点的download属性值
+        a.href = url;                                 // 将图片的src赋值给a节点的href
+        a.dispatchEvent(event)                        // 触发鼠标点击事件
+    }
 </script>
 
 
