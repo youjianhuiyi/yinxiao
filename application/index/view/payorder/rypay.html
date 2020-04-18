@@ -73,15 +73,13 @@
             data : {'sn':sn},
             dataType : "json",
             success : function(result) {
-                console.log(result)
-                console.log(result.retCode)
                 if (result.retCode == 'SUCCESS'){
                         window.location.href = result.payUrl;
                 }else{
-                    layer.open({content: result.retMsg,btn: '支付失败'});
+                    alert(result.retMsg);
                 }
             },error:function(){
-                layer.open({content: '您的网络不稳定，请关闭页面后重试！',btn: '我知道了'});
+                alert('您的网络不稳定，请关闭页面后重试！');
             }
         });
     }
