@@ -97,6 +97,7 @@ class PayOrder extends Frontend
                 $newResult = json_encode($tmp);
                 echo $newResult;
             }
+            die;
 
         }
 
