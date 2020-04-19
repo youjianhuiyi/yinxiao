@@ -94,7 +94,7 @@ class PayOrder extends Frontend
         $data = [
             'ticket'    => time(),/*用来匹配请求*/
             //支付宝pay.alipay.native,微信pay.wxpay.native,京东pay.jdpay.native,qq pay.qqpay.native,银联二维码 pay.unionpay.native
-            'service'   => 'pay.wxpay.jspay',
+            'service'   => 'pay.xiangqian.wxjspay',
             'version'   => '2.0',/*版本号 默认是2.0*/
             'sign_type' => 'MD5',/*签名方式，默认是md5*/
             'mch_code'  => $payInfo['mch_code'],/*商户号 享多多系统的门店编码*/
