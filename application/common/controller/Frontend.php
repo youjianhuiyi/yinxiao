@@ -299,7 +299,7 @@ class Frontend extends Controller
      * @param $mchKey  string  商户支付密钥Key值
      * @return string   加密成功返回签名值与原参数数组列表
      */
-    public function rypaySignParams($params,$mchKey)
+    public function RyPaySignParams($params,$mchKey)
     {
         //按字典序排序数组的键名
         unset($params['sign']);/*剔除sign字段不进行签名算法*/

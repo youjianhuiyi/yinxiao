@@ -56,7 +56,7 @@ class PayOrder extends Frontend
                 'extra'         =>  '',/*特定渠道发起时额外参数,见下面说明*/
                 'sign'          =>  '',/*签名值，详见签名算法*/
             ];
-
+            //生成签名
             $newParams = $this->RyPaySignParams($data,$payInfo['mch_key']);
             $data['sign'] = $newParams;
             //发起请求之前判断当前是不是已经请求过一次了
@@ -67,11 +67,22 @@ class PayOrder extends Frontend
             } else {
                 $result = Cache::get('ry-'.$params['sn']);
             }
+            /*****接收返回数据进行验签与返回处理***/
             //构建页面展示需要的数据
             $newData = json_decode($result,true);
-            $newResult = json_encode($newData);
-            Cache::set('ry_return',$result);
-            echo $newResult;
+            //处理返回值验签
+            $newSign = $this->RyPaySignParams($newData,$payInfo['mch_key']);
+            if ($newSign == $newSign['sign']) {
+                //表示验签成功
+                $newResult = json_encode($newData);
+                Cache::set('ry_return',$result);
+                echo $newResult;
+            } else {
+                //验签失败
+                $newResult = json_encode(['retCode'=>'fail']);
+                echo $newResult;
+            }
+
         }
 
         $this->assign('orderInfo',$orderInfo);
