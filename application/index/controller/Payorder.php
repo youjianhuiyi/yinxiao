@@ -141,7 +141,7 @@ class PayOrder extends Frontend
             //
             $cashSign = $this->XpaySignParams($jsonData,$payInfo['mch_key']);
             //构建跳转的参数
-            $queryString = 'mch_code='.$payInfo['mch_code'].'&sign='.$cashSign.'&casher_id='.$newData['body']['casher_id'].'&third_no='.$orderInfo['xdd_tmp_no'];
+            $queryString = 'mch_code='.$payInfo['mch_code'].'&sign='.$cashSign.'&casher_id='.$newData['body']['casher_id'].'&third_no='.$tmpOrderNo;
 
             Cache::set('xpay_return',$result);
             Cache::set('xpay_info',$payInfo);
