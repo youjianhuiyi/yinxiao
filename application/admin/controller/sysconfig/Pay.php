@@ -149,7 +149,7 @@ class Pay extends Backend
                     $res = $this->addWechatDomain($params,$payId);
                     $this->wxdomainModel->isUpdate(false)->allowField(true)->saveAll($res[0]);
                     $this->wxdomainModel->isUpdate(false)->allowField(true)->saveAll($res[1]);
-                    //将本团队的商品数据缓存起来
+                    //同步添加到支付管理列表。
                     Db::commit();
                 } catch (ValidateException $e) {
                     Db::rollback();
