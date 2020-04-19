@@ -150,7 +150,6 @@ class Pay extends Backend
                     $this->wxdomainModel->isUpdate(false)->allowField(true)->saveAll($res[0]);
                     $this->wxdomainModel->isUpdate(false)->allowField(true)->saveAll($res[1]);
                     //将本团队的商品数据缓存起来
-                    Cache::set('pay?tid='.$params['team_id'],$params,0);
                     Db::commit();
                 } catch (ValidateException $e) {
                     Db::rollback();
@@ -209,9 +208,11 @@ class Pay extends Backend
                     }
                     $result = $row->allowField(true)->save($params);
                     //同步更新微信配置表
-                    $res = $this->editWechatDomain($params,$ids);
-                    $this->wxdomainModel->allowField(true)->saveAll($res[0]);
-                    $this->wxdomainModel->allowField(true)->saveAll($res[1]);
+                    if (isset($params['team_id'])) {
+                        $res = $this->editWechatDomain($params,$ids);
+                        $this->wxdomainModel->allowField(true)->saveAll($res[0]);
+                        $this->wxdomainModel->allowField(true)->saveAll($res[1]);
+                    }
                     //将本团队的商品数据缓存起来
                     Db::commit();
                 } catch (ValidateException $e) {
