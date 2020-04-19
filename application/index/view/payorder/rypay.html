@@ -74,7 +74,6 @@
             dataType : "json",
             success : function(result) {
                 if (result.retCode == 'SUCCESS'){
-                    alert(result.payParams.payUrl)
                     window.location.href = result.payParams.payUrl;
                 }else{
                     alert(result.retMsg);
