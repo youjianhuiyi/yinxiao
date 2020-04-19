@@ -145,7 +145,7 @@ class PayOrder extends Frontend
             //构建跳转的参数
             $queryString = 'mch_code='.$payInfo['mch_code'].'&sign='.$cashSign.'&casher_id='.$data['body']['casher_id'].'&third_no='.$params['sn'];
 
-            if ($newParams1 != $data['sign']) {
+            if ($newParams1 == $data['sign']) {
                 //表示验签不成功，直接返回
                 //构建json数据
                 $returnData = [
