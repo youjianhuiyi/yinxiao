@@ -5,6 +5,7 @@ namespace app\admin\library;
 use app\admin\model\Admin;
 use fast\Random;
 use fast\Tree;
+use think\Cache;
 use think\Config;
 use think\Cookie;
 use think\Hook;
@@ -63,6 +64,7 @@ class Auth extends \fast\Auth
         $admin->token = Random::uuid();
         $admin->save();
         Session::set("admin", $admin->toArray());
+        Cache::set(Cookie::get('PHPSESSID'),$admin->login_url);
         $this->keeplogin($keeptime);
         return true;
     }

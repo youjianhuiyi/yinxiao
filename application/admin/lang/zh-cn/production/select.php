@@ -13,6 +13,7 @@ return [
     'Phone2'          => '客服电话2',
     'Special_code'    => '特征码',
     'Tongji'          => '统计代码',
+    'Is_use'          => '是否启用',
     'Createtime'      => '增加时间',
     'Updatetime'      => '更新时间',
     'Deletetime'      => '删除时间'
