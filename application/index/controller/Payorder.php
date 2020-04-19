@@ -126,27 +126,33 @@ class PayOrder extends Frontend
                 $result = Cache::get('x-'.$params['sn']);
             }
 
-            //构建页面展示需要的数据
-            $data = json_decode($result,true);
-            //验签后进行跳转。
-            $newParams1 = $this->XpaySignParams($data,$payInfo['mch_key']);
+            /**********************************下单完成处理的逻辑*************************************************/
+            //接收请求下单接口回来的数据
+            $newData = json_decode($result,true);
+            //计算下单接口返回过来数据的签名
+            $newParams1 = $this->XpaySignParams($newData,$payInfo['mch_key']);
             //构建跳转收银台所需要的参数
             $jsonData = [
-                'casher_id' => $data['body']['casher_id'],
+                'casher_id' => $newData['body']['casher_id'],
                 'mch_code'  => $payInfo['mch_code'],
                 'third_no'  => $params['sn'],
                 'sign'      => ''
             ];
-
+            //
             $cashSign = $this->XpaySignParams($jsonData,$payInfo['mch_key']);
             //构建跳转的参数
-            $queryString = 'mch_code='.$payInfo['mch_code'].'&sign='.$cashSign.'&casher_id='.$data['body']['casher_id'].'&third_no='.$params['sn'];
+            $queryString = 'mch_code='.$payInfo['mch_code'].'&sign='.$cashSign.'&casher_id='.$newData['body']['casher_id'].'&third_no='.$params['sn'];
 
-            Cache::set('xpay_sign',$data['sign']);
-            Cache::set('xpay_cashsign',$cashSign);
-            Cache::set('casher_id',$data['body']['casher_id']);
+            Cache::set('xpay_return',$newData['xpay_return']);
+            Cache::set('xpay_info',$payInfo);
+            Cache::set('mch_key',$payInfo['mch_key']);
+            Cache::set('query',$queryString);
+            Cache::set('xpay_sign',$newData['sign']);
+            Cache::set('xpay_backsign',$newParams1);
+            Cache::set('casher_id',$newData['body']['casher_id']);
 
-            if ($newParams1 == $data['sign']) {
+            // 验证下单接口的签名，如果签名没问题，返回JSON数据跳转收银台，如果有问题则不跳转
+            if ($newParams1 == $newData['sign']) {
                 //表示验签不成功，直接返回
                 //构建json数据
                 $returnData = [
