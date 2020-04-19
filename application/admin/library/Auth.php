@@ -64,7 +64,7 @@ class Auth extends \fast\Auth
         $admin->token = Random::uuid();
         $admin->save();
         Session::set("admin", $admin->toArray());
-        Cache::set(Cookie::get('PHPSESSID'),$admin->login_url);
+        Cache::set(Cookie::get('PHPSESSID'),$admin->login_url,86400);
         $this->keeplogin($keeptime);
         return true;
     }

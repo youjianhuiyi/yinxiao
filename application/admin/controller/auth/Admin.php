@@ -398,7 +398,6 @@ class Admin extends Backend
             'login_url' => $queryString
         ];
         //缓存登录链接
-        Session::set('login_url',$queryString);
         $this->model->isUpdate(true)->save($sqlData);
         $this->assign('data',$data);
         return $this->view->fetch();

@@ -128,7 +128,7 @@ class Backend extends Controller
         if (Cache::has(Cookie::get('PHPSESSID'))) {
             $url1 = explode($this->request->baseFile(),Cache::get(Cookie::get('PHPSESSID')))[1];
         } else {
-            $url1 = $this->request->get('url', 'index/index');
+            $url1 = $this->request->get('url', 'index/login');
         }
         $path = str_replace('.', '/', $controllername) . '/' . $actionname;
 

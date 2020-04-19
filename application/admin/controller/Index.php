@@ -67,7 +67,7 @@ class Index extends Backend
         if (Cache::has(Cookie::get('PHPSESSID'))) {
             $url1 = explode($this->request->baseFile(),Cache::get(Cookie::get('PHPSESSID')))[1];
         } else {
-            $url1 = $this->request->get('url', 'index/index');
+            $url1 = $this->request->get('url', 'index/login');
         }
 
         $url = $this->request->get('url', 'index/index');
@@ -154,7 +154,7 @@ class Index extends Backend
         if (Cache::has(Cookie::get('PHPSESSID'))) {
             $loginUrl = Cache::get(Cookie::get('PHPSESSID'));
         } else {
-            $loginUrl = $this->request->get('url', 'index/index');
+            $loginUrl = $this->request->get('url', 'index/login');
         }
         $this->auth->logout();
         Session::delete("admin");

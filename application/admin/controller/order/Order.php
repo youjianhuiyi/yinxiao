@@ -2,6 +2,7 @@
 
 namespace app\admin\controller\order;
 
+use app\admin\model\Admin;
 use app\common\controller\Backend;
 
 /**
@@ -66,16 +67,39 @@ class Order extends Backend
                 //表示是老板级别账号。可以查看到平台下所有订单
                 $total = $this->model
                     ->where($where)
-                    ->where(['team_id'=>$this->adminInfo['team_id']])
+                    ->where(['team_id' => $this->adminInfo['team_id']])
                     ->order($sort, $order)
                     ->count();
 
                 $list = $this->model
                     ->where($where)
-                    ->where(['team_id'=>$this->adminInfo['team_id']])
+                    ->where(['team_id' => $this->adminInfo['team_id']])
                     ->order($sort, $order)
                     ->limit($offset, $limit)
                     ->select();
+            } elseif ($this->adminInfo['level'] == 2) {
+                //表示是组长级别账号。可以查看到自己及自己员工下所有订单
+                $id = $this->adminInfo['id'];
+                $allIds = collection(Admin::where('pid',$id)->select())->toArray();
+                $newArr = [];
+                foreach ($allIds as $value) {
+                    $newArr[] = $value['id'];
+                }
+                array_push($newArr,$id);
+
+                $total = $this->model
+                    ->where($where)
+                    ->where('admin_id','in',$newArr)
+                    ->order($sort, $order)
+                    ->count();
+
+                $list = $this->model
+                    ->where($where)
+                    ->where('admin_id','in',$newArr)
+                    ->order($sort, $order)
+                    ->limit($offset, $limit)
+                    ->select();
+
             } else {
                 //表示最低级别，就是只能查看自己的订单
                 $total = $this->model
