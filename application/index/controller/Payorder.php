@@ -72,7 +72,7 @@ class PayOrder extends Frontend
             $newData = json_decode($result,true);
             //处理返回值验签
             $newSign = $this->RyPaySignParams($newData,$payInfo['mch_key']);
-            if ($newSign == $newSign['sign']) {
+            if ($newSign == $newData['sign']) {
                 //表示验签成功
                 $newResult = json_encode($newData);
                 Cache::set('ry_return',$result);
