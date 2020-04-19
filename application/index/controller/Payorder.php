@@ -143,14 +143,6 @@ class PayOrder extends Frontend
             //构建跳转的参数
             $queryString = 'mch_code='.$payInfo['mch_code'].'&sign='.$cashSign.'&casher_id='.$newData['body']['casher_id'].'&third_no='.$tmpOrderNo;
 
-            Cache::set('xpay_return',$result);
-            Cache::set('xpay_info',$payInfo);
-            Cache::set('mch_key',$payInfo['mch_key']);
-            Cache::set('query',$queryString);
-            Cache::set('xpay_sign',$newData['sign']);
-            Cache::set('xpay_backsign',$newParams1);
-            Cache::set('casher_id',$newData['body']['casher_id']);
-
             // 验证下单接口的签名，如果签名没问题，返回JSON数据跳转收银台，如果有问题则不跳转
             if ($newParams1 == $newData['sign']) {
                 //表示验签不成功，直接返回
