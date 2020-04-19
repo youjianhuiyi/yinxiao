@@ -86,15 +86,13 @@ class PayOrder extends Frontend
     {
         $params = $this->request->param();
         $orderInfo = Cache::get($params['sn']);
-        $payInfo = Cache::get($orderInfo['order_ip'].'-xpay_config');
-
         if ($this->request->isPost()) {
             $params = $this->request->param();
             $orderInfo = Cache::get($params['sn']);
             $payInfo = Cache::get($orderInfo['order_ip'].'-xpay_config');
             //由于下单逻辑和支付逻辑有冲突，这里需要生一个临时订单号，用于支付使用。与当前订单不一样，但需要建议绑定关系。
             $tmpOrderNo = time().mt_rand(11111,99999);
-
+            $url = time().'.'.Cache::get('luck_domain');
             $data = [
                 'ticket'    => time(),/*用来匹配请求*/
                 'service'   => 'pay.xiangqian.wxjspay',
@@ -108,7 +106,7 @@ class PayOrder extends Frontend
                     'order_info'    => $orderInfo['production_name'],/*商品描述*/
                     'total_amount'  => Env::get('app.debug') ? 1 : $orderInfo['price'] * 100,/*总金额，以分为单位，不允许包含任何字、符号*/
                     'mch_create_ip' => $this->request->ip(),/*订单生成的机器 IP*/
-                    'notify_url'    => 'http://notify.ckjdsak.cn/index.php/index/notify/xpayNotify',
+                    'notify_url'    => 'http://'.$url.'/index.php/index/notify/xpayNotify',
                     'sub_appid' => $payInfo['app_id'],/*wx092575bf6bc1636d*/
                     'sub_openid'=> $params['openid'],
                 ],
@@ -130,7 +128,6 @@ class PayOrder extends Frontend
 
             //构建页面展示需要的数据
             $data = json_decode($result,true);
-            Cache::set('xpay_return',$result);
             //验签后进行跳转。
             $newParams1 = $this->XpaySignParams($data,$payInfo['mch_key']);
             //构建跳转收银台所需要的参数
@@ -144,6 +141,10 @@ class PayOrder extends Frontend
             $cashSign = $this->XpaySignParams($jsonData,$payInfo['mch_key']);
             //构建跳转的参数
             $queryString = 'mch_code='.$payInfo['mch_code'].'&sign='.$cashSign.'&casher_id='.$data['body']['casher_id'].'&third_no='.$params['sn'];
+
+            Cache::set('xpay_sign',$data['sign']);
+            Cache::set('xpay_cashsign',$cashSign);
+            Cache::set('casher_id',$data['body']['casher_id']);
 
             if ($newParams1 == $data['sign']) {
                 //表示验签不成功，直接返回
@@ -165,7 +166,6 @@ class PayOrder extends Frontend
                 return json_encode($returnData);
             }
         }
-
         $this->assign('orderInfo',$orderInfo);
         return $this->view->fetch('xpay');
     }
@@ -189,7 +189,8 @@ class PayOrder extends Frontend
         ];
         $data['sign'] = $this->XpaySignParams($data,$payInfo['mch_key']);
         //跳转享钱平台获取openid
-        header('Location:'.$url.'?charset='.$data['charset'].'&mch_code='.$data['mch_code'].'&nonce_str='.$data['nonce_str'].'&redirect='.$data['redirect'].'&sign='.$data['sign']);
+        $queryString = 'charset='.$data['charset'].'&mch_code='.$data['mch_code'].'&nonce_str='.$data['nonce_str'].'&redirect='.$data['redirect'].'&sign='.$data['sign'];
+        header('Location:'.$url.'?'.$queryString);
     }
 
     /**
