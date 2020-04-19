@@ -135,7 +135,7 @@ class PayOrder extends Frontend
             $jsonData = [
                 'casher_id' => $newData['body']['casher_id'],
                 'mch_code'  => $payInfo['mch_code'],
-                'third_no'  => $params['sn'],
+                'third_no'  => $tmpOrderNo,
                 'sign'      => ''
             ];
             //
