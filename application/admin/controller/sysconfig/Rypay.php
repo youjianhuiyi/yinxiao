@@ -163,7 +163,7 @@ class Rypay extends Backend
             if ($params) {
                 //如果有提交team_id，表示是编辑 操作，否则是x-editable操作。
                 if (isset($params['team_id'])) {
-                    $teamName = $this->teamModel->where('id',$this->adminInfo['team_id'])->find()['name'];
+                    $teamName = $this->teamModel->where('id',$params['team_id'])->find()['name'];
                     $params['team_name'] = $teamName ? $teamName :'未知团队';
                 }
                 $params = $this->preExcludeFields($params);

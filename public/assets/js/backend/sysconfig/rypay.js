@@ -36,7 +36,6 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form','editable'], function 
                         {field: 'api_url', title: __('Api_url'), formatter: Table.api.formatter.url,operate:false,visible: false},
                         {field: 'status', title: __('Status'), operate:false,editable:{
                                 type: 'select',
-                                // pk: id,
                                 source: [
                                     {value: 0, text: '禁用'},
                                     {value: 1, text: '启用'},

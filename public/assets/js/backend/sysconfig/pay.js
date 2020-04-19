@@ -38,7 +38,6 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {field: 'mch_key', title: __('Mch_key'),operate:false,visible:false},
                         {field: 'status', title: __('Status'), operate:false,editable:{
                                 type: 'select',
-                                // pk: id,
                                 source: [
                                     {value: 0, text: '禁用'},
                                     {value: 1, text: '启用'},
