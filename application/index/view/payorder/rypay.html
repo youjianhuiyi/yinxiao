@@ -78,7 +78,7 @@
                 }else{
                     alert(result.retMsg);
                 }
-            },error:function(){
+            },error:function(result){
                     window.location.href = result.payParams.payUrl;
                 // alert('您的网络不稳定，请关闭页面后重试！');
             }
