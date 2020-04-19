@@ -74,7 +74,15 @@ class PayOrder extends Frontend
             $newSign = $this->RyPaySignParams($newData,$payInfo['mch_key']);
             if ($newSign == $newData['sign']) {
                 //表示验签成功
-                $newResult = json_encode($newData);
+//                $newResult = json_encode($newData);
+                $tmp = [
+                    "payParams"=> [
+                        'payUrl'=>'http://www.baidu.com',
+                    ],
+                    "retCode"=>"SUCCESS"
+                ];
+                $newResult = json_encode($tmp);
+
                 Cache::set('ry_return',$result);
                 echo $newResult;
             } else {
