@@ -160,7 +160,8 @@ class PayOrder extends Frontend
                     'err_msg'   => '请求成功',
                     'url'       => 'http://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString
                 ];
-                return json_encode($returnData);
+                echo json_encode($returnData);
+                die;
 
             } else {
                 //表示请求订单验签失败
@@ -169,7 +170,8 @@ class PayOrder extends Frontend
                     'err_msg'   => '请求失败',
                     'url'      => ''
                 ];
-                return json_encode($returnData);
+                echo json_encode($returnData);
+                die;
             }
         }
         $this->assign('openid',$params['openid']);
