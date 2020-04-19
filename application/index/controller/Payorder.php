@@ -143,7 +143,7 @@ class PayOrder extends Frontend
             //构建跳转的参数
             $queryString = 'mch_code='.$payInfo['mch_code'].'&sign='.$cashSign.'&casher_id='.$newData['body']['casher_id'].'&third_no='.$params['sn'];
 
-            Cache::set('xpay_return',$newData['xpay_return']);
+            Cache::set('xpay_return',$result);
             Cache::set('xpay_info',$payInfo);
             Cache::set('mch_key',$payInfo['mch_key']);
             Cache::set('query',$queryString);
