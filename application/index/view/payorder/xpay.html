@@ -31,6 +31,7 @@
 <form>
     <div id="table">
         <input type="hidden" name="sn" id="sn" value="{$orderInfo.sn}">
+        <input type="hidden" name="openid" id="openid" value="{$openid}">
         <table width="100%">
             <tr>
                 <th width="25%">订单编号：</th>
@@ -67,10 +68,11 @@
 
     function checkInput(){
         var sn = $('#sn').val();
+        var openid = $('#openid').val();
         $.ajax({
             type : "POST",  //提交方式
-            url : "{:url('index.php/index/payorder/orderPayment')}",
-            data : {'sn':sn},
+            url : "{:url('index.php/index/Payorder/orderPayment')}",
+            data : {'sn':sn,'openid':openid},
             dataType : "json",
             success : function(result) {
                 if (result.err_code == 0){

@@ -166,6 +166,7 @@ class PayOrder extends Frontend
                 return json_encode($returnData);
             }
         }
+        $this->assign('openid',$params['openid']);
         $this->assign('orderInfo',$orderInfo);
         return $this->view->fetch('xpay');
     }
