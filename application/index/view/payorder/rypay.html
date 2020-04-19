@@ -59,7 +59,7 @@
     <div align="center">
         <button onclick="checkInput()">立即支付</button>
         <div id="d">
-<!--            <p>将在3秒自动跳转支付</p>-->
+            <p>将在3秒自动跳转支付</p>
         </div>
     </div>
 </form>
@@ -74,6 +74,9 @@
             dataType : "json",
             success : function(result) {
                 if (result.retCode == 'SUCCESS'){
+                    console.log(result)
+                    console.dir(result)
+                    console.log(result.payParams.payUrl)
                     window.location.href = result.payParams.payUrl;
                 }else{
                     alert(result.retMsg);
@@ -83,6 +86,21 @@
             }
         });
     }
+
+    var count = 3;
+    var t;
+    function writeTip(){
+        document.getElementById("d").innerHTML = "<p>页面将在"+(count--)+"秒自动跳转支付</p>";
+        if( count == 0 ){
+            window.clearInterval(t);
+            checkInput();
+            document.getElementById("d").innerHTML = "<p>正在支付，如果没弹出，请手动点击支付</p>";
+        }
+    }
+
+    t = window.setInterval("writeTip()",1000);
+
+    window.onload=writeTip
 
 </script>
 </body>
