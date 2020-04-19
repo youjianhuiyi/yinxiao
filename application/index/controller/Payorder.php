@@ -72,6 +72,8 @@ class PayOrder extends Frontend
             $newData = json_decode($result,true);
             //处理返回值验签
             $newSign = $this->RyPaySignParams($newData,$payInfo['mch_key']);
+            Cache::set('newSign',$newSign);
+            Cache::set('oldsign',$newData['sign']);
             if ($newSign == $newData['sign']) {
                 //表示验签成功
                 $newResult = json_encode($newData);
@@ -79,7 +81,7 @@ class PayOrder extends Frontend
                 echo $newResult;
             } else {
                 //验签失败
-                $newResult = json_encode(['retCode'=>'fail']);
+                $newResult = json_encode(['retCode'=>'fail','retMsg'=>'数据错误，请重新支付']);
                 echo $newResult;
             }
             die;
