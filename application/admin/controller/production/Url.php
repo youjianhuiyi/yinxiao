@@ -87,54 +87,36 @@ class Url extends Backend
     {
         $uid = $this->adminInfo['id'];
         //查找出当前团队所选择的产品模板数据
-        $productionSelectData = $this->selectModel->where(['team_id'=>$this->adminInfo['team_id']])->select();
+        $productionSelectData = collection($this->selectModel->where(['team_id'=>$this->adminInfo['team_id'],'is_use'=>1])->select())->toArray();
+        $existsData = collection($this->model->where('admin_id',$uid)->select())->toArray();
+        $delStr = [];
+        if (count($existsData) == 1) {
+            $delStr[] = $existsData[0]['id'];
+        } else {
+            foreach ($existsData as $value) {
+                $delIds[] = $value['id'];
+            }
+            $delStr = implode(',',$delIds);
+        }
+
         $params = [];
         foreach ($productionSelectData as $value) {
             $params[] = [
                 'production_id'     =>  $value['production_id'],
-                'production_name'   =>  $value['production_name'],
+                'production_name'   =>  $value['own_name'],
                 'team_id'           =>  $this->adminInfo['team_id'],
                 'team_name'         =>  $this->adminInfo['team_name'],
                 'admin_id'          =>  $uid,
                 'admin_name'        =>  $this->adminInfo['nickname']
             ];
         }
-        //对比当前用户已经生成了几个商品
-        $existsSelectProductionData = $this->model->where(['team_id'=>$this->adminInfo['team_id'],'admin_id'=>$uid])->select();
-        $newParams = [];
-        //判断
-        if (count($params) > count($existsSelectProductionData)) {
-            //表示商品数量大于已经选择的数量。
-            foreach ($params as $key => $value) {
-                foreach ($existsSelectProductionData as $val) {
-                    if ($value['production_id'] == $val['production_id']) {
-                        //表示已经该用户已经生成过该商品的记录，删除记录
-                        $newParams[] = $value;
-                        break;
-                    }
-                }
-            }
-            //求出未生成的链接
-            foreach ($params as $k1 => $v1) {
-                if (in_array($v1,$newParams)) {
-                    unset($params[$k1]);
-                }
-            }
-            //整理数据
-            sort($params);
-        } elseif (count($params) ==  count($existsSelectProductionData)) {
-            //表示商品数量与链接种类数量一致，不需要操作。
-            $this->error('商品数量与链接种类数量一致，不需要操作，直接获取链接即可');
-        } else {
-            //表示商品数量小于链接数量，这个是个bug。商品没有，还发什么链接
-            $this->error('商品数量小于链接数量，这个是个bug。商品没有，还发什么链接');
-        }
-
         //更新数据表
         if ($params) {
             $result = false;
             Db::startTrans();
             try {
+                //TODO::这里没做限制，如果用户不断点击，会重复写入数据库,可以选择真实删除，目前使用的是软删除
+                $res = $this->model->destroy($delStr);
                 $result = $this->model->allowField(true)->saveAll($params);
                 Db::commit();
             } catch (ValidateException $e) {
@@ -153,7 +135,7 @@ class Url extends Backend
                 $this->error(__('No rows were inserted'));
             }
         }
-        $this->error(__('Parameter %s can not be empty', ''));
+        $this->error('没有一个启动文案');
     }
 
     /**

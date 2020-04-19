@@ -196,23 +196,31 @@ class Select extends Backend
         }
         if ($this->request->isPost()) {
             $params = $this->request->post("row/a");
-            $params['team_id'] = $this->adminInfo['team_id'];
-            $params['team_name'] = $params['team_id'] == 0 ? '平台测试':$this->adminInfo['team_name'];
-            $params['production_name'] = $this->productionModel->get($params['production_id'])->name;
-            $params['own_name'] = $params['own_name'] == '' ? $params['production_name'] : $params['own_name'];
+
+            if (isset($params['team_id'])){
+                $params['team_id'] = $this->adminInfo['team_id'];
+                $params['team_name'] = $params['team_id'] == 0 ? '平台测试':$this->adminInfo['team_name'];
+                $params['production_name'] = $this->productionModel->get($params['production_id'])->name;
+                $params['own_name'] = $params['own_name'] == '' ? $params['production_name'] : $params['own_name'];
+            }
+
             if ($params) {
-                //判断价格体系
-                $params['sales_price'] = $params['sales_price'] == 0 ? $this->productionModel->get($params['production_id'])->sales_price : $params['sales_price'];
-                $params['discount'] = $params['discount'] == 0 ? $this->productionModel->get($params['production_id'])->discount : $params['discount'];
-                $params['true_price'] = $params['true_price'] == 0 ? $this->productionModel->get($params['production_id'])->true_price : $params['true_price'];
-                //判断填写的数据
-                if ($params['sales_price'] > $params['discount']) {
-                    if ($params['sales_price']-$params['discount'] != $params['true_price']) {
-                        $params['true_price'] = $params['sales_price']-$params['discount'];
+
+                if (isset($params['team_id'])) {
+                    //判断价格体系
+                    $params['sales_price'] = $params['sales_price'] == 0 ? $this->productionModel->get($params['production_id'])->sales_price : $params['sales_price'];
+                    $params['discount'] = $params['discount'] == 0 ? $this->productionModel->get($params['production_id'])->discount : $params['discount'];
+                    $params['true_price'] = $params['true_price'] == 0 ? $this->productionModel->get($params['production_id'])->true_price : $params['true_price'];
+                    //判断填写的数据
+                    if ($params['sales_price'] > $params['discount']) {
+                        if ($params['sales_price']-$params['discount'] != $params['true_price']) {
+                            $params['true_price'] = $params['sales_price']-$params['discount'];
+                        }
+                    } else {
+                        $this->error('价格体系填写不正确！');
                     }
-                } else {
-                    $this->error('价格体系填写不正确！');
                 }
+
                 $params = $this->preExcludeFields($params);
                 $result =  $result1 = false;
                 Db::startTrans();
@@ -224,12 +232,18 @@ class Select extends Backend
                         $row->validateFailException(true)->validate($validate);
                     }
                     $result = $row->allowField(true)->save($params);
-                    //团队数据更新
-                    if ($params['team_id'] != 0) {
-                        $teamData = $this->teamModel->get($params['team_id'])->team_productions;
-                        $newTeamProduction = empty($teamData) ? $params['production_id'] : $teamData.','.$params['production_id'];
-                        $result1 = $this->teamModel->isUpdate(true)->save($newTeamProduction,['id'=>$params['team_id']]);
+
+                    if (isset($params['team_id'])) {
+                        //团队数据更新
+                        if ($params['team_id'] != 0) {
+                            $teamData = $this->teamModel->get($params['team_id'])->team_productions;
+                            $newTeamProduction = empty($teamData) ? $params['production_id'] : $teamData.','.$params['production_id'];
+                            $result1 = $this->teamModel->isUpdate(true)->save($newTeamProduction,['id'=>$params['team_id']]);
+                        }
+                    } else {
+                        $result1 = true;
                     }
+
                     //将本团队的商品数据缓存起来
                     Db::commit();
                 } catch (ValidateException $e) {
@@ -242,6 +256,7 @@ class Select extends Backend
                     Db::rollback();
                     $this->error($e->getMessage());
                 }
+
                 if ($result !== false && $result1 !== false) {
                     $this->success();
                 } else {
