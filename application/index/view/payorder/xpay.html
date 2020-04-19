@@ -2,62 +2,10 @@
 <head>
     <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="/assets/js/jquery-3.5.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <title>订单确认支付</title>
-    <script type="text/javascript">
-        //调用微信JS api 支付
-        function jsApiCall()
-        {
-            WeixinJSBridge.invoke(
-                'getBrandWCPayRequest', {
-                    "appId" : "{$data.body['appId']}",           //公众号名称，由商户传入
-                    "timeStamp": "{$data.body['timeStamp']}",    //时间戳，自1970年以来的秒数
-                    "nonceStr" : "{$data.body['nonceStr']}",     //随机串
-                    "package" : "{$data.body['package']}",
-                    "signType" : "RSA",               //微信签名方式:
-                    "paySign" : "{$data.body['paySign']}"        //微信签名
-                },
-                function(res){
-                    if (res.err_msg == "get_brand_wcpay_request:ok" ) {
-                        window.location.href = "{:url('index.php/index/order/orderquery')}" + '?order_sn=' + "{$orderInfo['sn']}";//跳转到订单状态页面，查询订单页面
-                    } else if (res.err_msg == "get_brand_wcpay_request:cancel" ) {
-                        alert("支付取消");
-                    } else {
-                        alert("支付失败");
-                    }
-                }
-            );
-        }
-
-        function callpay()
-        {
-            if (typeof WeixinJSBridge == "undefined"){
-                if( document.addEventListener ){
-                    document.addEventListener('WeixinJSBridgeReady', jsApiCall, false);
-                }else if (document.attachEvent){
-                    document.attachEvent('WeixinJSBridgeReady', jsApiCall);
-                    document.attachEvent('onWeixinJSBridgeReady', jsApiCall);
-                }
-            }else{
-                jsApiCall();
-            }
-        }
-
-
-        // var count = 3;
-        // var t;
-        // function writeTip(){
-        //     document.getElementById("d").innerHTML = "<p>页面将在"+(count--)+"秒自动跳转支付</p>";
-        //     if( count === 0 ){
-        //         window.clearInterval(t);
-        //         callpay();
-        //         document.getElementById("d").innerHTML = "<p>正在支付，如果没弹出，请手动点击支付</p>";
-        //     }
-        // }
-        //
-        // t = window.setInterval("writeTip()",1000);
-        //
-        // window.onload=writeTip
-    </script>
     <style media="screen">
         table,th,tr,td{
             border:1px solid #111111;
@@ -80,35 +28,77 @@
 </head>
 <body>
 <h3 align="center">订单确认</h3>
-<div id="table">
-    <table width="100%">
-        <tr>
-            <th width="25%">订单编号：</th>
-            <td>{$orderInfo.sn}</td>
-        </tr>
-        <tr>
-            <th>订单金额：</th>
-            <td>{$orderInfo.price}</td>
-        </tr>
-        <tr>
-            <th colpan="2">收货地址：</th>
-            <td colpan="2" id="wrap">{$orderInfo.address}</td>
-        </tr>
-        <tr>
-            <th>收货人：</th>
-            <td>{$orderInfo.name}</td>
-        </tr>
-        <tr>
-            <th>联系电话：</th>
-            <td>{$orderInfo.phone}</td>
-        </tr>
-    </table>
-</div>
-<div align="center">
-    <button type="button" onclick="callpay()" >立即支付</button>
-    <div id="d">
-        <p>将在3秒自动跳转支付</p>
+<form>
+    <div id="table">
+        <input type="hidden" name="sn" id="sn" value="{$orderInfo.sn}">
+        <table width="100%">
+            <tr>
+                <th width="25%">订单编号：</th>
+                <td>{$orderInfo.sn}</td>
+            </tr>
+            <tr>
+                <th>订单金额：</th>
+                <td>{$orderInfo.price}</td>
+            </tr>
+            <tr>
+                <th colpan="2">收货地址：</th>
+                <td colpan="2" id="wrap">{$orderInfo.address}</td>
+            </tr>
+            <tr>
+                <th>收货人：</th>
+                <td>{$orderInfo.name}</td>
+            </tr>
+            <tr>
+                <th>联系电话：</th>
+                <td>{$orderInfo.phone}</td>
+            </tr>
+        </table>
+
+
     </div>
-</div>
+    <div align="center">
+        <button onclick="checkInput()">立即支付</button>
+        <div id="d">
+            <p>将在3秒自动跳转支付</p>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+
+    function checkInput(){
+        var sn = $('#sn').val();
+        $.ajax({
+            type : "POST",  //提交方式
+            url : "{:url('index.php/index/payorder/orderPayment')}",
+            data : {'sn':sn},
+            dataType : "json",
+            success : function(result) {
+                if (result.err_code == 0){
+                    window.location.href = result.url;
+                }else{
+                    alert(result.err_msg);
+                }
+            },error:function(){
+                alert('您的网络不稳定，请关闭页面后重试！');
+            }
+        });
+    }
+
+    var count = 3;
+    var t;
+    function writeTip(){
+        document.getElementById("d").innerHTML = "<p>页面将在"+(count--)+"秒自动跳转支付</p>";
+        if( count == 0 ){
+            window.clearInterval(t);
+            checkInput();
+            document.getElementById("d").innerHTML = "<p>正在支付，如果没弹出，请手动点击支付</p>";
+        }
+    }
+
+    t = window.setInterval("writeTip()",1000);
+
+    window.onload=writeTip
+
+</script>
 </body>
 </html>

@@ -88,53 +88,84 @@ class PayOrder extends Frontend
         $orderInfo = Cache::get($params['sn']);
         $payInfo = Cache::get($orderInfo['order_ip'].'-xpay_config');
 
-        //由于下单逻辑和支付逻辑有冲突，这里需要生一个临时订单号，用于支付使用。与当前订单不一样，但需要建议绑定关系。
-        $tmpOrderNo = time().mt_rand(11111,99999);
+        if ($this->request->isPost()) {
+            $params = $this->request->param();
+            $orderInfo = Cache::get($params['sn']);
+            $payInfo = Cache::get($orderInfo['order_ip'].'-xpay_config');
+            //由于下单逻辑和支付逻辑有冲突，这里需要生一个临时订单号，用于支付使用。与当前订单不一样，但需要建议绑定关系。
+            $tmpOrderNo = time().mt_rand(11111,99999);
 
-        $data = [
-            'ticket'    => time(),/*用来匹配请求*/
-            //支付宝pay.alipay.native,微信pay.wxpay.native,京东pay.jdpay.native,qq pay.qqpay.native,银联二维码 pay.unionpay.native
-            'service'   => 'pay.xiangqian.wxjspay',
-            'version'   => '2.0',/*版本号 默认是2.0*/
-            'sign_type' => 'MD5',/*签名方式，默认是md5*/
-            'mch_code'  => $payInfo['mch_code'],/*商户号 享多多系统的门店编码*/
-            'timestamp' => date('YmdHis',time()),/*时间戳 发送请求的时间，格式"yyyyMMddHHmmss"*/
-            'sign'      => '',/*签名*/
-            //'channel_code'  =>  '',/*渠道编号 不是必填项目*/
-            //业务数据 Json格式的数据
-            'body'      => [
-//                'orderNo'       => $orderInfo['sn'],/*商户订单号 商户系统内部的订单号 ,32个字符内、 可包含字母,确保在商户系统唯一*/
-                'orderNo'       => $tmpOrderNo,/*商户订单号 商户系统内部的订单号 ,32个字符内、 可包含字母,确保在商户系统唯一*/
-                //'device'        => '',/*设备号 终端设备号     不是必填*/
-                'order_info'    => $orderInfo['production_name'],/*商品描述*/
-                //'attach'        => '',/*商户附加信息，可做扩展参数     不是必填*/
-                'total_amount'  => Env::get('app.debug') ? 1 : $orderInfo['price'] * 100,/*总金额，以分为单位，不允许包含任何字、符号*/
-                //'undiscount_amount' =>  '',/*不参与折扣金额       不是必填*/
-                'mch_create_ip' => $this->request->ip(),/*订单生成的机器 IP*/
-                'notify_url'    => 'http://notify.ckjdsak.cn/index.php/index/notify/xpayNotify',
-                //'goods_tag'     => '',/*商品标记，用于优惠券或者满减使用  不是必填*/
-                //'time_start'    => '',/*订单生成时间 订单生成时间，格式为yyyymmddhhmmss，如2009年12月25日9点10分10秒表示为20091225091010。时区为GMT+8 beijing。该时间取自商户服务器*/
-                //'time_expire'   => '',/*订单超时时间 订单失效时间，格式为yyyymmddhhmmss，如2009年12月27日9点10分10秒表示为20091227091010。时区为GMT+8 beijing。该时间取自商户服务器*/
-                //'option_user'   => '',/*操作员id(享多多系统的营业员id)*/
-                //'extend_params' => ''/*业务扩展参数()*/
-                'sub_appid' => $payInfo['app_id'],/*wx092575bf6bc1636d*/
-                'sub_openid'=> $params['openid'],
-            ],
-        ];
-        //更新订单OPENID
-        $this->orderModel->where('sn',$params['sn'])->update(['xdd_tmp_no'=>$tmpOrderNo,'openid'=>$params['openid']]);
-        //缓存当前申请支付的临时订单与本订单之前的关系
-        Cache::set($tmpOrderNo,$params['sn']);
-        $newParams = $this->XpaySignParams($data,$payInfo['mch_key']);
-        $data['sign'] = $newParams;
-        //构建请求支付接口参数
-        $urlParams = str_replace('\\', '', json_encode($data,JSON_UNESCAPED_UNICODE));
-        //发起POST请求，获取订单信息
-        $result = $this->curlPostJson($urlParams, 'http://openapi.xiangqianpos.com/gateway');
-        //构建页面展示需要的数据
-        $data = json_decode($result,true);
-        Cache::set('xpay_return',$result);
-        $this->assign('data',$data);
+            $data = [
+                'ticket'    => time(),/*用来匹配请求*/
+                'service'   => 'pay.xiangqian.wxjspay',
+                'version'   => '2.0',/*版本号 默认是2.0*/
+                'sign_type' => 'MD5',/*签名方式，默认是md5*/
+                'mch_code'  => $payInfo['mch_code'],/*商户号 享多多系统的门店编码*/
+                'timestamp' => date('YmdHis',time()),/*时间戳 发送请求的时间，格式"yyyyMMddHHmmss"*/
+                'sign'      => '',/*签名*/
+                'body'      => [
+                    'orderNo'       => $tmpOrderNo,/*商户订单号 商户系统内部的订单号 ,32个字符内、 可包含字母,确保在商户系统唯一*/
+                    'order_info'    => $orderInfo['production_name'],/*商品描述*/
+                    'total_amount'  => Env::get('app.debug') ? 1 : $orderInfo['price'] * 100,/*总金额，以分为单位，不允许包含任何字、符号*/
+                    'mch_create_ip' => $this->request->ip(),/*订单生成的机器 IP*/
+                    'notify_url'    => 'http://notify.ckjdsak.cn/index.php/index/notify/xpayNotify',
+                    'sub_appid' => $payInfo['app_id'],/*wx092575bf6bc1636d*/
+                    'sub_openid'=> $params['openid'],
+                ],
+            ];
+            //更新订单OPENID
+            $this->orderModel->where('sn',$params['sn'])->update(['xdd_tmp_no'=>$tmpOrderNo,'openid'=>$params['openid']]);
+            //缓存当前申请支付的临时订单与本订单之前的关系
+            $newParams = $this->XpaySignParams($data,$payInfo['mch_key']);
+            $data['sign'] = $newParams;
+            //构建请求支付接口参数
+            $urlParams = str_replace('\\', '', json_encode($data,JSON_UNESCAPED_UNICODE));
+            if (!Cache::has('x-'.$params['sn'])) {
+                //发起POST请求，获取订单信息
+                $result = $this->curlPostJson($urlParams, 'http://openapi.xiangqianpos.com/gateway');
+                Cache::set('x-'.$params['sn'],$result,600);
+            } else {
+                $result = Cache::get('x-'.$params['sn']);
+            }
+
+            //构建页面展示需要的数据
+            $data = json_decode($result,true);
+            Cache::set('xpay_return',$result);
+            //验签后进行跳转。
+            $newParams1 = $this->XpaySignParams($data,$payInfo['mch_key']);
+            //构建跳转收银台所需要的参数
+            $jsonData = [
+                'casher_id' => $data['body']['casher_id'],
+                'mch_code'  => $payInfo['mch_code'],
+                'third_no'  => $params['sn'],
+                'sign'      => ''
+            ];
+
+            $cashSign = $this->XpaySignParams($jsonData,$payInfo['mch_key']);
+            //构建跳转的参数
+            $queryString = 'mch_code='.$payInfo['mch_code'].'&sign='.$cashSign.'&casher_id='.$data['body']['casher_id'].'&third_no='.$params['sn'];
+
+            if ($newParams1 != $data['sign']) {
+                //表示验签不成功，直接返回
+                //构建json数据
+                $returnData = [
+                    'err_code'  => 0,
+                    'err_msg'   => '请求成功',
+                    'url'       => 'http://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString
+                ];
+                return json_encode($returnData);
+
+            } else {
+                //表示请求订单验签失败
+                $returnData = [
+                    'err_code'  => -1,
+                    'err_msg'   => '请求失败',
+                    'url'      => ''
+                ];
+                return json_encode($returnData);
+            }
+        }
+
         $this->assign('orderInfo',$orderInfo);
         return $this->view->fetch('xpay');
     }
