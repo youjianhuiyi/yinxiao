@@ -211,11 +211,7 @@ class Admin extends Backend
                     if (isset($newTeamId)) {
                         $level = 0;
                     } else {
-                        if ($params['pid'] == $this->adminInfo['id']) {
-                            $level = 1;
-                        } else {
-                            $level = 2;
-                        }
+                        $level = \app\admin\model\Admin::where('id',$params['pid'])->value('level')+1;
                     }
 
                     $params['level'] = $level;
@@ -267,11 +263,11 @@ class Admin extends Backend
             $teamName = $this->teamModel->where('id',$params['team_id'])->value('name');
             $params['team_name'] = $teamName  != '' ? $teamName : '未知团队';
             //设置团队关系级别
-            if ($params['pid'] < 3) {
+            if ($params['pid'] == 0 && $this->adminInfo['id'] != 1) {
                 //表示用户不是第一层级
-                $level = \app\admin\model\Admin::where('id',$params['pid'])->value('level') + 1;
+                $level = 0;
             } else {
-                $level = 3;
+                $level = \app\admin\model\Admin::where('id',$params['pid'])->value('level') + 1;
             }
             $params['level'] = $level;
             if ($params) {
@@ -322,6 +318,7 @@ class Admin extends Backend
         $this->view->assign("groupids", $groupids);
         return $this->view->fetch();
     }
+
 
     /**
      * 删除

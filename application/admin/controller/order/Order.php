@@ -77,7 +77,7 @@ class Order extends Backend
                     ->order($sort, $order)
                     ->limit($offset, $limit)
                     ->select();
-            } elseif ($this->adminInfo['level'] == 2) {
+            } elseif ($this->adminInfo['pid'] != 0) {
                 //表示是组长级别账号。可以查看到自己及自己员工下所有订单
                 $id = $this->adminInfo['id'];
                 $allIds = collection(Admin::where('pid',$id)->select())->toArray();
@@ -86,7 +86,6 @@ class Order extends Backend
                     $newArr[] = $value['id'];
                 }
                 array_push($newArr,$id);
-
                 $total = $this->model
                     ->where($where)
                     ->where('admin_id','in',$newArr)
