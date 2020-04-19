@@ -76,12 +76,13 @@ class Admin extends Backend
                 ->where(['team_id'=>$this->adminInfo['team_id']])
                 ->column('nickname','id');
             $adminData[0] = '添加账号属于谁的下级，就选择谁，没有下级就选择本项';
+        } elseif($this->adminInfo['pid'] == 0) {
+            $adminData = \app\admin\model\Admin::where('level','in',[0,1,2])->column('nickname','id');
+            $adminData[0] = '添加账号属于谁的下级，就选择谁，没有下级就选择本项';
         } else {
-            $adminData = \app\admin\model\Admin::where('level','in',[0,1,2])
-                ->column('nickname','id');
+            $adminData = \app\admin\model\Admin::where('level', 'in', [1, 2])->column('nickname', 'id');
             $adminData[0] = '添加账号属于谁的下级，就选择谁，没有下级就选择本项';
         }
-
 
         ksort($adminData);
         $this->view->assign('adminData',$adminData);
@@ -168,7 +169,7 @@ class Admin extends Backend
      */
     public function add()
     {
-        if ($this->adminInfo['pid'] == 0) {
+//        if ($this->adminInfo['pid'] == 0) {
             if ($this->request->isPost()) {
                 $this->token();
                 $params = $this->request->post("row/a");
@@ -241,9 +242,9 @@ class Admin extends Backend
                 $this->error();
             }
             return $this->view->fetch();
-        } else {
-            $this->error('你不能添加账号');
-        }
+//        } else {
+//            $this->error('你不能添加账号');
+//        }
 
     }
 

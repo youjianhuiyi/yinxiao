@@ -149,7 +149,7 @@ class Boss extends Backend
     public function logout()
     {
         if (Cache::has(Cookie::get('PHPSESSID'))) {
-            $loginUrl = explode($this->request->baseFile(),Cache::get(Cookie::get('PHPSESSID')))[1];
+            $loginUrl = Cache::get(Cookie::get('PHPSESSID'));
         } else {
             $loginUrl = $this->request->get('url', 'index/index');
         }
