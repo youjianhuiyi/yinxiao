@@ -125,11 +125,6 @@ class Backend extends Controller
         $controllername = Loader::parseName($this->request->controller());
         $actionname = strtolower($this->request->action());
 
-        if (Cache::has(Cookie::get('PHPSESSID'))) {
-            $url1 = explode($this->request->baseFile(),Cache::get(Cookie::get('PHPSESSID')))[1];
-        } else {
-            $url1 = $this->request->get('url', 'index/login');
-        }
         $path = str_replace('.', '/', $controllername) . '/' . $actionname;
 
         // 定义是否Addtabs请求
@@ -153,6 +148,11 @@ class Backend extends Controller
                 $url = Session::get('referer');
                 $url = $url ? $url : $this->request->url();
 //                $loginUrl = $this->adminInfo['login_url'];
+                if (Cache::has(Cookie::get('PHPSESSID'))) {
+                    $url1 = explode($this->request->baseFile(),Cache::get(Cookie::get('PHPSESSID')))[1];
+                } else {
+                    $url1 = $this->request->get('url', 'index/login');
+                }
                 //判断当前用户的登录地址。如果登录过期，则重定向到正确的登录地址
                 if ($url == '/') {
 //                    $this->redirect('index/login', [], 302, ['referer' => $url]);

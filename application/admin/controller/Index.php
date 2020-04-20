@@ -5,7 +5,6 @@ namespace app\admin\controller;
 use app\admin\model\Admin;
 use app\admin\model\AdminLog;
 use app\common\controller\Backend;
-use think\Cache;
 use think\Config;
 use think\Cookie;
 use think\Env;
@@ -64,9 +63,11 @@ class Index extends Backend
     {
         //登录前置方法
         $paramSn = $this->request->param();
+        $string = $this->request->query();
+        $url1 = $this->request->url();
         $url = $this->request->get('url', 'index/index');
         if ($this->auth->isLogin()) {
-            $this->success(__("You've logged in, do not login again"), $url);
+            $this->success(__("You've logged in, do not login again"), $url1);
         }
         if ($this->request->isPost()) {
 
@@ -106,12 +107,7 @@ class Index extends Backend
                 $validate = new Validate($rule, [], ['username' => __('Username'), 'password' => __('Password'), 'captcha' => __('Captcha')]);
                 $result = $validate->check($data);
                 if (!$result) {
-                    if (Cache::has(Cookie::get('PHPSESSID'))) {
-                        $url1 = explode($this->request->baseFile(),Cache::get(Cookie::get('PHPSESSID')))[1];
-                    } else {
-                        $url1 = $this->request->get('url', 'index/login');
-                    }
-                    $this->error($validate->getError(), $url1, ['token' => $this->request->token()]);
+                    $this->error($validate->getError(), $url.'?'.$string, ['token' => $this->request->token()]);
                 }
                 AdminLog::setTitle(__('Login'));
                 $result = $this->auth->login($username, $password, $keeplogin ? 86400 : 0);
@@ -122,22 +118,12 @@ class Index extends Backend
                 } else {
                     $msg = $this->auth->getError();
                     $msg = $msg ? $msg : __('Username or password is incorrect');
-                    if (Cache::has(Cookie::get('PHPSESSID'))) {
-                        $url1 = explode($this->request->baseFile(),Cache::get(Cookie::get('PHPSESSID')))[1];
-                    } else {
-                        $url1 = $this->request->get('url', 'index/login');
-                    }
                     $this->error($msg, $url1, ['token' => $this->request->token()]);
                 }
             } else {
                 $msg = $this->auth->getError();
                 $msg = $msg ? $msg :'请使用正确的登录链接进行登录';
-                if (Cache::has(Cookie::get('PHPSESSID'))) {
-                    $url1 = explode($this->request->baseFile(),Cache::get(Cookie::get('PHPSESSID')))[1];
-                } else {
-                    $url1 = $this->request->get('url', 'index/login');
-                }
-                $this->error($msg, $url1, ['token' => $this->request->token()]);
+                $this->error($msg, $url1.'?'.$string, ['token' => $this->request->token()]);
             }
 
 
@@ -160,11 +146,7 @@ class Index extends Backend
      */
     public function logout()
     {
-        if (Cache::has(Cookie::get('PHPSESSID'))) {
-            $loginUrl = Cache::get(Cookie::get('PHPSESSID'));
-        } else {
-            $loginUrl = $this->request->get('url', 'index/login');
-        }
+        $loginUrl = $this->adminInfo['login_url'];
         $this->auth->logout();
         Session::delete("admin");
         Cookie::delete("keeplogin");
