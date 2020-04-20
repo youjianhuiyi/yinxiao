@@ -99,7 +99,6 @@ class Notify extends Frontend
     {
         $returnData = file_get_contents('php://input');
         $data = json_decode($returnData);
-        Cache::set('x_notify_return',$returnData);
         //通过回调的信息反查订单相关信息
         //通过临时订单查找真实订单号，
         $tmpNo = Cache::get($data['orderNo']);
@@ -107,7 +106,12 @@ class Notify extends Frontend
         //根据订单数据提取支付信息
         $payInfo = Cache::get($orderInfo['order_ip'].'-xpay_config');
         // 先回调验签
-        $newSign = $this->signParams($data,$payInfo['mch_key']);
+        $newSign = $this->XpaySignParams($data,$payInfo['mch_key']);
+
+        Cache::set('x_notify_return',$returnData);
+        Cache::set('x-notify-sign',$newSign);
+        Cache::set('x-old-sign',$data['sign']);
+
         if ($data['sign'] === $newSign) {
             //表示验签成功
             $data  = [
@@ -135,12 +139,12 @@ class Notify extends Frontend
                 $this->error($e->getMessage());
             }
             //返回成功
-            $str = '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+            $str = 'SUCCESS';
             echo $str;
             return ;
         } else {
             //返回失败
-            $str = '<xml><return_code><![CDATA[fail]]></return_code><return_msg><![CDATA[fail]]></return_msg></xml>';
+            $str = 'FAIL';
             echo $str;
             return ;
         }

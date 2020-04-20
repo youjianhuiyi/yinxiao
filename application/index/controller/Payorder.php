@@ -141,7 +141,6 @@ class PayOrder extends Frontend
                 $tmpOrderNo = $this->orderModel->where(['sn'=>$params['sn']])->find()['xdd_tmp_no'];
             }
 
-
             /**********************************下单完成处理的逻辑*************************************************/
             //接收请求下单接口回来的数据
             $newData = json_decode($result,true);

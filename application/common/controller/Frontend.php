@@ -259,9 +259,7 @@ class Frontend extends Controller
         }
         //最后拼接商户号入网的reqKey参数
         $string .= '&key='.$MchKey;
-
-        Cache::set('x-string'.time(),$string);
-
+        Cache::set('x-string',$string);
         $ownSign = strtoupper(md5(ltrim($string,'&')));/*执行加密算法*/
         $params['sign'] = $ownSign;/*将签名赋值给数组*/
         return $ownSign;
