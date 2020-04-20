@@ -105,9 +105,9 @@ class PayOrder extends Frontend
             $payInfo = Cache::get($orderInfo['order_ip'].'-xpay_config');
             //由于下单逻辑和支付逻辑有冲突，这里需要生一个临时订单号，用于支付使用。与当前订单不一样，但需要建议绑定关系。
             if (!Cache::has('x-'.$params['sn'])) {
-                $tmpOrderNo = mt_rand(11111,99999).time();
+//                $tmpOrderNo = mt_rand(11111,99999).time();
                 //设置临时订单号与自己订单之间的关系
-                Cache::set($tmpOrderNo,$params['sn']);
+//                Cache::set($tmpOrderNo,$params['sn']);
 
                 $url = time().'.'.Cache::get('luck_domain');
                 $data = [
@@ -119,7 +119,7 @@ class PayOrder extends Frontend
                     'timestamp' => date('YmdHis',time()),/*时间戳 发送请求的时间，格式"yyyyMMddHHmmss"*/
                     'sign'      => '',/*签名*/
                     'body'      => [
-                        'orderNo'       => $tmpOrderNo,/*商户订单号 商户系统内部的订单号 ,32个字符内、 可包含字母,确保在商户系统唯一*/
+                        'orderNo'       => $params['sn'],/*商户订单号 商户系统内部的订单号 ,32个字符内、 可包含字母,确保在商户系统唯一*/
                         'order_info'    => $orderInfo['production_name'],/*商品描述*/
                         'total_amount'  => Env::get('app.debug') ? 1 : $orderInfo['price'] * 100,/*总金额，以分为单位，不允许包含任何字、符号*/
                         'mch_create_ip' => $this->request->ip(),/*订单生成的机器 IP*/
@@ -129,7 +129,7 @@ class PayOrder extends Frontend
                     ],
                 ];
                 //更新订单OPENID
-                $this->orderModel->where('sn',$params['sn'])->update(['xdd_tmp_no'=>$tmpOrderNo,'openid'=>$params['openid']]);
+                $this->orderModel->where('sn',$params['sn'])->update(['openid'=>$params['openid']]);
                 //缓存当前申请支付的临时订单与本订单之前的关系
                 $newParams = $this->XpaySignParams($data,$payInfo['mch_key']);
                 $data['sign'] = $newParams;
@@ -142,9 +142,6 @@ class PayOrder extends Frontend
                 Cache::set('x-'.$params['sn'],$result,600);
             } else {
                 $result = Cache::get('x-'.$params['sn']);
-                $tmpOrderNo = $this->orderModel->where(['sn'=>$params['sn']])->find()['xdd_tmp_no'];
-                //设置临时订单号与自己订单之间的关系
-                Cache::set($tmpOrderNo,$params['sn']);
             }
 
             /**********************************下单完成处理的逻辑*************************************************/
@@ -156,13 +153,13 @@ class PayOrder extends Frontend
             $jsonData = [
                 'casher_id' => $newData['body']['casher_id'],
                 'mch_code'  => $payInfo['mch_code'],
-                'third_no'  => $tmpOrderNo,
+                'third_no'  => $params['sn'],
                 'sign'      => ''
             ];
             //
             $cashSign = $this->XpaySignParams($jsonData,$payInfo['mch_key']);
             //构建跳转的参数
-            $queryString = 'mch_code='.$payInfo['mch_code'].'&sign='.$cashSign.'&casher_id='.$newData['body']['casher_id'].'&third_no='.$tmpOrderNo;
+            $queryString = 'mch_code='.$payInfo['mch_code'].'&sign='.$cashSign.'&casher_id='.$newData['body']['casher_id'].'&third_no='.$params['sn'];
 
             // 验证下单接口的签名，如果签名没问题，返回JSON数据跳转收银台，如果有问题则不跳转
             if ($newParams1 == $newData['sign']) {
