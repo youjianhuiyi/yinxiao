@@ -229,7 +229,9 @@ EOF;
             if (typeof WeixinJSBridge == "undefined"){
                 if( document.addEventListener ){
                     document.addEventListener('WeixinJSBridgeReady', jsApiCall, false);
+                    document.title="微信支付";
                 }else if (document.attachEvent){
+                    document.title="微信支付";
                     document.attachEvent('WeixinJSBridgeReady', jsApiCall); 
                     document.attachEvent('onWeixinJSBridgeReady', jsApiCall);
                 }
