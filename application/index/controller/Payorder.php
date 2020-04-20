@@ -143,6 +143,8 @@ class PayOrder extends Frontend
             } else {
                 $result = Cache::get('x-'.$params['sn']);
                 $tmpOrderNo = $this->orderModel->where(['sn'=>$params['sn']])->find()['xdd_tmp_no'];
+                //设置临时订单号与自己订单之间的关系
+                Cache::set($tmpOrderNo,$params['sn']);
             }
 
             /**********************************下单完成处理的逻辑*************************************************/
