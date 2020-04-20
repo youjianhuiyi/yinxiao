@@ -30,7 +30,7 @@ class OrderAddNotify extends Migrator
     {
         $table = $this->table('order');
         $table
-            ->addColumn('notify_data','text',['after'=>'xdd_trade_no','null'=>false,'comment'=>'回调数据'])
+            ->addColumn('notify_data','text',['after'=>'xdd_trade_no','default'=>null,'comment'=>'回调数据'])
             ->update();
     }
 }

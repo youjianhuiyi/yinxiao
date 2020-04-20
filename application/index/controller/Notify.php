@@ -106,9 +106,12 @@ class Notify extends Frontend
         //根据订单数据提取支付信息
         $payInfo = Cache::get($orderInfo['order_ip'].'-xpay_config');
         // 先回调验签
-        $newSign = $this->strSignParams($data,$payInfo['mch_key']);
+        $newSign = $this->XpaySignParams($data,$payInfo['mch_key']);
 
-//        if ($data['sign'] === $newSign) {
+        Cache::set('old-xsign',$data['sign']);
+        Cache::set('new-xsign',$newSign);
+
+        if ($data['sign'] === $newSign) {
             //表示验签成功
             $saveData  = [
                 'id'             => $orderInfo['id'],
@@ -137,12 +140,12 @@ class Notify extends Frontend
             $str = 'SUCCESS';
             echo $str;
             return ;
-//        } else {
-////            返回失败
-//            $str = 'FAIL';
-//            echo $str;
-//            return ;
-//        }
+        } else {
+            //返回失败
+            $str = 'FAIL';
+            echo $str;
+            return ;
+        }
 
     }
 
