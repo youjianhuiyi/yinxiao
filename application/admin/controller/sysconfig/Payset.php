@@ -92,6 +92,8 @@ class Payset extends Backend
                 'pay_channel'       =>  $value['pay_name'],
                 'team_id'           =>  $this->adminInfo['team_id'],
                 'team_name'         =>  $this->adminInfo['team_name'],
+                'is_multiple'       =>  1,
+                'status'            =>  1
             ];
         }
 
