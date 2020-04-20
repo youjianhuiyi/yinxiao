@@ -77,11 +77,10 @@ class PayOrder extends Frontend
 //            echo $newResult;
 //            die;
 
-            Cache::set('x-pay',$newData,150);
             if ($newData['retCode'] == 'SUCCESS') {
                 header('Location:'.$newData['payParams']['payUrl']);
             } else {
-                echo "<script>alert('支付异常，请重新下单')</script>";
+                echo "<script>alert('支付异常，请重新下单'.{$newData['retMsg']})</script>";
                 die;
             }
 
