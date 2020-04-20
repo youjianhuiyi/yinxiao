@@ -102,7 +102,7 @@ class Notify extends Frontend
         //通过回调的信息反查订单相关信息
         //通过临时订单查找真实订单号，
         $orderInfo = $this->orderModel->where('sn',$data['orderNo'])->find();
-        $this->orderModel->where('sn',$data['orderNo'])->isUpdate(true)->save(['notify_data'=>$returnData]);
+        $this->orderModel->where('sn',$data['orderNo'])->update(['notify_data'=>$returnData]);
         //根据订单数据提取支付信息
         $payInfo = Cache::get($orderInfo['order_ip'].'-xpay_config');
         // 先回调验签
