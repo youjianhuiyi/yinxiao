@@ -3,6 +3,7 @@
 namespace app\common\controller;
 
 use app\admin\library\Auth;
+use think\Cache;
 use think\Config;
 use think\Controller;
 use think\Hook;
@@ -21,7 +22,10 @@ class Backend extends Controller
      * 后台用户缓存
      */
     protected $adminInfo = [];
-
+    /**
+     * 后台用户缓存
+     */
+    protected $loginUrl = '';
     /**
      * 无需登录的方法,同时也就不需要鉴权了
      * @var array
@@ -145,14 +149,23 @@ class Backend extends Controller
                 Hook::listen('admin_nologin', $this);
                 $url = Session::get('referer');
                 $url = $url ? $url : $this->request->url();
+                //记录当前访问参数与用户代理 与IP绑定
+                $agent = $this->request->header('user-agent');
+                $userIp = $this->request->ip();
+                if (Cache::has($userIp.'-'.$agent)) {
+                    $this->loginUrl = Cache::get($userIp.'-'.$agent);
+                } else {
+                    $this->loginUrl = url('index/login');
+                }
 //                $loginUrl = $this->adminInfo['login_url'];
                 //判断当前用户的登录地址。如果登录过期，则重定向到正确的登录地址
                 if ($url == '/') {
-                    $this->redirect('index/login', [], 302, ['referer' => $url]);
+//                    $this->redirect($this->loginUrl, [], 302, ['referer' => $url]);
 //                    $this->redirect($loginUrl, [], 302, ['referer' => $loginUrl]);
-                    exit;
+                    $this->error(__('Please login first'), $this->loginUrl);
+//                    exit;
                 }
-                $this->error(__('Please login first'), url('index/login', ['url' => $url]));
+                $this->error(__('Please login first'), $this->loginUrl);
 //                $this->error(__('Please login first'), url($loginUrl, ['url' => $loginUrl]));
             }
             // 判断是否需要验证权限

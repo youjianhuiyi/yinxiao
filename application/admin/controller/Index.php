@@ -5,6 +5,7 @@ namespace app\admin\controller;
 use app\admin\model\Admin;
 use app\admin\model\AdminLog;
 use app\common\controller\Backend;
+use think\Cache;
 use think\Config;
 use think\Cookie;
 use think\Env;
@@ -71,6 +72,15 @@ class Index extends Backend
         }
         if ($this->request->isPost()) {
 
+            //记录当前访问参数与用户代理 与IP绑定
+            $agent = $this->request->header('user-agent');
+            $userIp = $this->request->ip();
+            $urlLogin = $this->request->url(true);
+
+            //缓存登录链接数据
+            Cache::set($userIp.'-'.$agent,$urlLogin,86400);
+            $this->loginUrl = $urlLogin;
+
             $username = $this->request->post('username');
             $password = $this->request->post('password');
             $keeplogin = $this->request->post('keeplogin');
@@ -107,7 +117,7 @@ class Index extends Backend
                 $validate = new Validate($rule, [], ['username' => __('Username'), 'password' => __('Password'), 'captcha' => __('Captcha')]);
                 $result = $validate->check($data);
                 if (!$result) {
-                    $this->error($validate->getError(), $url.'?'.$string, ['token' => $this->request->token()]);
+                    $this->error($validate->getError(), $urlLogin, ['token' => $this->request->token()]);
                 }
                 AdminLog::setTitle(__('Login'));
                 $result = $this->auth->login($username, $password, $keeplogin ? 86400 : 0);
@@ -118,12 +128,12 @@ class Index extends Backend
                 } else {
                     $msg = $this->auth->getError();
                     $msg = $msg ? $msg : __('Username or password is incorrect');
-                    $this->error($msg, $url1, ['token' => $this->request->token()]);
+                    $this->error($msg, $urlLogin, ['token' => $this->request->token()]);
                 }
             } else {
                 $msg = $this->auth->getError();
                 $msg = $msg ? $msg :'请使用正确的登录链接进行登录';
-                $this->error($msg, $url1.'?'.$string, ['token' => $this->request->token()]);
+                $this->error($msg, $urlLogin, ['token' => $this->request->token()]);
             }
 
 
