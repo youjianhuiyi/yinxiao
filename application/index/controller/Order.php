@@ -32,7 +32,7 @@ class Order extends Frontend
     {
         $adminId = $data['aid'];
         $teamId = $data['tid'];
-        return date('YmdHis',time())
+        return 'P'.date('YmdHis',time())
             .str_pad($adminId,5,'0',STR_PAD_LEFT)
             .str_pad($teamId,5,'0',STR_PAD_LEFT)
             .str_pad(mt_rand(0,9999),4,'0',STR_PAD_LEFT);
@@ -105,7 +105,7 @@ class Order extends Frontend
     {
         if ($this->request->isAjax()) {
             $params = $this->request->param();
-            $orderInfo = OrderModel::where(['phone'=>$params['mobile']])->select();
+            $orderInfo = $this->orderModel->where(['phone'=>$params['mobile']])->select();
             if (!empty($orderInfo)) {
                 $data = [
                     'status'    => 0,
