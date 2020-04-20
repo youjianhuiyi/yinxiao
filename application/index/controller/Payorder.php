@@ -155,7 +155,10 @@ class PayOrder extends Frontend
             $cashSign = $this->XpaySignParams($jsonData,$payInfo['mch_key']);
             //构建跳转的参数
             $queryString = 'mch_code='.$payInfo['mch_code'].'&sign='.$cashSign.'&casher_id='.$newData['body']['casher_id'].'&third_no='.$tmpOrderNo;
-
+            
+            Cache::set('x-return',$result);
+            Cache::set('x-newdata',$newData);
+            Cache::set('x-newsign',$newParams1);
             // 验证下单接口的签名，如果签名没问题，返回JSON数据跳转收银台，如果有问题则不跳转
             if ($newParams1 == $newData['sign']) {
                 //表示验签不成功，直接返回
@@ -166,6 +169,7 @@ class PayOrder extends Frontend
                     'url'       => 'http://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString
                 ];
                 echo json_encode($returnData);
+                die;
             } else {
                 //表示请求订单验签失败
                 $returnData = [
@@ -174,6 +178,7 @@ class PayOrder extends Frontend
                     'url'      => ''
                 ];
                 echo json_encode($returnData);
+                die;
             }
         }
         $this->assign('openid',$params['openid']);
