@@ -105,7 +105,10 @@ class PayOrder extends Frontend
             $payInfo = Cache::get($orderInfo['order_ip'].'-xpay_config');
             //由于下单逻辑和支付逻辑有冲突，这里需要生一个临时订单号，用于支付使用。与当前订单不一样，但需要建议绑定关系。
             if (!Cache::has('x-'.$params['sn'])) {
-                $tmpOrderNo = time().mt_rand(11111,99999);
+                $tmpOrderNo = mt_rand(11111,99999).time();
+                //设置临时订单号与自己订单之间的关系
+                Cache::set($tmpOrderNo,$params['sn']);
+
                 $url = time().'.'.Cache::get('luck_domain');
                 $data = [
                     'ticket'    => time(),/*用来匹配请求*/
@@ -135,6 +138,7 @@ class PayOrder extends Frontend
 
                 //发起POST请求，获取订单信息
                 $result = $this->curlPostJson($urlParams, 'http://openapi.xiangqianpos.com/gateway');
+                //缓存请求数据，避免重复请求
                 Cache::set('x-'.$params['sn'],$result,600);
             } else {
                 $result = Cache::get('x-'.$params['sn']);
