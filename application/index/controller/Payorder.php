@@ -316,7 +316,7 @@ EOF;
                 ];
                 Cache::set($wxUserInfo['openid'],$returnData);
                 //跳转到微信支付
-                header('Location:'.$this->payInfo['pay_domain'.mt_rand(1,5)].'index.php/index/payorder/readypay?openid='.$wxUserInfo['openid']);
+                header('Location:'.$payInfo['pay_domain'.mt_rand(1,5)].'index.php/index/payorder/readypay?openid='.$wxUserInfo['openid']);
                 // 订单数据处理
             } else {
                 //表示非法请求
