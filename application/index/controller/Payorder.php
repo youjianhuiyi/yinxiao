@@ -204,12 +204,53 @@ EOF;
         if (Cache::has($param['openid'])) {
             //表示是正常的订单支付
             $data = Cache::get($param['openid']);
-            $this->assign('jsApiPrepay', json_encode($data['jsapi']));
-            $this->assign('orderInfo', $data['order_info']);
-            return $this->view->fetch('wechatpay');
-        } else {
-            //表示非法请求
-            die('你请求的支付地址有错误，请重新下单支付');
+
+            $jsApi = <<< EOF
+        <script type="text/javascript">
+        //调用微信JS api 支付
+        function jsApiCall()
+        {
+            WeixinJSBridge.invoke(
+                'getBrandWCPayRequest',
+                json_encode($data['jsapi']),
+                function(res) {
+                if (res.err_msg === "get_brand_wcpay_request:ok") {
+                    window.location.href = "/index.php/index/order/orderquery.html"
+                } else if (res.err_msg === "get_brand_wcpay_request:cancel") {
+                    alert("支付取消");
+                }else {
+                    alert("支付失败");
+                }
+            );
+        }
+
+        function callpay()
+        {
+            if (typeof WeixinJSBridge == "undefined"){
+                if( document.addEventListener ){
+                    document.addEventListener('WeixinJSBridgeReady', jsApiCall, false);
+                }else if (document.attachEvent){
+                    document.attachEvent('WeixinJSBridgeReady', jsApiCall); 
+                    document.attachEvent('onWeixinJSBridgeReady', jsApiCall);
+                }
+            }else{
+                jsApiCall();
+            }
+        }
+        </script>
+EOF;
+
+
+        echo $jsApi;
+        die;
+
+
+//            $this->assign('jsApiPrepay', json_encode($data['jsapi']));
+//            $this->assign('orderInfo', $data['order_info']);
+//            return $this->view->fetch('wechatpay');
+//        } else {
+//            //表示非法请求
+//            die('你请求的支付地址有错误，请重新下单支付');
         }
 
     }
@@ -273,7 +314,7 @@ EOF;
                 ];
                 Cache::set($wxUserInfo['openid'],$returnData);
                 //跳转到微信支付
-                header('Location:'.'http://pay.ckjdsak.cn/index.php/index/payorder/readypay?openid='.$wxUserInfo['openid']);
+                header('Location:'.$this->payInfo['pay_domain'.mt_rand(1,5)].'index.php/index/payorder/readypay?openid='.$wxUserInfo['openid']);
                 // 订单数据处理
             } else {
                 //表示非法请求
