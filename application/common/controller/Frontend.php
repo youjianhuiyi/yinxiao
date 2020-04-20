@@ -249,10 +249,10 @@ class Frontend extends Controller
     {
         //按字典序排序数组的键名
         unset($params['sign']);/*剔除sign字段不进行签名算法*/
-        ksort($params);
+        rsort($params);
         $string = '';
         foreach ($params as $key => $value) {
-            $string .= '&'.$key.'='.$value;
+            $string .= '&'.$value;
         }
         //最后拼接商户号入网的reqKey参数
         $string .= '&key='.$MchKey;
@@ -393,6 +393,23 @@ class Frontend extends Controller
         return $newArr;
     }
 
+
+    /**
+     * 兼容处理查询字符串参数
+     * @remark 返回403解密后的参数数组。用于查询数据
+     * @param $data string 通过403解密获取的字段参数
+     * @comment $data = aid=21&gid=4&tid=12&tp=shoes2&check_code=6c2cca0d880648d025948c7ffd57aea1
+     * @return array
+     */
+    public function doParams($data)
+    {
+        $arr = explode('&', $data);
+        $newArr = [];
+        foreach ($arr as $value) {
+            $newArr[] = $value;
+        }
+        return $newArr;
+    }
 
     /**
      * CURL_POST json请求
