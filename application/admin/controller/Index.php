@@ -64,15 +64,9 @@ class Index extends Backend
     {
         //登录前置方法
         $paramSn = $this->request->param();
-        if (Cache::has(Cookie::get('PHPSESSID'))) {
-            $url1 = explode($this->request->baseFile(),Cache::get(Cookie::get('PHPSESSID')))[1];
-        } else {
-            $url1 = $this->request->get('url', 'index/login');
-        }
-
         $url = $this->request->get('url', 'index/index');
         if ($this->auth->isLogin()) {
-            $this->success(__("You've logged in, do not login again"), $url1);
+            $this->success(__("You've logged in, do not login again"), $url);
         }
         if ($this->request->isPost()) {
 
@@ -112,6 +106,11 @@ class Index extends Backend
                 $validate = new Validate($rule, [], ['username' => __('Username'), 'password' => __('Password'), 'captcha' => __('Captcha')]);
                 $result = $validate->check($data);
                 if (!$result) {
+                    if (Cache::has(Cookie::get('PHPSESSID'))) {
+                        $url1 = explode($this->request->baseFile(),Cache::get(Cookie::get('PHPSESSID')))[1];
+                    } else {
+                        $url1 = $this->request->get('url', 'index/login');
+                    }
                     $this->error($validate->getError(), $url1, ['token' => $this->request->token()]);
                 }
                 AdminLog::setTitle(__('Login'));
@@ -123,11 +122,21 @@ class Index extends Backend
                 } else {
                     $msg = $this->auth->getError();
                     $msg = $msg ? $msg : __('Username or password is incorrect');
+                    if (Cache::has(Cookie::get('PHPSESSID'))) {
+                        $url1 = explode($this->request->baseFile(),Cache::get(Cookie::get('PHPSESSID')))[1];
+                    } else {
+                        $url1 = $this->request->get('url', 'index/login');
+                    }
                     $this->error($msg, $url1, ['token' => $this->request->token()]);
                 }
             } else {
                 $msg = $this->auth->getError();
                 $msg = $msg ? $msg :'请使用正确的登录链接进行登录';
+                if (Cache::has(Cookie::get('PHPSESSID'))) {
+                    $url1 = explode($this->request->baseFile(),Cache::get(Cookie::get('PHPSESSID')))[1];
+                } else {
+                    $url1 = $this->request->get('url', 'index/login');
+                }
                 $this->error($msg, $url1, ['token' => $this->request->token()]);
             }
 
