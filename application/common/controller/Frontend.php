@@ -238,6 +238,29 @@ class Frontend extends Controller
     }
 
 
+
+    /**
+     * 字符串签名算法
+     * @param $params   array   接口文档里面相关的参数
+     * @param $MchKey  string  商户密钥
+     * @return array|bool   加密成功返回签名值与原参数数组列表
+     */
+    public function strSignParams($params,$MchKey)
+    {
+        //按字典序排序数组的键名
+        unset($params['sign']);/*剔除sign字段不进行签名算法*/
+        ksort($params);
+        $string = '';
+        foreach ($params as $key => $value) {
+            $string .= '&'.$key.'='.$value;
+        }
+        //最后拼接商户号入网的reqKey参数
+        $string .= '&key='.$MchKey;
+        /*执行加密算法*/
+        return strtoupper(md5(ltrim($string,'&')));
+    }
+
+
     /**
      * xpay签名算法
      * @param $params   array   接口文档里面相关的参数
@@ -319,7 +342,7 @@ class Frontend extends Controller
         } else {
             return false;
         }
-    return strtoupper(md5(ltrim($string,'&')));/*执行加密算法*/
+        return strtoupper(md5(ltrim($string,'&')));/*执行加密算法*/
     }
 
 
@@ -366,7 +389,6 @@ class Frontend extends Controller
             $tmp = explode('=', $value);
             $newArr[$tmp[0]] = $tmp[1];
         }
-        Cache::set('403-arr',$newArr);
         return $newArr;
     }
 

@@ -105,7 +105,7 @@ class Notify extends Frontend
         //根据订单数据提取支付信息
         $payInfo = Cache::get($orderInfo['order_ip'].'-xpay_config');
         // 先回调验签
-        $newSign = $this->paySignParams($data,$payInfo['mch_key']);
+        $newSign = $this->strSignParams($data,$payInfo['mch_key']);
 
         Cache::set('x-data',$data);
         Cache::set('x_notify_return',$returnData);
