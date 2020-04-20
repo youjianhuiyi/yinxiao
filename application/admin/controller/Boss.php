@@ -60,7 +60,7 @@ class Boss extends Backend
      */
     public function login()
     {
-        dump($this->request->request());die;
+//        dump($this->request->request());die;
 
         //登录前置方法
         $paramSn = $this->request->param();
