@@ -204,28 +204,28 @@ EOF;
         if (Cache::has($param['openid'])) {
             //表示是正常的订单支付
             $data = Cache::get($param['openid']);
+            $jsApiData = json_encode($data['jsapi']);
 
             $jsApi = <<< EOF
         <script type="text/javascript">
         //调用微信JS api 支付
-        function jsApiCall()
-        {
+        function jsApiCall() {
             WeixinJSBridge.invoke(
                 'getBrandWCPayRequest',
-                json_encode($data['jsapi']),
+                "{$jsApiData}",
                 function(res) {
-                if (res.err_msg === "get_brand_wcpay_request:ok") {
-                    window.location.href = "/index.php/index/order/orderquery.html"
-                } else if (res.err_msg === "get_brand_wcpay_request:cancel") {
-                    alert("支付取消");
-                }else {
-                    alert("支付失败");
+                    if (res.err_msg === "get_brand_wcpay_request:ok") {
+                        window.location.href = "/index.php/index/order/orderquery.html"
+                    } else if (res.err_msg === "get_brand_wcpay_request:cancel") {
+                        alert("支付取消");
+                    }else {
+                        alert("支付失败");
+                    }
                 }
             );
         }
 
-        function callpay()
-        {
+        function callPay() {
             if (typeof WeixinJSBridge == "undefined"){
                 if( document.addEventListener ){
                     document.addEventListener('WeixinJSBridgeReady', jsApiCall, false);
@@ -237,6 +237,8 @@ EOF;
                 jsApiCall();
             }
         }
+        
+        window.onload = callPay;
         </script>
 EOF;
 
