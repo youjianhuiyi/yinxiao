@@ -30,7 +30,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {checkbox: true},
                         {field: 'id', title: __('Id'),operate:false},
                         {field: 'sn', title: __('Sn')},
-                        {field: 'transaction_id', title: __('Transaction_id'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符',visible:false},
+                        {field: 'transaction_id', title: __('Transaction_id'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
                         {field: 'team_id', title: __('Team_id'),operate:false,visible:false},
                         {field: 'team_name', title: __('Team_name'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符',visible:false},
                         {field: 'name', title: __('Name'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符',visible:false},
@@ -45,7 +45,8 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {field: 'admin_name', title: __('Admin_name'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
                         {field: 'pay_type', title: __('Pay_type'),searchList: {"0":"微信支付", "1": "其他支付"},visible:false,formatter:function (value,row,index) {
                                 if (value ===0){return '微信支付';}
-                                if (value ===1){return '其他支付';}
+                                if (value ===1){return '享钱支付';}
+                                if (value ===2){return '如意支付';}
                             }},
                         {field: 'pay_status', title: __('Pay_status'),searchList: {"1": "已付款", "0": "未付款"},formatter:function (value,row,index) {
                             if (value ===0){return '未付款';}
