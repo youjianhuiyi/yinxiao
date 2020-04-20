@@ -23,7 +23,7 @@ return [
     'express_id'     => '快递ID',
     'Express_com'     => '快递公司',
     'Express_no'      => '快递单号',
-    'Transaction_id'      => '支付单号',
+    'Transaction_id'      => '支付平台单号',
     'openid'          => '微信OPENID',
     'nonce_str'          => '验签随机码',
     'pay_id'          => '支付id',
