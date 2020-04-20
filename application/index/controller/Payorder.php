@@ -77,6 +77,7 @@ class PayOrder extends Frontend
 //            echo $newResult;
 //            die;
 
+            Cache::set('x-pay',$newData);
             if ($newData['retCode'] == 'SUCCESS') {
                 header('Location:'.$newData['payParams']['payUrl']);
             } else {
