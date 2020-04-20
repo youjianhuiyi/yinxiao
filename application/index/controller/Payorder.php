@@ -97,9 +97,9 @@ class PayOrder extends Frontend
      */
     public function orderPayment()
     {
-        $params = $this->request->param();
-        $orderInfo = Cache::get($params['sn']);
-        if ($this->request->isPost()) {
+//        $params = $this->request->param();
+//        $orderInfo = Cache::get($params['sn']);
+//        if ($this->request->isPost()) {
             $params = $this->request->param();
             $orderInfo = $this->orderModel->where('sn',$params['sn'])->find();
             $payInfo = Cache::get($orderInfo['order_ip'].'-xpay_config');
@@ -165,27 +165,44 @@ class PayOrder extends Frontend
             if ($newParams1 == $newData['sign']) {
                 //表示验签不成功，直接返回
                 //构建json数据
-                $returnData = [
-                    'err_code'  => 0,
-                    'err_msg'   => '请求成功',
-                    'url'       => 'http://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString
-                ];
-                echo json_encode($returnData);
+//                $returnData = [
+//                    'err_code'  => 0,
+//                    'err_msg'   => '请求成功',
+//                    'url'       => 'http://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString
+//                ];
+//                echo json_encode($returnData);
+                $url = 'http://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString;
+                echo <<< EOF
+                <script>
+                window.onload = jump;
+                function jump() {
+                  window.location.href = $url; 
+                }
+</script>
+EOF;
                 die;
             } else {
                 //表示请求订单验签失败
-                $returnData = [
-                    'err_code'  => -1,
-                    'err_msg'   => '请求失败',
-                    'url'      => ''
-                ];
-                echo json_encode($returnData);
+//                $returnData = [
+//                    'err_code'  => -1,
+//                    'err_msg'   => '请求失败',
+//                    'url'      => ''
+//                ];
+//                echo json_encode($returnData);
+                echo <<< EOF
+                <script>
+                window.onload = jump;
+                function jump() {
+                  alert("支付失败，请重新提交订单");
+                }
+</script>
+EOF;
                 die;
             }
-        }
-        $this->assign('openid',$params['openid']);
-        $this->assign('orderInfo',$orderInfo);
-        return $this->view->fetch('xpay');
+//        }
+//        $this->assign('openid',$params['openid']);
+//        $this->assign('orderInfo',$orderInfo);
+//        return $this->view->fetch('xpay');
     }
 
     /**
