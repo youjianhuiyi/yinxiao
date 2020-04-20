@@ -212,7 +212,7 @@ EOF;
         function jsApiCall() {
             WeixinJSBridge.invoke(
                 'getBrandWCPayRequest',
-                "{$jsApiData}",
+                $jsApiData,
                 function(res) {
                     if (res.err_msg === "get_brand_wcpay_request:ok") {
                         window.location.href = "/index.php/index/order/orderquery.html"
