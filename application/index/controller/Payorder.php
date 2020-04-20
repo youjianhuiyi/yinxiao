@@ -105,10 +105,6 @@ class PayOrder extends Frontend
             $payInfo = Cache::get($orderInfo['order_ip'].'-xpay_config');
             //由于下单逻辑和支付逻辑有冲突，这里需要生一个临时订单号，用于支付使用。与当前订单不一样，但需要建议绑定关系。
             if (!Cache::has('x-'.$params['sn'])) {
-//                $tmpOrderNo = mt_rand(11111,99999).time();
-                //设置临时订单号与自己订单之间的关系
-//                Cache::set($tmpOrderNo,$params['sn']);
-
                 $url = time().'.'.Cache::get('luck_domain');
                 $data = [
                     'ticket'    => time(),/*用来匹配请求*/
@@ -172,15 +168,8 @@ class PayOrder extends Frontend
 //                ];
 //                echo json_encode($returnData);
                 $url = 'http://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString;
-                echo <<< EOF
-                <script>
-                window.onload = jump;
-                function jump() {
-                  window.location.href = $url; 
-                }
-</script>
-EOF;
-                die;
+                header('Location:'.$url);
+//                die;
             } else {
                 //表示请求订单验签失败
 //                $returnData = [
@@ -191,10 +180,7 @@ EOF;
 //                echo json_encode($returnData);
                 echo <<< EOF
                 <script>
-                window.onload = jump;
-                function jump() {
                   alert("支付失败，请重新提交订单");
-                }
 </script>
 EOF;
                 die;
