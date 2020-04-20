@@ -34,10 +34,10 @@ class PayOrder extends Frontend
      */
     public function rypayOrder()
     {
-        $params = $this->request->param();
-        $orderInfo = Cache::get($params['sn']);
-
-        if ($this->request->isPost()) {
+//        $params = $this->request->param();
+//        $orderInfo = Cache::get($params['sn']);
+//
+//        if ($this->request->isPost()) {
             $params = $this->request->param();
             $orderInfo = Cache::get($params['sn']);
             $payInfo = Cache::get($orderInfo['order_ip'].'-rypay_config');
@@ -71,26 +71,24 @@ class PayOrder extends Frontend
             //构建页面展示需要的数据
             $newData = json_decode($result,true);
             //处理返回值验签
-            $newSign = $this->RyPaySignParams($newData,$payInfo['mch_key']);
-            Cache::set('newSign',$newSign);
-            Cache::set('ry_return',$result);
-            Cache::set('pay_info',$payInfo['mch_key']);
-            Cache::set('oldsign',$newData['sign']);
-//            if ($newSign == $newData['sign']) {
-                //表示验签成功
-                $newResult = json_encode($newData);
-                echo $newResult;
-//            } else {
-//                验签失败
-//                $newResult = json_encode(['retCode'=>'fail','retMsg'=>'数据错误，请重新支付']);
-//                echo $newResult;
-//            }
+//            $newSign = $this->RyPaySignParams($newData,$payInfo['mch_key']);
+            //表示验签成功
+//            $newResult = json_encode($newData);
+//            echo $newResult;
+//            die;
+
+            if ($newData['retCode'] == 'SUCCESS') {
+                header('Location:'.$newData['payParams']['payUrl']);
+            } else {
+                echo "alert('支付异常，请重新下单')";
+                die;
+            }
+
             die;
-
-        }
-
-        $this->assign('orderInfo',$orderInfo);
-        return $this->view->fetch('rypay');
+//        }
+//
+//        $this->assign('orderInfo',$orderInfo);
+//        return $this->view->fetch('rypay');
     }
 
     /**
