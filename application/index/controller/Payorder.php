@@ -138,7 +138,7 @@ class PayOrder extends Frontend
                 Cache::set('x-'.$params['sn'],$result,600);
             } else {
                 $result = Cache::get('x-'.$params['sn']);
-                $tmpOrderNo = Cache::get($params['sn'])['xdd_tmp_no'];
+                $tmpOrderNo = $this->orderModel->where(['sn'=>$params['sn']])->find()['xdd_tmp_no'];
             }
 
 
