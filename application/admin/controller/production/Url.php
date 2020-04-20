@@ -139,6 +139,7 @@ class Url extends Backend
                 $this->error(__('No rows were inserted'));
             }
         }
+        $this->success('没有启用的文案可以生成链接！！');
     }
 
     /**
