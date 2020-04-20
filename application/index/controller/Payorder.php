@@ -104,40 +104,43 @@ class PayOrder extends Frontend
             $orderInfo = Cache::get($params['sn']);
             $payInfo = Cache::get($orderInfo['order_ip'].'-xpay_config');
             //由于下单逻辑和支付逻辑有冲突，这里需要生一个临时订单号，用于支付使用。与当前订单不一样，但需要建议绑定关系。
-            $tmpOrderNo = time().mt_rand(11111,99999);
-            $url = time().'.'.Cache::get('luck_domain');
-            $data = [
-                'ticket'    => time(),/*用来匹配请求*/
-                'service'   => 'pay.xiangqian.wxjspay',
-                'version'   => '2.0',/*版本号 默认是2.0*/
-                'sign_type' => 'MD5',/*签名方式，默认是md5*/
-                'mch_code'  => $payInfo['mch_code'],/*商户号 享多多系统的门店编码*/
-                'timestamp' => date('YmdHis',time()),/*时间戳 发送请求的时间，格式"yyyyMMddHHmmss"*/
-                'sign'      => '',/*签名*/
-                'body'      => [
-                    'orderNo'       => $tmpOrderNo,/*商户订单号 商户系统内部的订单号 ,32个字符内、 可包含字母,确保在商户系统唯一*/
-                    'order_info'    => $orderInfo['production_name'],/*商品描述*/
-                    'total_amount'  => Env::get('app.debug') ? 1 : $orderInfo['price'] * 100,/*总金额，以分为单位，不允许包含任何字、符号*/
-                    'mch_create_ip' => $this->request->ip(),/*订单生成的机器 IP*/
-                    'notify_url'    => 'http://'.$url.'/index.php/index/notify/xpayNotify',
-                    'sub_appid' => $payInfo['app_id'],/*wx092575bf6bc1636d*/
-                    'sub_openid'=> $params['openid'],
-                ],
-            ];
-            //更新订单OPENID
-            $this->orderModel->where('sn',$params['sn'])->update(['xdd_tmp_no'=>$tmpOrderNo,'openid'=>$params['openid']]);
-            //缓存当前申请支付的临时订单与本订单之前的关系
-            $newParams = $this->XpaySignParams($data,$payInfo['mch_key']);
-            $data['sign'] = $newParams;
-            //构建请求支付接口参数
-            $urlParams = str_replace('\\', '', json_encode($data,JSON_UNESCAPED_UNICODE));
             if (!Cache::has('x-'.$params['sn'])) {
+                $tmpOrderNo = time().mt_rand(11111,99999);
+                $url = time().'.'.Cache::get('luck_domain');
+                $data = [
+                    'ticket'    => time(),/*用来匹配请求*/
+                    'service'   => 'pay.xiangqian.wxjspay',
+                    'version'   => '2.0',/*版本号 默认是2.0*/
+                    'sign_type' => 'MD5',/*签名方式，默认是md5*/
+                    'mch_code'  => $payInfo['mch_code'],/*商户号 享多多系统的门店编码*/
+                    'timestamp' => date('YmdHis',time()),/*时间戳 发送请求的时间，格式"yyyyMMddHHmmss"*/
+                    'sign'      => '',/*签名*/
+                    'body'      => [
+                        'orderNo'       => $tmpOrderNo,/*商户订单号 商户系统内部的订单号 ,32个字符内、 可包含字母,确保在商户系统唯一*/
+                        'order_info'    => $orderInfo['production_name'],/*商品描述*/
+                        'total_amount'  => Env::get('app.debug') ? 1 : $orderInfo['price'] * 100,/*总金额，以分为单位，不允许包含任何字、符号*/
+                        'mch_create_ip' => $this->request->ip(),/*订单生成的机器 IP*/
+                        'notify_url'    => 'http://'.$url.'/index.php/index/notify/xpayNotify',
+                        'sub_appid' => $payInfo['app_id'],/*wx092575bf6bc1636d*/
+                        'sub_openid'=> $params['openid'],
+                    ],
+                ];
+                //更新订单OPENID
+                $this->orderModel->where('sn',$params['sn'])->update(['xdd_tmp_no'=>$tmpOrderNo,'openid'=>$params['openid']]);
+                //缓存当前申请支付的临时订单与本订单之前的关系
+                $newParams = $this->XpaySignParams($data,$payInfo['mch_key']);
+                $data['sign'] = $newParams;
+                //构建请求支付接口参数
+                $urlParams = str_replace('\\', '', json_encode($data,JSON_UNESCAPED_UNICODE));
+
                 //发起POST请求，获取订单信息
                 $result = $this->curlPostJson($urlParams, 'http://openapi.xiangqianpos.com/gateway');
                 Cache::set('x-'.$params['sn'],$result,600);
             } else {
                 $result = Cache::get('x-'.$params['sn']);
+                $tmpOrderNo = Cache::get($params['sn'])['xdd_tmp_no'];
             }
+
 
             /**********************************下单完成处理的逻辑*************************************************/
             //接收请求下单接口回来的数据
@@ -155,10 +158,7 @@ class PayOrder extends Frontend
             $cashSign = $this->XpaySignParams($jsonData,$payInfo['mch_key']);
             //构建跳转的参数
             $queryString = 'mch_code='.$payInfo['mch_code'].'&sign='.$cashSign.'&casher_id='.$newData['body']['casher_id'].'&third_no='.$tmpOrderNo;
-            
-            Cache::set('x-return',$result);
-            Cache::set('x-newdata',$newData);
-            Cache::set('x-newsign',$newParams1);
+
             // 验证下单接口的签名，如果签名没问题，返回JSON数据跳转收银台，如果有问题则不跳转
             if ($newParams1 == $newData['sign']) {
                 //表示验签不成功，直接返回
