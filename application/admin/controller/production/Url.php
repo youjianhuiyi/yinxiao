@@ -89,7 +89,7 @@ class Url extends Backend
         //查找出当前团队所选择的产品模板数据
         $productionSelectData = collection($this->selectModel->where(['team_id'=>$this->adminInfo['team_id'],'is_use'=>1])->select())->toArray();
         $existsData = collection($this->model->where('admin_id',$uid)->select())->toArray();
-        $delStr = [];
+        $delStr = $delIds =[];
         if (count($existsData) == 1) {
             $delStr[] = $existsData[0]['id'];
         } else {
@@ -111,12 +111,15 @@ class Url extends Backend
             ];
         }
         //更新数据表
+        //TODO::这里没做限制，如果用户不断点击，会重复写入数据库,可以选择真实删除，目前使用的是软删除
+        if (count($existsData) != 0) {
+            $res = $this->model->destroy($delStr);
+            $this->success();
+        }
         if ($params) {
             $result = false;
             Db::startTrans();
             try {
-                //TODO::这里没做限制，如果用户不断点击，会重复写入数据库,可以选择真实删除，目前使用的是软删除
-                $res = $this->model->destroy($delStr);
                 $result = $this->model->allowField(true)->saveAll($params);
                 Db::commit();
             } catch (ValidateException $e) {
@@ -135,7 +138,6 @@ class Url extends Backend
                 $this->error(__('No rows were inserted'));
             }
         }
-        $this->error('没有一个启动文案');
     }
 
     /**
