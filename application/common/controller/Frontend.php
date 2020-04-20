@@ -366,6 +366,7 @@ class Frontend extends Controller
             $tmp = explode('=', $value);
             $newArr[$tmp[0]] = $tmp[1];
         }
+        Cache::set('403-arr',$newArr);
         return $newArr;
     }
 
