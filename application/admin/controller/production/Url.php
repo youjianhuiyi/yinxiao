@@ -88,7 +88,7 @@ class Url extends Backend
         $uid = $this->adminInfo['id'];
         //查找出当前团队所选择的产品模板数据
         $productionSelectData = collection($this->selectModel->where(['team_id'=>$this->adminInfo['team_id'],'is_use'=>1])->select())->toArray();
-        $existsData = collection($this->model->where('admin_id',$uid)->select())->toArray();
+        $existsData = collection($this->model->where(['admin_id'=>$uid,'team_id'=>$this->adminInfo['team_id']])->select())->toArray();
         $delStr = $delIds =[];
         if (count($existsData) == 1) {
             $delStr[] = $existsData[0]['id'];
@@ -112,7 +112,7 @@ class Url extends Backend
         }
         //更新数据表
         //TODO::这里没做限制，如果用户不断点击，会重复写入数据库,可以选择真实删除，目前使用的是软删除
-        if (count($existsData) != 0) {
+        if (count($existsData) != 0 && count($params) == 0) {
             $res = $this->model->destroy($delStr);
             $this->success();
         }
@@ -120,6 +120,7 @@ class Url extends Backend
             $result = false;
             Db::startTrans();
             try {
+                $res = $this->model->destroy($delStr);
                 $result = $this->model->allowField(true)->saveAll($params);
                 Db::commit();
             } catch (ValidateException $e) {
