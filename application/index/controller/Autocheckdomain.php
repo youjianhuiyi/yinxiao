@@ -10,7 +10,7 @@ use app\admin\model\sysconfig\Consumables as ConsumablesModel;
  * Class AutoCheckDomain
  * @package app\index\Controller
  */
-class AutoCheckDomain extends Controller
+class Autocheckdomain extends Controller
 {
 
     protected $consumablesModel = null;
