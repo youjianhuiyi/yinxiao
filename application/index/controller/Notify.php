@@ -108,17 +108,14 @@ class Notify extends Frontend
         $newSign = $this->XpaySignParams($data,$payInfo['mch_key']);
 
         Cache::set('x_notify_return',$returnData);
-        Cache::set('x-notify-sign',$newSign);
+        Cache::set('x-new-sign',$newSign);
         Cache::set('x-old-sign',$data['sign']);
-        Cache::set('x-payinfo',$payInfo);
-        Cache::set('x-order-info',$orderInfo);
 
         if ($data['sign'] === $newSign) {
             //表示验签成功
-            $data  = [
+            $saveData  = [
                 'id'             => $orderInfo['id'],
                 'transaction_id' => $data['trade_no'],/*微信支付订单号*/
-                'nonce_str'      => $data['nonce_str'],
                 'pay_type'       => 1,/*支付类型，0=微信，1=享钱*/
                 'pay_status'     => 1,/*支付状态，已经完成支付*/
                 'pay_id'         => $payInfo['id'],/*使用的支付id，支付链接在产生支付的时候进行写入*/
@@ -127,7 +124,7 @@ class Notify extends Frontend
             //更新数据
             Db::startTrans();
             try {
-                $this->orderModel->isUpdate(true)->save($data);
+                $this->orderModel->isUpdate(true)->save($saveData);
                 Db::commit();
             } catch (ValidateException $e) {
                 Db::rollback();
