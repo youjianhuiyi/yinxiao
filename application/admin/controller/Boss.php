@@ -61,7 +61,6 @@ class Boss extends Backend
      */
     public function login()
     {
-
         //登录前置方法
         $paramSn = $this->request->param();
         $url = $this->request->get('url', 'index/index');

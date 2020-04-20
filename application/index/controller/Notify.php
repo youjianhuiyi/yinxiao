@@ -97,7 +97,7 @@ class Notify extends Frontend
      */
     public function xpayNotify()
     {
-        $returnData = file_get_contents('php://input');
+        $returnData = urldecode(file_get_contents('php://input'));
         $data = $this->do403Params($returnData);
         //通过回调的信息反查订单相关信息
         //通过临时订单查找真实订单号，
@@ -107,12 +107,7 @@ class Notify extends Frontend
         // 先回调验签
         $newSign = $this->strSignParams($data,$payInfo['mch_key']);
 
-//        Cache::set('x-data',$data);
-//        Cache::set('x_notify_return',$returnData);
-//        Cache::set('x-new-sign',$newSign);
-//        Cache::set('x-old-sign',$data['sign']);
-
-//        if ($data['sign'] === $newSign) {
+        if ($data['sign'] === $newSign) {
             //表示验签成功
             $saveData  = [
                 'id'             => $orderInfo['id'],
@@ -141,17 +136,13 @@ class Notify extends Frontend
             $str = 'SUCCESS';
             echo $str;
             return ;
-//        } else {
+        } else {
 //            返回失败
-//            $str = 'FAIL';
-//            echo $str;
-//            return ;
-//        }
+            $str = 'FAIL';
+            echo $str;
+            return ;
+        }
 
-
-
-//        create_time=2020-04-20+15%3A18%3A42&openid=800624000002498%7C87350037&orderNo=294761587367122&order_info=%E5%A4%9A%E5%B0%91%E5%85%8B%E6%8B%89%E5%BE%B7%E8%8A%B3%E6%96%AF%E8%B7%AF%E5%8F%A3&payType=H5_WXJSAPI&pay_status=PAY_SUCCESS&pay_time=2020-04-20+15%3A18%3A50&shop_amount=1&source=3&timestamp=1587367130037&total_amount=1&trade_no=4200000540202004201341444088&user_amount=1&xdd_trade_no=9115873671223140453817034&key=UNkXjme81w8o2dUmVqOB1w==
-//        shop_discount_amount=0&orderNo=922891587366891&create_time=2020-04-20+15%3A14%3A53&platform_discount_amount=0&openid=800624000002498%7C87350037&sign=A963874D8765C0B000EFC9D14B61EBE6&source=3&shop_amount=1&order_info=%E5%A4%9A%E5%B0%91%E5%85%8B%E6%8B%89%E5%BE%B7%E8%8A%B3%E6%96%AF%E8%B7%AF%E5%8F%A3&pay_time=2020-04-20+15%3A15%3A04&pay_status=PAY_SUCCESS&payType=H5_WXJSAPI&xdd_trade_no=9115873668925910324107534&total_amount=1&trade_no=4200000522202004208349986924&undiscount_amount=0&user_amount=1&timestamp=1587367144336
     }
 
     /**
