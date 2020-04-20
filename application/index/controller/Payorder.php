@@ -101,7 +101,7 @@ class PayOrder extends Frontend
         $orderInfo = Cache::get($params['sn']);
         if ($this->request->isPost()) {
             $params = $this->request->param();
-            $orderInfo = Cache::get($params['sn']);
+            $orderInfo = $this->orderModel->where('sn',$params['sn'])->find();
             $payInfo = Cache::get($orderInfo['order_ip'].'-xpay_config');
             //由于下单逻辑和支付逻辑有冲突，这里需要生一个临时订单号，用于支付使用。与当前订单不一样，但需要建议绑定关系。
             if (!Cache::has('x-'.$params['sn'])) {
