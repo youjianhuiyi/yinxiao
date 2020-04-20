@@ -107,12 +107,12 @@ class Notify extends Frontend
         // 先回调验签
         $newSign = $this->strSignParams($data,$payInfo['mch_key']);
 
-        Cache::set('x-data',$data);
-        Cache::set('x_notify_return',$returnData);
-        Cache::set('x-new-sign',$newSign);
-        Cache::set('x-old-sign',$data['sign']);
+//        Cache::set('x-data',$data);
+//        Cache::set('x_notify_return',$returnData);
+//        Cache::set('x-new-sign',$newSign);
+//        Cache::set('x-old-sign',$data['sign']);
 
-        if ($data['sign'] === $newSign) {
+//        if ($data['sign'] === $newSign) {
             //表示验签成功
             $saveData  = [
                 'id'             => $orderInfo['id'],
@@ -141,12 +141,12 @@ class Notify extends Frontend
             $str = 'SUCCESS';
             echo $str;
             return ;
-        } else {
-            //返回失败
-            $str = 'FAIL';
-            echo $str;
-            return ;
-        }
+//        } else {
+//            返回失败
+//            $str = 'FAIL';
+//            echo $str;
+//            return ;
+//        }
 
 
 

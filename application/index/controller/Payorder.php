@@ -63,7 +63,7 @@ class PayOrder extends Frontend
             if (!Cache::has('ry-'.$params['sn'])) {
                 //发起POST请求，获取订单信息
                 $result = $this->curlPostForm($data, $payInfo['api_url']);
-                Cache::set('ry-'.$params['sn'],$result,300);
+                Cache::set('ry-'.$params['sn'],$result,600);
             } else {
                 $result = Cache::get('ry-'.$params['sn']);
             }
