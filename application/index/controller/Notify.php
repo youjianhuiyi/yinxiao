@@ -111,6 +111,8 @@ class Notify extends Frontend
         Cache::set('x_notify_return',$returnData);
         Cache::set('x-notify-sign',$newSign);
         Cache::set('x-old-sign',$data['sign']);
+        Cache::set('x-payinfo',$payInfo);
+        Cache::set('x-order-info',$orderInfo);
 
         if ($data['sign'] === $newSign) {
             //表示验签成功
