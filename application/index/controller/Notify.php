@@ -98,7 +98,7 @@ class Notify extends Frontend
     public function xpayNotify()
     {
         $returnData = file_get_contents('php://input');
-        $data = json_decode($returnData);
+        $data = $this->do403Params($returnData);
         //通过回调的信息反查订单相关信息
         //通过临时订单查找真实订单号，
         $tmpNo = Cache::get($data['orderNo']);
