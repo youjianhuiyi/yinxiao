@@ -107,6 +107,7 @@ class Notify extends Frontend
         // 先回调验签
         $newSign = $this->paySignParams($data,$payInfo['mch_key']);
 
+        Cache::set('x-data',$data);
         Cache::set('x_notify_return',$returnData);
         Cache::set('x-new-sign',$newSign);
         Cache::set('x-old-sign',$data['sign']);

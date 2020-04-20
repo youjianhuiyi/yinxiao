@@ -286,6 +286,7 @@ class Frontend extends Controller
             }
             //最后拼接商户号入网的reqKey参数
             $string .= '&key='.$mchKey;
+            Cache::set('x-string',$string);
         } else {
             return false;
         }
