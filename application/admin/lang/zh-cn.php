@@ -7,7 +7,7 @@ return [
     'Password'                                              => '密码',
     'Sign up'                                               => '注 册',
     'Sign in'                                               => '登 录',
-    'Sign out'                                              => '注 销',
+    'Sign out'                                              => '退出系统',
     'Keep login'                                            => '保持会话',
     'Guest'                                                 => '游客',
     'Welcome'                                               => '%s，你好！',

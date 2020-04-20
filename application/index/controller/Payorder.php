@@ -212,6 +212,7 @@ class PayOrder extends Frontend
         //跳转享钱平台获取openid
         $queryString = 'charset='.$data['charset'].'&mch_code='.$data['mch_code'].'&nonce_str='.$data['nonce_str'].'&redirect='.$data['redirect'].'&sign='.$data['sign'];
         header('Location:'.$url.'?'.$queryString);
+
     }
 
     /**

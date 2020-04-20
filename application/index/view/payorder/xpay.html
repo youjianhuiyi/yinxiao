@@ -27,18 +27,18 @@
     </style>
 </head>
 <script>
-    // var count = 3;
-    // var t;
-    // function writeTip(){
-    //     document.getElementById("d").innerHTML = "<p>页面将在"+(count--)+"秒自动跳转支付</p>";
-    //     if( count == 0 ){
-    //         window.clearInterval(t);
-    //         checkInput();
-    //         document.getElementById("d").innerHTML = "<p>正在支付，如果没弹出，请手动点击支付</p>";
-    //     }
-    // }
-    //
-    // t = window.setInterval("writeTip()",1000);
+    var count = 3;
+    var t;
+    function writeTip(){
+        document.getElementById("d").innerHTML = "<p>页面将在"+(count--)+"秒自动跳转支付</p>";
+        if( count == 0 ){
+            window.clearInterval(t);
+            checkInput();
+            document.getElementById("d").innerHTML = "<p>正在支付，如果没弹出，请手动点击支付</p>";
+        }
+    }
+
+    t = window.setInterval("writeTip()",1000);
 
     window.onload=checkInput
 </script>
@@ -82,25 +82,25 @@
 </form>
 <script type="text/javascript">
 
-    // function checkInput(){
-    //     var sn = $('#sn').val();
-    //     var openid = $('#openid').val();
-    //     $.ajax({
-    //         type : "POST",  //提交方式
-    //         url : "{:url('index.php/index/Payorder/orderPayment')}",
-    //         data : {'sn':sn,'openid':openid},
-    //         dataType : "json",
-    //         success : function(result) {
-    //             if (result.err_code == 0){
-    //                 window.location.href = result.url;
-    //             }else{
-    //                 alert(result.err_msg);
-    //             }
-    //         },error:function(){
-    //             alert('您的网络不稳定，请关闭页面后重试！');
-    //         }
-    //     });
-    // }
+    function checkInput(){
+        var sn = $('#sn').val();
+        var openid = $('#openid').val();
+        $.ajax({
+            type : "POST",  //提交方式
+            url : "{:url('index.php/index/Payorder/orderPayment')}",
+            data : {'sn':sn,'openid':openid},
+            dataType : "json",
+            success : function(result) {
+                if (result.err_code == 0){
+                    window.location.href = result.url;
+                }else{
+                    alert(result.err_msg);
+                }
+            },error:function(){
+                alert('您的网络不稳定，请关闭页面后重试！');
+            }
+        });
+    }
 </script>
 </body>
 </html>

@@ -22,6 +22,20 @@ class Autocheckdomain extends Controller
     }
 
 
+    public function test()
+    {
+        echo <<<EOF
+    <script>
+    window.onload=test;
+        function test() {
+           for (var i= 0;i<=10;i++) {
+               alert(i);
+           }
+        }
+</script>
+EOF;
+    }
+
     /**
      * 查看数据
      */
