@@ -80,7 +80,7 @@ class PayOrder extends Frontend
             if ($newData['retCode'] == 'SUCCESS') {
                 header('Location:'.$newData['payParams']['payUrl']);
             } else {
-                echo "alert('支付异常，请重新下单')";
+                echo "<script>alert('支付异常，请重新下单')</script>";
                 die;
             }
 
