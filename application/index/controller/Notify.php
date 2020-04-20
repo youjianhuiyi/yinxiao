@@ -98,11 +98,10 @@ class Notify extends Frontend
     public function xpayNotify()
     {
         $returnData = file_get_contents('php://input');
-        $orderNo = $this->do403Params($returnData);
-        $data = $this->doParams($returnData);
+        $data = $this->do403Params($returnData);
         //通过回调的信息反查订单相关信息
         //通过临时订单查找真实订单号，
-        $orderInfo = $this->orderModel->where('xdd_tmp_no',$orderNo['orderNo'])->find();
+        $orderInfo = $this->orderModel->where('xdd_tmp_no',$data['orderNo'])->find();
         //根据订单数据提取支付信息
         $payInfo = Cache::get($orderInfo['order_ip'].'-xpay_config');
         // 先回调验签

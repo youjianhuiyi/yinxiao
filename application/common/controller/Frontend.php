@@ -388,7 +388,11 @@ class Frontend extends Controller
         $newArr = [];
         foreach ($arr as $value) {
             $tmp = explode('=', $value);
-            $newArr[$tmp[0]] = $tmp[1];
+            if (isset($tmp[1])) {
+                $newArr[$tmp[0]] = $tmp[1];
+            } else {
+                $newArr[$tmp[0]] = '';
+            }
         }
         return $newArr;
     }
