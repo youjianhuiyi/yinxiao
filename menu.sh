@@ -25,3 +25,4 @@ php think menu -c sysconfig/wxdomain
 php think menu -c sysconfig/xpay
 php think menu -c sysconfig/rypay
 php think menu -c sysconfig/payset
+php think menu -c data/visit
