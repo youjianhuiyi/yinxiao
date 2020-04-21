@@ -41,7 +41,28 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form','editable'], function 
                             }},
                         {field: 'createtime', title: __('Createtime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
                         {field: 'updatetime', title: __('Updatetime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime,visible: false},
-                        {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate, formatter: Table.api.formatter.operate}
+                        {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate,
+                            formatter: Table.api.formatter.operate,
+                            buttons:[
+                                {
+                                    name: '支付通道测试',
+                                    title: '支付通道测试',
+                                    classname: 'btn btn-xs btn-success btn-magic btn-ajax',
+                                    icon: 'fa fa-paper-plane',
+                                    confirm: '确认发送本条支付通道测试吗？',
+                                    url: 'sysconfig/xpay/testPay',
+                                    success: function (data, ret) {
+                                        Layer.alert(ret.msg + ",返回数据：" + JSON.stringify(data));
+                                    },
+                                    error: function (data, ret) {
+                                        console.log(data, ret);
+                                        Layer.alert(ret.msg);
+                                        return false;
+                                    }
+                                }
+                            ]
+
+                        }
                     ]
                 ]
             });

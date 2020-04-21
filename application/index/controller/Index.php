@@ -260,10 +260,11 @@ class Index extends Frontend
         //查询当前团队使用的是哪种支付方式,通过渲染方式不同，落地方法不一样，流程不一样。
         //根据推广链接403入口，来决定是走哪种支付方式，不同的支付方式，需要不同地流程与渲染，落地，成交，支付
         $payPool = collection($this->paysetModel->where(['team_id'=>$condition['tid'],'status'=>1])->select())->toArray();
-//        Cache::set('pay_pool',$payPool);
+        //TODO::需要加入轮询操作。暂时没启作用。轮询开与不开都一样是轮询的结果
+        Cache::set('403-paypool',$payPool,120);
         //根据查询出来的数据，生成支付通道。
         $payInfo = $this->getPayChannel($payPool);
-        Cache::set('pay_info',$payInfo);
+        Cache::set('403-payinfo',$payInfo);
         if (false === $payInfo) {
             //表示没有支付
             die("支付通道无效，请联系老板！！！");
@@ -289,12 +290,15 @@ class Index extends Frontend
                 $luckDomain = Cache::get('luck_domain');
             }
 
+            //更新支付使用情况，只要生成一次落地就使用一次支付
+            $this->paysetModel->where(['team_id'=>$condition['tid'],'pay_id'=>$payInfo['id']])->setInc("count");
+
             //根据不同的支付类型，跳转不同的支付方法与落地页面
             $wholeDomain = 'http://'.time().'.'.$luckDomain.'/index.php/index/index/index'.$payInfo['type'].'?'.$queryStr;
             echo "handler('successcode','{$wholeDomain}')";
             die;
         } else {
-            //表示验证失败
+            //表示验证失败，目前暂时没做。后台响应
             echo "handler('failure','http://www.qq.com')";
             die;
         }

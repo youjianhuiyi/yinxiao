@@ -561,4 +561,96 @@ class Backend extends Controller
         }
         return implode('.',$data);
     }
+
+    /**
+     * xpay签名算法
+     * @param $params   array   接口文档里面相关的参数
+     * @param $MchKey  string  商户密钥
+     * @return array|bool   加密成功返回签名值与原参数数组列表
+     */
+    protected function XpaySignParams($params,$MchKey)
+    {
+        //按字典序排序数组的键名
+        unset($params['sign']);/*剔除sign字段不进行签名算法*/
+        ksort($params);
+        $string = '';
+        if (isset($params['body'])) {
+            ksort($params['body']);
+            $params['body'] = str_replace("\\/", "/", json_encode($params['body'],JSON_UNESCAPED_UNICODE));
+        }
+        foreach ($params as $key => $value) {
+            $string .= '&'.$key.'='.$value;
+        }
+        //最后拼接商户号入网的reqKey参数
+        $string .= '&key='.$MchKey;
+        $ownSign = strtoupper(md5(ltrim($string,'&')));/*执行加密算法*/
+        $params['sign'] = $ownSign;/*将签名赋值给数组*/
+        return $ownSign;
+    }
+
+    /**
+     * CURL_POST普通请求
+     * @param $str  string  json字符串
+     * @param $url  string  请求的url地址
+     * @param $second  int  请求最长时间
+     * @return bool|string
+     */
+    protected function curlPostForm($str, $url, $second = 30)
+    {
+
+        $ch = curl_init();
+        //设置超时
+        curl_setopt($ch, CURLOPT_TIMEOUT, $second);
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        //设置 header
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        //要求结果为字符串且输出到屏幕上
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        //post 提交方式
+        curl_setopt($ch, CURLOPT_POST, TRUE);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $str);
+        //运行 curl
+        $data = curl_exec($ch);
+        //返回结果
+        if ($data) {
+            curl_close($ch);
+            return $data;
+        } else {
+            $error = curl_errno($ch);
+            curl_close($ch);
+            echo "curl 出错，错误码:$error" . "<br>";
+            return false;
+        }
+    }
+
+    /**
+     * CURL_POST json请求
+     * @param $str  string  json字符串
+     * @param $url  string  请求的url地址
+     * @param $second  int  请求最长时间
+     * @return bool|string
+     */
+    public static function curlPostJson($str, $url, $second = 30)
+    {
+
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $str);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json','Content-Length: ' . strlen($str)));
+        $data = curl_exec($ch);
+        //返回结果
+        if ($data) {
+            curl_close($ch);
+            return $data;
+        } else {
+            $error = curl_errno($ch);
+            curl_close($ch);
+            echo "curl 出错，错误码:$error" . "<br>";
+            return false;
+        }
+    }
+
 }
