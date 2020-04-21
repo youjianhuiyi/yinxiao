@@ -26,12 +26,19 @@ class Order extends Backend
         $this->model = new \app\admin\model\order\Order;
         $this->adminModel = new AdminModel();
         $pid = $this->adminInfo['pid'];
+        $level = $this->adminInfo['level'];
+
         if ($pid == 0) {
             //表示是老板级别，可以查看所有信息
             $this->assignconfig('show_column',true);
-        } else {
+            $this->assignconfig('admin_level',0);
+        } elseif ($pid != 0 ) {
             //表示没权限，列表显示多少看多少
             $this->assignconfig('show_column',false);
+            $this->assignconfig('admin_level',1);
+        } else {
+            $this->assignconfig('show_column',false);
+            $this->assignconfig('admin_level',2);
         }
 
     }
