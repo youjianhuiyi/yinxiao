@@ -263,7 +263,7 @@ class Index extends Frontend
 //        Cache::set('pay_pool',$payPool);
         //根据查询出来的数据，生成支付通道。
         $payInfo = $this->getPayChannel($payPool);
-//        Cache::set('pay_info',$payInfo);
+        Cache::set('pay_info',$payInfo);
         if (false === $payInfo) {
             //表示没有支付
             die("支付通道无效，请联系老板！！！");
@@ -315,6 +315,7 @@ class Index extends Frontend
             } else {
                 //表示有多个支付通道，进行随机抽取。
                 $res =  $data[mt_rand(0,count($data)-1)];
+                Cache::set('pay_mt_rand',$res,120);
                 return $this->getPayInfo($res['type'],$res['pay_id']);
             }
         } else {
