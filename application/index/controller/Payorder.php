@@ -247,14 +247,6 @@ EOF;
 
         echo $jsApi;
         die;
-
-
-//            $this->assign('jsApiPrepay', json_encode($data['jsapi']));
-//            $this->assign('orderInfo', $data['order_info']);
-//            return $this->view->fetch('wechatpay');
-//        } else {
-//            //表示非法请求
-//            die('你请求的支付地址有错误，请重新下单支付');
         }
 
     }

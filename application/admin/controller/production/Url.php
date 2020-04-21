@@ -88,16 +88,10 @@ class Url extends Backend
         $uid = $this->adminInfo['id'];
         //查找出当前团队所选择的产品模板数据
         $productionSelectData = collection($this->selectModel->where(['team_id'=>$this->adminInfo['team_id'],'is_use'=>1])->select())->toArray();
-        $existsData = collection($this->model->where(['admin_id'=>$uid,'team_id'=>$this->adminInfo['team_id']])->select())->toArray();
-        $delStr = $delIds =[];
-        if (count($existsData) == 1) {
-            $delStr[] = $existsData[0]['id'];
-        } else {
-            foreach ($existsData as $value) {
-                $delIds[] = $value['id'];
-            }
-            $delStr = implode(',',$delIds);
-        }
+        $field = ['production_id','production_name','team_id','team_name','admin_id','admin_name'];
+        $existsData = collection($this->model->field($field)->where(['admin_id'=>$uid,'team_id'=>$this->adminInfo['team_id']])->select())->toArray();
+
+        //老数据里面如果存在已经选择的文案，则不进行更新操作。因为里面有对应的访问数据与下单数据
 
         $params = [];
         foreach ($productionSelectData as $value) {
@@ -110,17 +104,26 @@ class Url extends Backend
                 'admin_name'        =>  $this->adminInfo['nickname']
             ];
         }
-        //更新数据表
-        //TODO::这里没做限制，如果用户不断点击，会重复写入数据库,可以选择真实删除，目前使用的是软删除
-        if (count($existsData) != 0 && count($params) == 0) {
-            $res = $this->model->destroy($delStr);
-            $this->success();
+
+        //对比新老数据
+        foreach ($params as $key => $value) {
+            if (in_array($value,$existsData)) {
+                //表示新文案在原有数据里面已存在
+                unset($params[$key]);
+            }
         }
+        //更新数据表
+        //不能删除现有数据，因为里面有访问数据以及成单数据
+        //TODO::这里没做限制，如果用户不断点击，会重复写入数据库,可以选择真实删除，目前使用的是软删除
+//        if (count($existsData) != 0 && count($params) == 0) {
+//            $res = $this->model->destroy($delStr);
+//            $this->success();
+//        }
         if ($params) {
             $result = false;
             Db::startTrans();
             try {
-                $res = $this->model->destroy($delStr);
+//                $res = $this->model->destroy($delStr);
                 $result = $this->model->allowField(true)->saveAll($params);
                 Db::commit();
             } catch (ValidateException $e) {
@@ -154,6 +157,16 @@ class Url extends Backend
         $urlData = $this->model->get($ids);
         //获取主表商品相关数据
         $productionData = $this->productionModel->get($urlData['production_id']);
+        //获取方案选择表，获取 状态，如果有状态。则可以获取成功，如果是禁用状态。则不能生成链接
+        $selectData = $this->selectModel->where(['production_id'=>$urlData['production_id'],'team_id'=>$this->adminInfo['team_id']])->find();
+        if ($selectData['is_use'] == 0) {
+            //表示没有启动模板，不能获取推广链接
+            $urlData['app-debug'] = false;
+            $urlData['is_use'] = false;
+            $urlData['production_url'] = '';
+            $this->assign('data',$urlData);
+            return $this->view->fetch();
+        }
         //加密算法
         $str = 'aid='.$this->adminInfo['id'].'&gid='.$urlData['production_id'].'&tid='.$this->adminInfo['team_id'].'&tp='.$productionData['module_name'];
         $checkCode = md5($str);
@@ -236,7 +249,6 @@ class Url extends Backend
             $urlData['production_url'] = $groundUrl;
             Cache::set('ground_url_'.$this->adminInfo['id'],$groundUrl);
         }
-//        $urlData['app-debug'] = Env::get('app.debug');
         $urlData['app-debug'] = false;
         $this->assign('data',$urlData);
         return $this->view->fetch();

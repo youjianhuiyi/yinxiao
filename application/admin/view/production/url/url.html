@@ -28,7 +28,11 @@
     <div class="mall">
         <div class="login-url-new">
             <dl>
+                {if $data['is_use']}
                 <dt><img src="" alt="" id='qrcodeimg' /></dt>
+                {else}
+                <h2>此文案已经停用，不能进行推广</h2>
+                {/if}
                 <dd>
                     <li>商品推广链接</li>
                     <p>(长按保存图片用手机浏览器扫码进入)</p>
