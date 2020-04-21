@@ -71,28 +71,30 @@ class Admin extends Backend
             $newTeamData[$this->adminInfo['team_id']] = $teamData[$this->adminInfo['team_id']];
         }
         //团队关系
-        $data = collection(\app\admin\model\Admin::field(['id','pid','nickname'])->where('team_id',$this->adminInfo['team_id'])->order('id desc')->select())->toArray();
-        $tree = Tree::instance();
-        $tree->init($data,'pid');
-        $teamList = $tree->getTreeList($tree->getTreeArray(0), 'nickname');
-//        if ($this->adminInfo['id'] != 1) {
-//            $adminData = \app\admin\model\Admin::where('level','in',[0,1,2])
-//                ->where(['team_id'=>$this->adminInfo['team_id']])
-//                ->column('nickname','id');
-//            $adminData[0] = '添加账号属于谁的下级，就选择谁，没有下级就选择本项';
-//        } elseif($this->adminInfo['pid'] == 0) {
-//            $adminData = \app\admin\model\Admin::where('level','in',[0,1,2])->column('nickname','id');
-//            $adminData[0] = '添加账号属于谁的下级，就选择谁，没有下级就选择本项';
-//        } else {
-//            $adminData = \app\admin\model\Admin::where('level', 'in', [1, 2])->column('nickname', 'id');
-//            $adminData[0] = '添加账号属于谁的下级，就选择谁，没有下级就选择本项';
-//        }
-
-        $adminData = [];
-        foreach ($teamList as $k => $v) {
-            $adminData[$v['id']] = $v['nickname'];
+        if ($this->adminInfo['id'] == 1) {
+            //表示当前为平台管理员
+            $data = collection(\app\admin\model\Admin::field(['id','pid','nickname'])->order('id desc')->select())->toArray();
+        } elseif ($this->adminInfo['pid'] == 0 && $this->adminInfo['id'] !=1) {
+            //表示当前用户为老板用户，只能查看到自己团队下的所有用户
+            $data = collection(\app\admin\model\Admin::field(['id','pid','nickname'])->where('team_id',$this->adminInfo['team_id'])->order('id desc')->select())->toArray();
+        } else {
+            //表示是团队下组长级的权限
+            $data = [
+                $this->adminInfo['id']=>$this->adminInfo['nickname'],
+            ];
         }
-//        ksort($adminData);
+        if ($this->adminInfo['pid'] == 0 || $this->adminInfo['id'] == 1) {
+            $tree = Tree::instance();
+            $tree->init($data,'pid');
+            $teamList = $tree->getTreeList($tree->getTreeArray(0), 'nickname');
+            $adminData = [];
+            foreach ($teamList as $k => $v) {
+                $adminData[$v['id']] = $v['nickname'];
+            }
+        } else {
+            $adminData = $data;
+        }
+
         $this->view->assign('adminData',$adminData);
         $this->view->assign('groupdata', $groupdata);
         $this->view->assign('teamData', $newTeamData);
@@ -141,7 +143,8 @@ class Admin extends Backend
                     ->order($sort, $order)
                     ->limit($offset, $limit)
                     ->select();
-            } else {
+            } elseif ($this->adminInfo['pid'] == 0) {
+                //表示是老板查看
                 $total = $this->model
                     ->where($where)
                     ->where('id', 'in', $this->childrenAdminIds)
@@ -153,6 +156,40 @@ class Admin extends Backend
                     ->where($where)
                     ->where('id', 'in', $this->childrenAdminIds)
                     ->where(['team_id'=>$this->adminInfo['team_id']])
+                    ->field(['password', 'salt', 'token'], true)
+                    ->order($sort, $order)
+                    ->limit($offset, $limit)
+                    ->select();
+            } elseif ($this->adminInfo['pid'] != 0) {
+                //表示是组长查看
+                $total = $this->model
+                    ->where($where)
+                    ->where('id', 'in', $this->childrenAdminIds)
+                    ->where(['team_id'=>$this->adminInfo['team_id']])
+                    ->where('pid',$this->adminInfo['id'])
+                    ->order($sort, $order)
+                    ->count();
+
+                $list = $this->model
+                    ->where($where)
+                    ->where('id', 'in', $this->childrenAdminIds)
+                    ->where(['team_id'=>$this->adminInfo['team_id']])
+                    ->where('pid',$this->adminInfo['id'])
+                    ->field(['password', 'salt', 'token'], true)
+                    ->order($sort, $order)
+                    ->limit($offset, $limit)
+                    ->select();
+            } else {
+                //表示是其他权限查看
+                $total = $this->model
+                    ->where($where)
+                    ->where(['id'=>$this->adminInfo['id']])
+                    ->order($sort, $order)
+                    ->count();
+
+                $list = $this->model
+                    ->where($where)
+                    ->where(['id'=>$this->adminInfo['id']])
                     ->field(['password', 'salt', 'token'], true)
                     ->order($sort, $order)
                     ->limit($offset, $limit)

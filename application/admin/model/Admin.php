@@ -14,6 +14,24 @@ class Admin extends Model
     protected $createTime = 'createtime';
     protected $updateTime = 'updatetime';
 
+    protected $append = [
+        'pid_text'
+    ];
+
+
+    public function getPidText()
+    {
+        return  $this->column('nickname','id');
+    }
+
+    public function getPidTextAttr($value, $data)
+    {
+        $value = $value ? $value : (isset($data['pid']) ? $data['pid'] : '');
+        $list = $this->getPidText();
+        return isset($list[$value]) ? $list[$value] : '';
+    }
+
+
     /**
      * 重置用户密码
      * @author baiyouwen
