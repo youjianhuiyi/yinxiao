@@ -71,20 +71,28 @@ class Admin extends Backend
             $newTeamData[$this->adminInfo['team_id']] = $teamData[$this->adminInfo['team_id']];
         }
         //团队关系
-        if ($this->adminInfo['id'] != 1) {
-            $adminData = \app\admin\model\Admin::where('level','in',[0,1,2])
-                ->where(['team_id'=>$this->adminInfo['team_id']])
-                ->column('nickname','id');
-            $adminData[0] = '添加账号属于谁的下级，就选择谁，没有下级就选择本项';
-        } elseif($this->adminInfo['pid'] == 0) {
-            $adminData = \app\admin\model\Admin::where('level','in',[0,1,2])->column('nickname','id');
-            $adminData[0] = '添加账号属于谁的下级，就选择谁，没有下级就选择本项';
-        } else {
-            $adminData = \app\admin\model\Admin::where('level', 'in', [1, 2])->column('nickname', 'id');
-            $adminData[0] = '添加账号属于谁的下级，就选择谁，没有下级就选择本项';
-        }
+        $data = collection(\app\admin\model\Admin::field(['id','pid','nickname'])->where('team_id',$this->adminInfo['team_id'])->order('id desc')->select())->toArray();
+        $tree = Tree::instance();
+        $tree->init($data,'pid');
+        $teamList = $tree->getTreeList($tree->getTreeArray(0), 'nickname');
+//        if ($this->adminInfo['id'] != 1) {
+//            $adminData = \app\admin\model\Admin::where('level','in',[0,1,2])
+//                ->where(['team_id'=>$this->adminInfo['team_id']])
+//                ->column('nickname','id');
+//            $adminData[0] = '添加账号属于谁的下级，就选择谁，没有下级就选择本项';
+//        } elseif($this->adminInfo['pid'] == 0) {
+//            $adminData = \app\admin\model\Admin::where('level','in',[0,1,2])->column('nickname','id');
+//            $adminData[0] = '添加账号属于谁的下级，就选择谁，没有下级就选择本项';
+//        } else {
+//            $adminData = \app\admin\model\Admin::where('level', 'in', [1, 2])->column('nickname', 'id');
+//            $adminData[0] = '添加账号属于谁的下级，就选择谁，没有下级就选择本项';
+//        }
 
-        ksort($adminData);
+        $adminData = [];
+        foreach ($teamList as $k => $v) {
+            $adminData[$v['id']] = $v['nickname'];
+        }
+//        ksort($adminData);
         $this->view->assign('adminData',$adminData);
         $this->view->assign('groupdata', $groupdata);
         $this->view->assign('teamData', $newTeamData);
@@ -169,79 +177,68 @@ class Admin extends Backend
      */
     public function add()
     {
-//        if ($this->adminInfo['pid'] == 0) {
-            if ($this->request->isPost()) {
-                $this->token();
-                $params = $this->request->post("row/a");
-                if ($params) {
-                    if (!Validate::is($params['password'], '\S{6,16}')) {
-                        $this->error(__("Please input correct password"));
-                    }
-                    $params['salt'] = Random::alnum();
-                    $params['password'] = md5(md5($params['password']) . $params['salt']);
-                    $params['avatar'] = '/assets/img/avatar.png'; //设置新管理员默认头像。
-                    if ($params['team_id'] == 0) {
-                        //表示需要自动创建团队
-                        $data = [
-                            'id'    => null,
-                            'name'  => $params['nickname'].'团队',
-                            'admin_id'  => 0,/*需要增加完用户后再补*/
-                            'admin_username' => $params['nickname'],
-//                            'phone'     =>  $params['phone'],
-                            'team_productions'  => ''
-                        ];
-                        $hasName = $this->teamModel->where(['name'=>$params['nickname'].'团队'])->find();
-                        if (!$hasName) {
-                            $this->teamModel->isUpdate(false)->save($data);
-                            $newTeamId = $this->teamModel->id;
-                            $params['team_id'] = $newTeamId;
-                        } else {
-                            $params['team_id'] = $hasName['id'];
-                        }
-                        $params['team_name'] = $params['nickname'].'团队';
-                    } else {
-                        $teamName = $this->teamModel->where('id',$params['team_id'])->find()['name'];
-                        $params['team_name'] = $teamName ?:'未知团队';
-                    }
-
-                    //设置团队关系级别,如果没有设置，则添加的所有账号都是我的下级
-                    $params['pid'] = $params['pid'] == 0 && isset($newTeamId) ?  $params['pid'] : $this->adminInfo['id'] ;
-
-                    //老板默认级别为0，组长级别为1，业务员级别为2
-                    if (isset($newTeamId)) {
-                        $level = 0;
-                    } else {
-                        $level = \app\admin\model\Admin::where('id',$params['pid'])->value('level')+1;
-                    }
-
-                    $params['level'] = $level;
-                    $result = $this->model->validate('Admin.add')->save($params);
-                    if ($result === false) {
-                        $this->error($this->model->getError());
-                    }
-                    $group = $this->request->post("group/a");
-
-                    //过滤不允许的组别,避免越权
-                    $group = array_intersect($this->childrenGroupIds, $group);
-                    $dataset = [];
-                    foreach ($group as $value) {
-                        $dataset[] = ['uid' => $this->model->id, 'group_id' => $value];
-                    }
-                    model('AuthGroupAccess')->saveAll($dataset);
-                    //更新团队admin_id字段
-                    if (isset($newTeamId)) {
-                        //表示是新增的团队
-                        $this->teamModel->isUpdate(true)->save(['admin_id'=>$this->model->id,'id'=>$newTeamId]);
-                    }
-                    $this->success();
+        if ($this->request->isPost()) {
+            $this->token();
+            $params = $this->request->post("row/a");
+            if ($params) {
+                if (!Validate::is($params['password'], '\S{6,16}')) {
+                    $this->error(__("Please input correct password"));
                 }
-                $this->error();
-            }
-            return $this->view->fetch();
-//        } else {
-//            $this->error('你不能添加账号');
-//        }
+                $params['salt'] = Random::alnum();
+                $params['password'] = md5(md5($params['password']) . $params['salt']);
+                $params['avatar'] = '/assets/img/avatar.png'; //设置新管理员默认头像。
+                if ($params['team_id'] == 0) {
+                    //表示需要自动创建团队
+                    $data = [
+                        'id'    => null,
+                        'name'  => $params['nickname'].'团队',
+                        'admin_id'  => 0,/*需要增加完用户后再补*/
+                        'admin_username' => $params['nickname'],
+                        'team_productions'  => ''
+                    ];
+                    $hasName = $this->teamModel->where(['name'=>$params['nickname'].'团队'])->find();
+                    if (!$hasName) {
+                        $this->teamModel->isUpdate(false)->save($data);
+                        $newTeamId = $this->teamModel->id;
+                        $params['team_id'] = $newTeamId;
+                    } else {
+                        $params['team_id'] = $hasName['id'];
+                    }
+                    $params['team_name'] = $params['nickname'].'团队';
+                } else {
+                    $teamName = $this->teamModel->where('id',$params['team_id'])->find()['name'];
+                    $params['team_name'] = $teamName ?:'未知团队';
+                }
 
+                if ($params['pid']  == 0) {
+                    $level = 0;
+                } else {
+                    $level = \app\admin\model\Admin::where('id',$params['pid'])->value('level')+1;
+                }
+                $params['level'] = $level;
+                $result = $this->model->validate('Admin.add')->save($params);
+                if ($result === false) {
+                    $this->error($this->model->getError());
+                }
+                $group = $this->request->post("group/a");
+
+                //过滤不允许的组别,避免越权
+                $group = array_intersect($this->childrenGroupIds, $group);
+                $dataset = [];
+                foreach ($group as $value) {
+                    $dataset[] = ['uid' => $this->model->id, 'group_id' => $value];
+                }
+                model('AuthGroupAccess')->saveAll($dataset);
+                //更新团队admin_id字段
+                if (isset($newTeamId)) {
+                    //表示是新增的团队
+                    $this->teamModel->isUpdate(true)->save(['admin_id'=>$this->model->id,'id'=>$newTeamId]);
+                }
+                $this->success();
+            }
+            $this->error();
+        }
+        return $this->view->fetch();
     }
 
     /**
