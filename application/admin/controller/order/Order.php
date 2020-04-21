@@ -133,7 +133,6 @@ class Order extends Backend
         return $this->error('暂时不支持后台添加订单~');
     }
 
-
     /**
      * 订单详情
      * @param null $ids
@@ -148,4 +147,5 @@ class Order extends Backend
         $this->view->assign("row", $row->toArray());
         return $this->view->fetch();
     }
+
 }

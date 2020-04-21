@@ -25,6 +25,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                 search:false,
                 showColumns: show_column,
                 showExport:show_column,
+                exportTypes:["excel"],
                 columns: [
                     [
                         {checkbox: true},
