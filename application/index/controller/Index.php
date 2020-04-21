@@ -9,6 +9,7 @@ use app\admin\model\production\Url as UrlModel;
 use app\admin\model\sysconfig\Consumables as ConsumablesModel;
 use app\admin\model\sysconfig\Ground as GroundModel;
 use app\admin\model\sysconfig\Payset as PaySetModel;
+use app\admin\model\data\Visit as VisitModel;
 
 /**
  * 模板渲染
@@ -23,6 +24,7 @@ class Index extends Frontend
     protected $groundModel = null;
     protected $consumablesModel = null;
     protected $paysetModel = null;
+    protected $visitModel = null;
 
     public function _initialize()
     {
@@ -32,12 +34,16 @@ class Index extends Frontend
         $this->groundModel = new GroundModel();
         $this->consumablesModel = new ConsumablesModel();
         $this->paysetModel = new PaySetModel();
+        $this->visitModel = new VisitModel();
     }
 
 
-    public function index()
+    /**
+     * 类单元测试方法
+     */
+    public function test()
     {
-        
+
     }
 
     /**
@@ -100,10 +106,28 @@ class Index extends Frontend
 
         //缓存组装好的数据，进行跳转403,组装好中间域名。
         Cache::set('index_'.$params['check_code'],$data);/*缓存好数据。用于后面调用数据*/
-        //更新访问记录。
-        $this->urlModel->where(['check_code'=>$params['check_code']])->setInc('count');
 
         $this->assign('data',$data);
+        //更新链接访问次数
+        $url = $this->request->url(true);
+        $visitIp = $userIp.'-'.$url;
+        //设置当前链接缓存
+        $urlData = [
+            'admin_id'  => $params['aid'],
+            'url'       => $visitIp,
+            'team_id'   => $params['tid'],
+            'production_id'     => $params['gid'],
+            'check_code'        => $params['check_code'],
+            'count'             => 1
+        ];
+        //如果今天已经存在访问链接 ，就不在记录
+        if (!Cache::has($visitIp)) {
+            Cache::set($visitIp,$visitIp,$this->getDiscountTime());
+            $this->urlModel->where(['admin_id'=>$params['aid'],'check_code'=>$params['check_code']])->setInc('count');
+            $this->visitModel->save($urlData);
+        }else {
+            $this->visitModel->where('url',$visitIp)->setInc('count');
+        }
         return $this->view->fetch($params['tp']);
     }
 
@@ -164,12 +188,29 @@ class Index extends Frontend
 
         //缓存组装好的数据，进行跳转403,组装好中间域名。
         Cache::set('index_'.$params['check_code'],$data);/*缓存好数据。用于后面调用数据*/
-        //更新访问记录。
-        $this->urlModel->where(['check_code'=>$params['check_code']])->setInc('count');
         $this->assign('data',$data);
+        //更新链接访问次数
+        $url = $this->request->url(true);
+        $visitIp = $userIp.'-'.$url;
+        //设置当前链接缓存
+        $urlData = [
+            'admin_id'  => $params['aid'],
+            'url'       => $visitIp,
+            'team_id'   => $params['tid'],
+            'production_id'     => $params['gid'],
+            'check_code'        => $params['check_code'],
+            'count'             => 1
+        ];
+        //如果今天已经存在访问链接 ，就不在记录
+        if (!Cache::has($visitIp)) {
+            Cache::set($visitIp,$visitIp,$this->getDiscountTime());
+            $this->urlModel->where(['admin_id'=>$params['aid'],'check_code'=>$params['check_code']])->setInc('count');
+            $this->visitModel->save($urlData);
+        } else {
+            $this->visitModel->where('url',$visitIp)->setInc('count');
+        }
         return $this->view->fetch($params['tp']);
     }
-
 
     /**
      * rypay落地页面
@@ -228,13 +269,29 @@ class Index extends Frontend
 
         //缓存组装好的数据，进行跳转403,组装好中间域名。
         Cache::set('index_'.$params['check_code'],$data);/*缓存好数据。用于后面调用数据*/
-        //更新访问记录。
-        $this->urlModel->where(['check_code'=>$params['check_code']])->setInc('count');
         $this->assign('data',$data);
+        //更新链接访问次数
+        $url = $this->request->url(true);
+        $visitIp = $userIp.'-'.$url;
+        //设置当前链接缓存
+        $urlData = [
+            'admin_id'  => $params['aid'],
+            'url'       => $visitIp,
+            'team_id'   => $params['tid'],
+            'production_id'     => $params['gid'],
+            'check_code'        => $params['check_code'],
+            'count'             => 1
+        ];
+        //如果今天已经存在访问链接 ，就不在记录
+        if (!Cache::has($visitIp)) {
+            Cache::set($visitIp,$visitIp,$this->getDiscountTime());
+            $this->urlModel->where(['admin_id'=>$params['aid'],'check_code'=>$params['check_code']])->setInc('count');
+            $this->visitModel->save($urlData);
+        } else {
+            $this->visitModel->where('url',$visitIp)->setInc('count');
+        }
         return $this->view->fetch($params['tp']);
     }
-
-
 
     /**
      * 最终落地页面,403请求接口

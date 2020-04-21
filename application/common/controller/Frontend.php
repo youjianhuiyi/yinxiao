@@ -478,4 +478,15 @@ class Frontend extends Controller
             return false;
         }
     }
+
+    /**
+     * 获取当前离当天24点还剩下多少秒
+     */
+    public function getDiscountTime()
+    {
+        $ytime = strtotime(date("Y-m-d",strtotime("-1 day")));//昨天开始时间戳
+        $yetime = $ytime+24 * 60 * 60;//昨天结束时间戳
+        $totime = $yetime+24 * 60 * 60-1;//昨天结束时间戳
+        return $totime - time();
+    }
 }
