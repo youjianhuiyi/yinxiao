@@ -7,6 +7,7 @@ use think\Cache;
 use think\Db;
 use think\exception\PDOException;
 use think\exception\ValidateException;
+use app\admin\model\production\Url as UrlModel;
 
 /**
  * 回调处理类
@@ -16,12 +17,22 @@ use think\exception\ValidateException;
 class Notify extends Frontend
 {
     protected $orderModel = null;
+    protected $urlModel = null;
 
     public function _initialize()
     {
         parent::_initialize();
         $this->orderModel = new OrderModel();
+        $this->urlModel = new UrlModel();
 
+    }
+
+    /**
+     * 类的测试方法
+     */
+    public function test()
+    {
+//        $this->urlModel->where('admin_id',31)->setInc('order_done');
     }
 
     /**
@@ -67,6 +78,8 @@ class Notify extends Frontend
             Db::startTrans();
             try {
                 (new OrderModel())->isUpdate(true)->save($data);
+                //增加订单完成数量
+                $this->urlModel->where('admin_id',$orderInfo['admin_id'])->setInc('order_done');
                 Db::commit();
             } catch (ValidateException $e) {
                 Db::rollback();
@@ -122,6 +135,8 @@ class Notify extends Frontend
             Db::startTrans();
             try {
                 $this->orderModel->isUpdate(true)->save($saveData);
+                //增加订单完成次数
+                $this->urlModel->where('admin_id',$orderInfo['admin_id'])->setInc('order_done');
                 Db::commit();
             } catch (ValidateException $e) {
                 Db::rollback();
@@ -180,6 +195,8 @@ class Notify extends Frontend
             Db::startTrans();
             try {
                 $this->orderModel->isUpdate(true)->save($data);
+                //增加订单下单完成次数
+                $this->urlModel->where('admin_id',$orderInfo['admin_id'])->setInc('order_done');
                 Db::commit();
             } catch (ValidateException $e) {
                 Db::rollback();
