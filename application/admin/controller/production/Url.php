@@ -250,6 +250,7 @@ class Url extends Backend
             Cache::set('ground_url_'.$this->adminInfo['id'],$groundUrl);
         }
         $urlData['app-debug'] = false;
+        $urlData['is_use'] = true;
         $this->assign('data',$urlData);
         return $this->view->fetch();
     }

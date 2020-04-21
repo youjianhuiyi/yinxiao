@@ -2,8 +2,8 @@
 
 namespace app\admin\controller\order;
 
-use app\admin\model\Admin;
 use app\common\controller\Backend;
+use app\admin\model\Admin as AdminModel;
 
 /**
  * 订单管理
@@ -18,11 +18,13 @@ class Order extends Backend
      * @var \app\admin\model\order\Order
      */
     protected $model = null;
+    protected $adminModel = null;
 
     public function _initialize()
     {
         parent::_initialize();
         $this->model = new \app\admin\model\order\Order;
+        $this->adminModel = new AdminModel();
         $pid = $this->adminInfo['pid'];
         if ($pid == 0) {
             //表示是老板级别，可以查看所有信息
@@ -51,6 +53,14 @@ class Order extends Backend
             //admin_id = 0 查看全站
             //假如admin_id = 3 是老板号 4是经理号，5是业务员号，
             //3可以查看所有 3为团队的订单。即以团队id=1.
+            //表示是组长级别账号。可以查看到自己及自己员工下所有订单
+            $id = $this->adminInfo['id'];
+            $allIds = collection($this->adminModel->field('id')->where('pid',$id)->select())->toArray();
+            $newArr = [];
+            foreach ($allIds as $value) {
+                $newArr[] = $value['id'];
+            }
+            array_push($newArr,$id);
             if ($this->adminInfo['id'] == 1) {
                 //表示当前用户为总平台管理层
                 $total = $this->model
@@ -77,15 +87,7 @@ class Order extends Backend
                     ->order($sort, $order)
                     ->limit($offset, $limit)
                     ->select();
-            } elseif ($this->adminInfo['pid'] != 0) {
-                //表示是组长级别账号。可以查看到自己及自己员工下所有订单
-                $id = $this->adminInfo['id'];
-                $allIds = collection(Admin::where('pid',$id)->select())->toArray();
-                $newArr = [];
-                foreach ($allIds as $value) {
-                    $newArr[] = $value['id'];
-                }
-                array_push($newArr,$id);
+            } elseif ($this->adminInfo['pid'] != 0 && count($newArr) > 1) {
                 $total = $this->model
                     ->where($where)
                     ->where('admin_id','in',$newArr)
