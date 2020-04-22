@@ -334,7 +334,7 @@ class Express extends Backend
                 $value['order_id'] = $this->orderModel->where(['sn'=>$value['order_sn']])->find()['id'] ? : 0;
             }
             $this->model->saveAll($insert);
-            Cache::set('import',json_encode($insert));
+            $this->setExpressToOrder($insert);
         } catch (PDOException $exception) {
             $msg = $exception->getMessage();
             if (preg_match("/.+Integrity constraint violation: 1062 Duplicate entry '(.+)' for key '(.+)'/is", $msg, $matches)) {
@@ -350,8 +350,27 @@ class Express extends Backend
 
 
     /**
+     * 联动写入
+     * @param $data
+     */
+    private function setExpressToOrder($data)
+    {
+        $newArr = [];
+        foreach ($data as $value) {
+            $newArr[]= [
+                'id'            =>  $value['order_id'],
+                'express_no'    =>  $value['express_no'],
+                'express_com'   =>  $value['express_com']
+            ];
+        }
+
+        $this->orderModel->isUpdate(true)->saveAll($newArr);
+    }
+    
+    
+
+    /**
      * 下载导入模板
-     *
      */
     public function template()
     {

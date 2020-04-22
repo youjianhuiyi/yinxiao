@@ -236,7 +236,6 @@ class Xpay extends Backend
         //发起POST请求，获取订单信息
         $result = $this->curlPostJson($urlParams, 'http://openapi.xiangqianpos.com/gateway');
         return $result;
-//            {"ticket":"1587476678","status":"0","message":"成功","result_code":"0","mch_code":"621140010001","timestamp":"1587476679386","err_code":"0","err_msg":"成功","body":{"casher_id":"9115874766787830625818334"},"sign":"1EC51E4B904659CA9F98D8A1847125B4"}
     }
 
 }
