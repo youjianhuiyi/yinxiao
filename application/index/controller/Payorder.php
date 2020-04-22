@@ -159,7 +159,7 @@ class PayOrder extends Frontend
         if ($newParams1 == $newData['sign']) {
             //表示验签不成功，直接返回
             //构建json数据
-            $url = 'http://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString;
+            $url = 'https://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString;
             header('Location:'.$url);
         } else {
             //表示请求订单验签失败
