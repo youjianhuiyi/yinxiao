@@ -157,7 +157,9 @@
                 <div class="row  table-responsive" style="margin-top:15px;">
                     <table class="table">
                         <tr>
+                            {if $user.id == 1}
                             <th>团队名称</th>
+                            {/if}
                             <th>组长</th>
                             <th>业务员</th>
                             <th>访问量</th>
@@ -166,7 +168,9 @@
                         </tr>
                         {foreach name="userInfoData" item="vo"}
                         <tr>
+                            {if $user.id == 1}
                             <td>{:isset($teamData[$vo.team_id]) ? $teamData[$vo.team_id] : ''}</td>
+                            {/if}
                             <td>{:isset($adminName[$vo.pid]) ? $adminName[$vo.pid] : $adminName[$vo.id]}</td>
                             <td>{$vo.nickname}</td>
                             <td>{$visitData[$vo.id]}</td>

@@ -224,7 +224,8 @@ class Dashboard extends Backend
         $this->assign('visitData',$visitData);/*访问数量*/
         $this->assign('userInfoData',$userInfoData);/*用户数据*/
         $this->assign('teamData',$teamData);/*团队数据*/
-        $this->assign('adminName',$adminName);/*团队数据*/
+        $this->assign('adminName',$adminName);/*业务员ID=>名称数据*/
+        $this->assign('user',$this->adminInfo);/*当前用户信息*/
         return $this->view->fetch();
     }
 
