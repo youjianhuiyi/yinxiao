@@ -10,6 +10,7 @@ use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Reader\Csv;
 use PhpOffice\PhpSpreadsheet\Reader\Xls;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
+use think\Cache;
 use think\Db;
 use think\exception\PDOException;
 use think\exception\ValidateException;
@@ -302,7 +303,7 @@ class Express extends Backend
                     $insert[] = $row;
                 }
             }
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $this->error($exception->getMessage());
         }
         if (!$insert) {
@@ -330,19 +331,22 @@ class Express extends Backend
             foreach ($insert as $key => &$value) {
                 $value['team_id'] = $this->adminInfo['team_id'];
                 $value['team_name'] = $this->adminInfo['team_name'];
-                $value['order_id'] = $this->orderModel->where(['sn'=>$value['order_sn']])->find()->id;
+                $value['express_no'] = (string)$value['express_no'];
+                $value['order_id'] = $this->orderModel->where(['sn'=>$value['order_sn']])->find()['id'] ? : 0;
             }
             $this->model->saveAll($insert);
+            Cache::set('import',json_encode($insert));
         } catch (PDOException $exception) {
             $msg = $exception->getMessage();
             if (preg_match("/.+Integrity constraint violation: 1062 Duplicate entry '(.+)' for key '(.+)'/is", $msg, $matches)) {
                 $msg = "导入失败，包含【{$matches[1]}】的记录已存在";
             };
             $this->error($msg);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->error($e->getMessage());
         }
 
         $this->success();
     }
+
 }

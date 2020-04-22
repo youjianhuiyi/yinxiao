@@ -6,7 +6,7 @@ use app\common\controller\Backend;
 use app\admin\model\order\Order as OrderModel;
 use app\admin\model\team\Team as TeamModel;
 use app\admin\model\data\Visit as VisitModel;
-use app\admin\model\production\url as UrlModel;
+use app\admin\model\production\Url as UrlModel;
 use app\admin\model\Admin as AdminModel;
 use fast\Tree;
 
