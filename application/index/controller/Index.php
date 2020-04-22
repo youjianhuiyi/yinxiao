@@ -306,20 +306,22 @@ class Index extends Frontend
         header('Access-Control-Allow-Headers: Content-Type,Content-Length,Accept-Encoding,X-Requested-with,X_Requested_With,Origin,application/json'); // 设置允许自定义请求头的字段
         //接收403页面来的参数请求
         $params = $this->request->param();
-        //表示验签参数可能有效，接下来进行验证
+        //表示验签参数可能有效，接下来进行验证,先查缓存，缓存不存在则查数据库
         if (Cache::has($params['code'])) {
             $queryStr = Cache::get($params['code']);
         } else {
             $queryStr = $this->urlModel->where(['check_code'=>$params['code']])->find()['query_string'];
         }
         $str = md5(explode('&check_code',$queryStr)[0]);
+        //处理字符串为键值对的数组
         $condition = $this->do403Params($queryStr);
         //查询当前团队使用的是哪种支付方式,通过渲染方式不同，落地方法不一样，流程不一样。
         //根据推广链接403入口，来决定是走哪种支付方式，不同的支付方式，需要不同地流程与渲染，落地，成交，支付
+        //获取开启的域名池，默认开启轮询操作
         $payPool = collection($this->paysetModel->where(['team_id'=>$condition['tid'],'status'=>1])->select())->toArray();
         //TODO::需要加入轮询操作。暂时没启作用。轮询开与不开都一样是轮询的结果
         Cache::set('403-paypool',$payPool,120);
-        //根据查询出来的数据，生成支付通道。
+        //根据查询出来的数据，生成支付通道。获取指定的支付域名。
         $payInfo = $this->getPayChannel($payPool,$params['code']);
         Cache::set('403-payinfo',$payInfo);
         if (false === $payInfo) {
