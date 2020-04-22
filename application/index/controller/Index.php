@@ -320,7 +320,7 @@ class Index extends Frontend
         //TODO::需要加入轮询操作。暂时没启作用。轮询开与不开都一样是轮询的结果
         Cache::set('403-paypool',$payPool,120);
         //根据查询出来的数据，生成支付通道。
-        $payInfo = $this->getPayChannel($payPool);
+        $payInfo = $this->getPayChannel($payPool,$params['code']);
         Cache::set('403-payinfo',$payInfo);
         if (false === $payInfo) {
             //表示没有支付
@@ -365,19 +365,20 @@ class Index extends Frontend
     /**
      * 根据支付池里面的数据，生成支付参数
      * @param $data
+     * @param $checkCode
      * @return bool|array
      */
-    public function getPayChannel($data)
+    public function getPayChannel($data,$checkCode)
     {
         if (!empty($data)) {
             if (count($data) == 1) {
                 //表示只有一个支付通道
-                return $this->getPayInfo($data[0]['type'],$data[0]['pay_id']);
+                return $this->getPayInfo($data[0]['type'],$data[0]['pay_id'],$checkCode);
             } else {
                 //表示有多个支付通道，进行随机抽取。
                 $res =  $data[mt_rand(0,count($data)-1)];
                 Cache::set('pay_mt_rand',$res,120);
-                return $this->getPayInfo($res['type'],$res['pay_id']);
+                return $this->getPayInfo($res['type'],$res['pay_id'],$checkCode);
             }
         } else {
             //表示已经没有支付通道使用了

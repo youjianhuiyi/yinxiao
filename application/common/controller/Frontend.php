@@ -148,17 +148,18 @@ class Frontend extends Controller
      * 获取团队支付信息
      * @param $type integer 支付类型 0=微信原生JSAPI支付，1=享钱支付
      * @param $payId integer 支付通道ID
+     * @param $checkCode   string   推广码
      * @return array|mixed
      */
-    public function getPayInfo($type,$payId)
+    public function getPayInfo($type,$payId,$checkCode)
     {
         $userIp = $this->request->ip();
         if ($type == 0) {
-            return $this->_getPayInfo($userIp.'-pay_config',$payId,$type,'payModel');
+            return $this->_getPayInfo($userIp.'-'.$checkCode.'-pay_config',$payId,$type,'payModel');
         } elseif ($type == 1) {
-            return $this->_getPayInfo($userIp.'-xpay_config',$payId,$type,'xpayModel');
+            return $this->_getPayInfo($userIp.'-'.$checkCode.'-xpay_config',$payId,$type,'xpayModel');
         } elseif ($type == 2) {
-            return $this->_getPayInfo($userIp.'-rypay_config',$payId,$type,'rypayModel');
+            return $this->_getPayInfo($userIp.'-'.$checkCode.'-rypay_config',$payId,$type,'rypayModel');
         } else {
             //TODO::如果所有支付都挂了，可以关闭
             return false;
