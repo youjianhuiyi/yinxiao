@@ -37,6 +37,7 @@ class Dashboard extends Backend
 
     /**
      * 获取当天0点到当天23点59分59秒的时间戳
+     * @internal
      */
     public function getBeginEndTime()
     {
@@ -48,6 +49,7 @@ class Dashboard extends Backend
 
     /**
      * @description:根据数据
+     * @internal
      * @param {dataArr:需要分组的数据；keyStr:分组依据}
      * @return array
      */
@@ -81,7 +83,6 @@ class Dashboard extends Backend
         $teamData = $this->teamModel->column('name','id');
         $adminName = $this->adminModel->column('nickname','id');
         $userIds = $this->getUserLower();
-//        dump($userIds);die;
 
         if ($userInfo['id'] == 1) {
             //表示是平台总管理员，可以查看所有记录
@@ -233,9 +234,7 @@ class Dashboard extends Backend
     /**
      * 获取用户关系。往
      * @return array
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @internal
      */
     public function getUserLower()
     {

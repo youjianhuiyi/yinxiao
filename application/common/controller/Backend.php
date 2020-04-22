@@ -564,6 +564,7 @@ class Backend extends Controller
 
     /**
      * xpay签名算法
+     * @internal
      * @param $params   array   接口文档里面相关的参数
      * @param $MchKey  string  商户密钥
      * @return array|bool   加密成功返回签名值与原参数数组列表
@@ -590,6 +591,7 @@ class Backend extends Controller
 
     /**
      * CURL_POST普通请求
+     * @internal
      * @param $str  string  json字符串
      * @param $url  string  请求的url地址
      * @param $second  int  请求最长时间
@@ -627,6 +629,7 @@ class Backend extends Controller
 
     /**
      * CURL_POST json请求
+     * @internal
      * @param $str  string  json字符串
      * @param $url  string  请求的url地址
      * @param $second  int  请求最长时间

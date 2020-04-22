@@ -4,7 +4,6 @@ namespace app\admin\controller\express;
 
 use app\admin\library\Auth;
 use app\admin\model\order\Order as OrderModel;
-use app\admin\model\production\Production as ProductionModel;
 use app\common\controller\Backend;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Reader\Csv;
@@ -349,4 +348,24 @@ class Express extends Backend
         $this->success();
     }
 
+
+    /**
+     * 下载导入模板
+     *
+     */
+    public function template()
+    {
+        $filename = 'express_import.zip'; //获取文件名称
+        $down_host = $this->request->domain().DS; //当前域名
+        //判断如果文件存在,则跳转到下载路径
+        if(file_exists(ROOT_PATH.'public/'.$filename)){
+            header("Content-type:application/octet-stream");
+            header("Accept-Ranges:bytes");
+            header("Accept-Length:".filesize(ROOT_PATH.'public/'.$filename));
+            header("Content-Disposition: attachment; filename=".$filename);
+            readfile($down_host.$filename);
+        }else{
+            header('HTTP/1.1 404 Not Found');
+        }
+    }
 }
