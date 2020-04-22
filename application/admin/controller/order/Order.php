@@ -26,20 +26,17 @@ class Order extends Backend
         $this->model = new \app\admin\model\order\Order;
         $this->adminModel = new AdminModel();
         $pid = $this->adminInfo['pid'];
-        $level = $this->adminInfo['level'];
 
         if ($pid == 0) {
             //表示是老板级别，可以查看所有信息
-            $this->assignconfig('show_column',true);
             $this->assignconfig('admin_level',0);
         } elseif ($pid != 0 ) {
             //表示没权限，列表显示多少看多少
-            $this->assignconfig('show_column',false);
             $this->assignconfig('admin_level',1);
         } else {
-            $this->assignconfig('show_column',false);
             $this->assignconfig('admin_level',2);
         }
+        $this->assignconfig('show_column',true);
 
     }
 
@@ -61,6 +58,7 @@ class Order extends Backend
             //假如admin_id = 3 是老板号 4是经理号，5是业务员号，
             //3可以查看所有 3为团队的订单。即以团队id=1.
             //表示是组长级别账号。可以查看到自己及自己员工下所有订单
+            //客服组需要单独查看团队所有人员的订单权限
             $id = $this->adminInfo['id'];
             $allIds = collection($this->adminModel->field('id')->where('pid',$id)->select())->toArray();
             $newArr = [];
@@ -139,7 +137,7 @@ class Order extends Backend
      */
     public function add()
     {
-        return $this->error('暂时不支持后台添加订单~');
+        $this->error('暂时不支持后台添加订单~');
     }
 
     /**
