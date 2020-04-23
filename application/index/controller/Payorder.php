@@ -100,7 +100,10 @@ class PayOrder extends Frontend
     {
         $params = $this->request->param();
         $orderInfo = $this->orderModel->where('sn',$params['sn'])->find();
-        $payInfo = Cache::get($orderInfo['order_ip'].'-xpay_config');
+        $xpay = $this->xpayModel
+            ->where(['admin_id'=>$orderInfo['admin_id'],'team_id'=>$orderInfo['team_id'],'production_id'=>$orderInfo['production_id']])
+            ->find()['check_code'];
+        $payInfo = Cache::get($orderInfo['order_ip'].'-'.$xpay.'-xpay_config');
         //由于下单逻辑和支付逻辑有冲突，这里需要生一个临时订单号，用于支付使用。与当前订单不一样，但需要建议绑定关系。
         if (!Cache::has('x-'.$params['sn'])) {
             $url = time().'.'.Cache::get('luck_domain');
@@ -159,7 +162,7 @@ class PayOrder extends Frontend
         if ($newParams1 == $newData['sign']) {
             //表示验签不成功，直接返回
             //构建json数据
-            $url = 'http://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString;
+            $url = 'https://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString;
             header('Location:'.$url);
         } else {
             //表示请求订单验签失败
@@ -180,7 +183,7 @@ EOF;
         //判断访问链接，如果有微信授权链接参数，直接放行到落地页面。如果没有则进行微信授权认证
         $params = $this->request->param();
         $orderInfo = Cache::get($params['sn']);
-        $payInfo = Cache::get($orderInfo['order_ip'].'-xpay_config');
+        $payInfo = Cache::get($orderInfo['order_ip'].'-'.$params['check_code'].'-xpay_config');
         $url = 'http://open.xiangqianpos.com/wxPayOauth/openid';
         $data = [
             'mch_code'  => $payInfo['mch_code'],
