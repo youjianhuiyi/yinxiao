@@ -126,6 +126,7 @@ class Pay extends Backend
     {
         if ($this->request->isPost()) {
             $params = $this->request->post("row/a");
+            $params['status'] = 1;
             $teamName = $this->teamModel->where('id',$params['team_id'])->find()['name'];
             $params['team_name'] = $teamName ? $teamName :'未知团队';
             if ($params) {
@@ -197,6 +198,7 @@ class Pay extends Backend
             }
             if ($params) {
                 $params = $this->preExcludeFields($params);
+                $params['status'] = 1;
                 $result = false;
                 Db::startTrans();
                 try {

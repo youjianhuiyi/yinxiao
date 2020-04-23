@@ -121,7 +121,8 @@ class Payset extends Backend
             ];
         }
         //查找当前有的支付数据，直接全部干掉，使用全新的数据
-        $existsPayData = $this->model->where(['team_id'=>$this->adminInfo['team_id']])->select();
+        $existsPayData = collection($this->model->where(['team_id'=>$this->adminInfo['team_id']])->select())->toArray();
+        dump($existsPayData);die;
         $newParams = [];
         foreach ($existsPayData as $value) {
             $newParams[] .= $value['id'];
