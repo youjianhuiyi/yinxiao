@@ -9,6 +9,7 @@ use WeChat\Oauth;
 use app\admin\model\order\Order as OrderModel;
 use WeChat\Pay;
 use app\admin\model\sysconfig\Xpay as XpayModel;
+use app\admin\model\production\Url as UrlModel;
 
 /**
  * 支付类
@@ -19,12 +20,14 @@ class PayOrder extends Frontend
 {
     protected $orderModel = null;
     protected $xpayModel = null;
+    protected $urlModel = null;
 
     public function _initialize()
     {
         parent::_initialize();
         $this->orderModel = new OrderModel();
         $this->xpayModel = new XpayModel();
+        $this->urlModel = new UrlModel();
     }
 
     /**
@@ -100,7 +103,7 @@ class PayOrder extends Frontend
     {
         $params = $this->request->param();
         $orderInfo = $this->orderModel->where('sn',$params['sn'])->find();
-        $xpay = $this->xpayModel
+        $xpay = $this->urlModel
             ->where(['admin_id'=>$orderInfo['admin_id'],'team_id'=>$orderInfo['team_id'],'production_id'=>$orderInfo['production_id']])
             ->find()['check_code'];
         $payInfo = Cache::get($orderInfo['order_ip'].'-'.$xpay.'-xpay_config');
