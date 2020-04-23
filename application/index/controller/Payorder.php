@@ -37,62 +37,58 @@ class PayOrder extends Frontend
      */
     public function rypayOrder()
     {
-//        $params = $this->request->param();
-//        $orderInfo = Cache::get($params['sn']);
-//
-//        if ($this->request->isPost()) {
-            $params = $this->request->param();
-            $orderInfo = Cache::get($params['sn']);
-            $payInfo = Cache::get($orderInfo['order_ip'].'-rypay_config');
-            $url = time().'.'.Cache::get('luck_domain');
-            $data = [
-                'mchId'         =>  $payInfo['mch_id'],/*分配的商户号*/
-                'appId'         =>  $payInfo['app_id'],/*该商户创建的应用对应的ID*/
-                'productId'     =>  $payInfo['product_id'],/*支付产品ID*/
-                'mchOrderNo'    =>  $params['sn'],/*商户生成的订单号*/
-                'currency'      =>  'cny',/*三位货币代码,人民币:cny*/
-                'amount'        =>  Env::get('app.debug') ? 500 : $orderInfo['price'] * 100,/*支付金额,单位分*/
-                'returnUrl'     =>  'http://'.$url.'/index.php/index/order/orderquery',/*支付结果回调URL*/
-                'notifyUrl'     =>  'http://'.$url.'/index.php/index/notify/rypayNotify',/*支付结果回调URL*/
-                'subject'       =>  $orderInfo['production_name'],/*商品主题*/
-                'body'          =>  $orderInfo['goods_info'],/*商品描述信息*/
-                'extra'         =>  '',/*特定渠道发起时额外参数,见下面说明*/
-                'sign'          =>  '',/*签名值，详见签名算法*/
-            ];
-            //生成签名
-            $newParams = $this->RyPaySignParams($data,$payInfo['mch_key']);
-            $data['sign'] = $newParams;
-            //发起请求之前判断当前是不是已经请求过一次了
-            if (!Cache::has('ry-'.$params['sn'])) {
-                //发起POST请求，获取订单信息
-                $result = $this->curlPostForm($data, $payInfo['api_url']);
-                Cache::set('ry-'.$params['sn'],$result,600);
-            } else {
-                $result = Cache::get('ry-'.$params['sn']);
-            }
-            /*****接收返回数据进行验签与返回处理***/
-            //构建页面展示需要的数据
-            $newData = json_decode($result,true);
-            //处理返回值验签
+        $params = $this->request->param();
+        $orderInfo = Cache::get($params['sn']);
+        $checkCode = $this->urlModel
+            ->where(['admin_id'=>$orderInfo['admin_id'],'team_id'=>$orderInfo['team_id'],'production_id'=>$orderInfo['production_id']])
+            ->find()['check_code'];
+        $payInfo = Cache::get($orderInfo['order_ip'].'-'.$checkCode.'-rypay_config');
+        $url = time().'.'.Cache::get('luck_domain');
+        $data = [
+            'mchId'         =>  $payInfo['mch_id'],/*分配的商户号*/
+            'appId'         =>  $payInfo['app_id'],/*该商户创建的应用对应的ID*/
+            'productId'     =>  $payInfo['product_id'],/*支付产品ID*/
+            'mchOrderNo'    =>  $params['sn'],/*商户生成的订单号*/
+            'currency'      =>  'cny',/*三位货币代码,人民币:cny*/
+            'amount'        =>  Env::get('app.debug') ? 500 : $orderInfo['price'] * 100,/*支付金额,单位分*/
+            'returnUrl'     =>  'http://'.$url.'/index.php/index/order/orderquery',/*支付结果回调URL*/
+            'notifyUrl'     =>  'http://'.$url.'/index.php/index/notify/rypayNotify',/*支付结果回调URL*/
+            'subject'       =>  $orderInfo['production_name'],/*商品主题*/
+            'body'          =>  $orderInfo['goods_info'],/*商品描述信息*/
+            'extra'         =>  '',/*特定渠道发起时额外参数,见下面说明*/
+            'sign'          =>  '',/*签名值，详见签名算法*/
+        ];
+        //生成签名
+        $newParams = $this->RyPaySignParams($data,$payInfo['mch_key']);
+        $data['sign'] = $newParams;
+        //发起请求之前判断当前是不是已经请求过一次了
+        if (!Cache::has('ry-'.$params['sn'])) {
+            //发起POST请求，获取订单信息
+            $result = $this->curlPostForm($data, $payInfo['api_url']);
+            Cache::set('ry-'.$params['sn'],$result,600);
+        } else {
+            $result = Cache::get('ry-'.$params['sn']);
+        }
+        /*****接收返回数据进行验签与返回处理***/
+        //构建页面展示需要的数据
+        $newData = json_decode($result,true);
+        //处理返回值验签
 //            $newSign = $this->RyPaySignParams($newData,$payInfo['mch_key']);
-            //表示验签成功
+        //表示验签成功
 //            $newResult = json_encode($newData);
 //            echo $newResult;
 //            die;
 
-            Cache::set('ry-pay-order',$newData,120);
-            if ($newData['retCode'] == 'SUCCESS') {
-                header('Location:'.$newData['payParams']['payUrl']);
-            } else {
-                echo "<script>alert('支付异常，请重新下单'.{$newData['retMsg']})</script>";
-                die;
-            }
-
+        Cache::set('ry-pay-order',$newData,120);
+        if ($newData['retCode'] == 'SUCCESS') {
+            header('Location:'.$newData['payParams']['payUrl']);
+        } else {
+            echo "<script>alert('支付异常，请重新下单'.{$newData['retMsg']})</script>";
             die;
-//        }
-//
-//        $this->assign('orderInfo',$orderInfo);
-//        return $this->view->fetch('rypay');
+        }
+
+        die;
+
     }
 
     /**
@@ -103,10 +99,10 @@ class PayOrder extends Frontend
     {
         $params = $this->request->param();
         $orderInfo = $this->orderModel->where('sn',$params['sn'])->find();
-        $xpay = $this->urlModel
+        $checkCode = $this->urlModel
             ->where(['admin_id'=>$orderInfo['admin_id'],'team_id'=>$orderInfo['team_id'],'production_id'=>$orderInfo['production_id']])
             ->find()['check_code'];
-        $payInfo = Cache::get($orderInfo['order_ip'].'-'.$xpay.'-xpay_config');
+        $payInfo = Cache::get($orderInfo['order_ip'].'-'.$checkCode.'-xpay_config');
         //由于下单逻辑和支付逻辑有冲突，这里需要生一个临时订单号，用于支付使用。与当前订单不一样，但需要建议绑定关系。
         if (!Cache::has('x-'.$params['sn'])) {
             $url = time().'.'.Cache::get('luck_domain');
@@ -276,15 +272,14 @@ EOF;
             if (Cache::has($paramsNew['code'])) {
                 $wxUserInfo = Cache::get($paramsNew['code']);
             } else {
-                $payInfo = Cache::get($this->request->ip().'-pay_config');
+                $payInfo = Cache::get($this->request->ip().'-'.$paramsNew['check_code'].'-pay_config');
                 $weChatConfig = $this->setConfig($payInfo);
                 // 实例接口
                 $weChat = new Oauth($weChatConfig);
                 // 执行操作
                 $wxUserInfo = $weChat->getOauthAccessToken();
                 //pay_domain_1缓存，记录支付域名，和支付信息一起，记录当前访问用户与固定一个支付域名绑定，30分钟。
-                Cache::set($paramsNew['code'],$wxUserInfo,Env::get('redis.expire'));
-                Session::set('openid',$wxUserInfo['openid']);
+                Cache::set($paramsNew['code'],$wxUserInfo,600);
             }
 
             //准备开始配置支付参数与调用支付
