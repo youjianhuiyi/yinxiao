@@ -120,8 +120,8 @@ class PayOrder extends Frontend
                     'total_amount'  => Env::get('app.debug') ? 1 : $orderInfo['price'] * 100,/*总金额，以分为单位，不允许包含任何字、符号*/
                     'mch_create_ip' => $this->request->ip(),/*订单生成的机器 IP*/
                     'notify_url'    => 'http://'.$url.'/index.php/index/notify/xpayNotify',
-                    'sub_appid'  => $payInfo['app_id'],/*wx092575bf6bc1636d*/
-                    'sub_openid'=> $params['openid'],
+                    'sub_appid'     => $payInfo['app_id'],/*wx092575bf6bc1636d*/
+                    'sub_openid'    => $params['openid'],
                 ],
             ];
             //更新订单OPENID
