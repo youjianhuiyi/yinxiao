@@ -63,6 +63,8 @@ class Index extends Backend
     public function login()
     {
         //登录前置方法
+        Session::delete("admin");
+        Cookie::delete("keeplogin");
         $paramSn = $this->request->param();
         $string = $this->request->query();
         $url1 = $this->request->url();
