@@ -64,9 +64,9 @@ class Boss extends Backend
         //登录前置方法
         $paramSn = $this->request->param();
         $url = $this->request->get('url', 'index/index');
-        if ($this->auth->isLogin()) {
-            $this->success(__("You've logged in, do not login again"), $url);
-        }
+//        if ($this->auth->isLogin()) {
+//            $this->success(__("You've logged in, do not login again"), $url);
+//        }
         if ($this->request->isPost()) {
 
             //记录当前访问参数与用户代理 与IP绑定
