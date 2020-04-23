@@ -13,19 +13,13 @@
             </div>
             <div class="row">
                 {foreach name="$result['rows']" item="vo" key="k" }
-                <form action="" method="post">
-                    <input type="hidden" name="text" value="{$vo['url']}">
-                </form>
                 <div class="col-sm-4 col-md-3">
                     <div class="thumbnail example">
-                        <img id="qrcodeimg{$vo['id']}" src='' style="width:100%;" alt="">
+                        <img id="qrcodeimg-{$vo['id']}" src="{:url('production/url/build?text=')}{$vo['url']}" style="width:100%;" alt="">
                         <div class="caption">
                             <h4>{$vo.production_name}</h4>
                             <p class="text-muted">访问次数:{$vo.count}</p>
-                            <p class="text-muted">操作时间:</p>
-                            <p>
-                                <span class="pull-right" style="margin-top:10px;"></span>
-                            </p>
+                            <button class="btn btn-xl btn-success" onclick='regetqr("{$vo['id']}")'>重新取码</button>
                         </div>
                     </div>
                 </div>
@@ -35,17 +29,22 @@
         </div>
     </div>
 </div>
-<script type="text/javascript" src="/assets/js/clipboard.min.js"></script>
-<script src="https://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
-{foreach name="$result['rows']" item="vo" key="k"}
-    <script type="text/javascript">
-        $(function () {
-            $("form").submit(function () {
-                $("#qrcodeimg"+"{$vo['id']}").prop("src", "{:url('production/url/build',[],false)}?" + $(this).serialize());
-                $("#qrcodeurl").text();
-                return false;
-            });
-            $("form").trigger('submit');
+<script type="text/javascript">
+    function regetqr(id){
+        $.ajax({
+            type : "POST",
+            url : "{:url('production/url/url')}",
+            data : {'ids':id},
+            dataType : "json",
+            success : function(result) {
+                if (result.is_use) {
+                    window.location.reload();
+                }else{
+                    alert('入口域名用完了');
+                }
+            },error:function(){
+                alert('您的网络不稳定，请关闭页面后重试！');
+            }
         });
-    </script>
-{/foreach}
+    }
+</script>

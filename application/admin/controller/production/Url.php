@@ -50,33 +50,67 @@ class Url extends Backend
     {
         //设置过滤方法
         $this->request->filter(['strip_tags']);
-//        if ($this->request->isAjax()) {
-            //如果发送的来源是Selectpage，则转发到Selectpage
-            if ($this->request->request('keyField')) {
-                return $this->selectpage();
-            }
-            list($where, $sort, $order, $offset, $limit) = $this->buildparams();
-            $total = $this->model
-                ->where($where)
-                ->where(['team_id'=>$this->adminInfo['team_id']])
-                ->where(['admin_id'=>$this->adminInfo['id']])
-                ->order($sort, $order)
-                ->count();
+        //如果发送的来源是Selectpage，则转发到Selectpage
+        if ($this->request->request('keyField')) {
+            return $this->selectpage();
+        }
+        list($where, $sort, $order, $offset, $limit) = $this->buildparams();
+        $total = $this->model
+            ->where($where)
+            ->where(['team_id'=>$this->adminInfo['team_id']])
+            ->where(['admin_id'=>$this->adminInfo['id']])
+            ->order($sort, $order)
+            ->count();
 
-            $list = $this->model
-                ->where($where)
-                ->where(['team_id'=>$this->adminInfo['team_id']])
-                ->where(['admin_id'=>$this->adminInfo['id']])
-                ->order($sort, $order)
-                ->limit($offset, $limit)
-                ->select();
+        $list = $this->model
+            ->where($where)
+            ->where(['team_id'=>$this->adminInfo['team_id']])
+            ->where(['admin_id'=>$this->adminInfo['id']])
+            ->order($sort, $order)
+            ->limit($offset, $limit)
+            ->select();
 
-            $list = collection($list)->toArray();
-            $result = array("total" => $total, "rows" => $list);
-            $this->assign('result',$result);
+        $list = collection($list)->toArray();
+        $result = array("total" => $total, "rows" => $list);
+        $this->assign('result',$result);
         return $this->view->fetch();
     }
 
+
+    /**
+     * 生成加密推广值
+     * @param $gid
+     * @param $tid
+     * @param $tp
+     * @return array
+     */
+    private function setCheckCode($gid,$tid,$tp)
+    {
+        //加密算法
+        $str = 'aid='.$this->adminInfo['id'].'&gid='.$gid.'&tid='.$tid.'&tp='.$tp;
+        $checkCode = md5($str);
+        //接入403逻辑，用于验证入口地址的真实性。
+        Cache::set($checkCode,$str.'&check_code='.$checkCode,0);
+        return ['str'=> $str.'&check_code='.$checkCode,'check_code' => $checkCode];
+    }
+
+    /**
+     * 生成域名与推广链接
+     * @param $checkCode
+     * @return array
+     */
+    private function setDomainUrl($checkCode)
+    {
+        //获取当前可用的入口域名
+        $groudDomainData = $this->groundModel->where(['is_forbidden'=>0])->column('domain_url');
+        //判断域名是否已经被封，表示已经被封，需要重新生成新的入口推广链接
+        //拼接随机域名前缀
+        $urlPrefix = $this->getRandomStrDomainPrefix();
+        $groundUrl = $urlPrefix.'.'.$groudDomainData[mt_rand(0,count($groudDomainData)-1)];
+        //拼接最后的访问链接
+        $url = 'http://'.$groundUrl.'/index.php/index/index/code/'.$checkCode;
+        return ['url'=> $url,'domain_url'=> $groundUrl];
+    }
 
     /**
      * 生成产品数据
@@ -86,20 +120,28 @@ class Url extends Backend
         $uid = $this->adminInfo['id'];
         //查找出当前团队所选择的产品模板数据
         $productionSelectData = collection($this->selectModel->where(['team_id'=>$this->adminInfo['team_id'],'is_use'=>1])->select())->toArray();
-        $field = ['production_id','production_name','team_id','team_name','admin_id','admin_name'];
+        $field = ['production_id','production_name','team_id','team_name','admin_id','admin_name','check_code','query_string','domain_url','url'];
         $existsData = collection($this->model->field($field)->where(['admin_id'=>$uid,'team_id'=>$this->adminInfo['team_id']])->select())->toArray();
-
         //老数据里面如果存在已经选择的文案，则不进行更新操作。因为里面有对应的访问数据与下单数据
-
         $params = [];
         foreach ($productionSelectData as $value) {
+            //获取模板名称
+            $moduleName = $this->productionModel->get($value['production_id'])['module_name'];
+            //获取推广码字串
+            $checkData = $this->setCheckCode($value['production_id'],$this->adminInfo['team_id'],$moduleName);
+            //获取推广链接
+            $domainData = $this->setDomainUrl($checkData['check_code']);
             $params[] = [
                 'production_id'     =>  $value['production_id'],
                 'production_name'   =>  $value['own_name'],
                 'team_id'           =>  $this->adminInfo['team_id'],
                 'team_name'         =>  $this->adminInfo['team_name'],
                 'admin_id'          =>  $uid,
-                'admin_name'        =>  $this->adminInfo['nickname']
+                'admin_name'        =>  $this->adminInfo['nickname'],
+                'check_code'        =>  $checkData['check_code'],
+                'query_string'      =>  $checkData['str'],
+                'domain_url'        =>  $domainData['domain_url'],
+                'url'               =>  $domainData['url']
             ];
         }
 
@@ -113,15 +155,10 @@ class Url extends Backend
         //更新数据表
         //不能删除现有数据，因为里面有访问数据以及成单数据
         //TODO::这里没做限制，如果用户不断点击，会重复写入数据库,可以选择真实删除，目前使用的是软删除
-//        if (count($existsData) != 0 && count($params) == 0) {
-//            $res = $this->model->destroy($delStr);
-//            $this->success();
-//        }
         if ($params) {
             $result = false;
             Db::startTrans();
             try {
-//                $res = $this->model->destroy($delStr);
                 $result = $this->model->allowField(true)->saveAll($params);
                 Db::commit();
             } catch (ValidateException $e) {
@@ -249,8 +286,7 @@ class Url extends Backend
         }
         $urlData['app-debug'] = false;
         $urlData['is_use'] = true;
-        $this->assign('data',$urlData);
-        return $this->view->fetch();
+        return $urlData;
     }
 
     /**
@@ -310,8 +346,6 @@ class Url extends Backend
         return new Response($qrCode->get(), 200, ['Content-Type' => $qrCode->getContentType()]);
     }
 
-
-
     /**
      * 回收站
      * @internal
@@ -340,13 +374,4 @@ class Url extends Backend
         return $this->error('不允许此操作');
     }
 
-//    /**
-//     * 删除
-//     * @param null $ids
-//     * @internal
-//     */
-//    public function del($ids = null)
-//    {
-//        return $this->error('不允许此操作');
-//    }
 }
