@@ -69,9 +69,9 @@ class Index extends Backend
         $string = $this->request->query();
         $url1 = $this->request->url();
         $url = $this->request->get('url', 'index/index');
-        if ($this->auth->isLogin()) {
-            $this->success(__("You've logged in, do not login again"), $url1);
-        }
+//        if ($this->auth->isLogin()) {
+//            $this->success(__("You've logged in, do not login again"), $url1);
+//        }
         if ($this->request->isPost()) {
 
             //记录当前访问参数与用户代理 与IP绑定
