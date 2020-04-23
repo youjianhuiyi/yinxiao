@@ -104,6 +104,8 @@ class Payset extends Backend
                 'pay_channel'       =>  $value['pay_name'],
                 'team_id'           =>  $this->adminInfo['team_id'],
                 'team_name'         =>  $this->adminInfo['team_name'],
+                'is_multiple'       =>  1,
+                'status'            =>  1,
             ];
         }
 
@@ -114,6 +116,8 @@ class Payset extends Backend
                 'pay_channel'       =>  $value['pay_name'],
                 'team_id'           =>  $this->adminInfo['team_id'],
                 'team_name'         =>  $this->adminInfo['team_name'],
+                'is_multiple'       =>  1,
+                'status'            =>  1,
             ];
         }
         //查找当前有的支付数据，直接全部干掉，使用全新的数据
