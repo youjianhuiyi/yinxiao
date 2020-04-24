@@ -162,9 +162,10 @@ class Url extends Backend
 
         //对比新老数据
         foreach ($params as $key => $value) {
-            if (in_array($value,$existsData)) {
-                //表示新文案在原有数据里面已存在
-                unset($params[$key]);
+            foreach ($existsData as $value2) {
+                if (in_array($value['production_name'],$value2)) {
+                    unset($params[$key]);
+                }
             }
         }
         //更新数据表
