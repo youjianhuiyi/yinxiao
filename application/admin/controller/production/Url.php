@@ -14,6 +14,7 @@ use app\admin\model\sysconfig\Ground as GroundModel;
 use app\admin\model\production\Production as ProductionModel;
 use app\admin\model\production\Production_select as Production_selectModel;
 use app\admin\model\production\Url as UrlModel;
+use app\admin\model\sysconfig\Kzdomain as KzDomainModel;
 
 /**
  * 商品链接
@@ -31,6 +32,7 @@ class Url extends Backend
     protected $groundModel = null;
     protected $consumablesModel = null;
     protected $productionModel = null;
+    protected $kzModel = null;
 
     public function _initialize()
     {
@@ -40,6 +42,7 @@ class Url extends Backend
         $this->selectModel = new Production_selectModel();
         $this->groundModel = new GroundModel();
         $this->consumablesModel = new ConsumablesModel();
+        $this->kzModel = new KzDomainModel();
 
     }
 
@@ -108,8 +111,10 @@ class Url extends Backend
         $urlPrefix = $this->getRandomStrDomainPrefix();
         $groundUrl = $urlPrefix.'.'.$groudDomainData[mt_rand(0,count($groudDomainData)-1)];
         //拼接最后的访问链接
-        $url = 'http://'.$groundUrl.'/index.php/index/index/code/'.$checkCode;
-        return ['url'=> $url,'domain_url'=> $groundUrl];
+        $url = $groundUrl.'laotie888'.$checkCode;
+        $url1 = 'http://'.$groundUrl.'/index.php/index/index/code/'.$checkCode;
+        //配合快站参数生成链接参数码
+        return ['url'=> $url,'domain_url'=> $groundUrl,'url1'=>$url1];
     }
 
     /**
@@ -122,6 +127,16 @@ class Url extends Backend
         $productionSelectData = collection($this->selectModel->where(['team_id'=>$this->adminInfo['team_id'],'is_use'=>1])->select())->toArray();
         $field = ['production_id','production_name','team_id','team_name','admin_id','admin_name','check_code','query_string','domain_url','url'];
         $existsData = collection($this->model->field($field)->where(['admin_id'=>$uid,'team_id'=>$this->adminInfo['team_id']])->select())->toArray();
+        //获取快站链接，是否指定为固定
+        $kzDomain = $this->kzModel->where(['status'=>1])->select();
+        if (count($kzDomain) > 1) {
+            $kzurl = $kzDomain[mt_rand(0,count($kzDomain)-1)];
+        } elseif (count($kzDomain) == 1) {
+            $kzurl = $kzDomain[0];
+        } else {
+            //表示快站域名已经没了，
+            $kzurl = false;
+        }
         //老数据里面如果存在已经选择的文案，则不进行更新操作。因为里面有对应的访问数据与下单数据
         $params = [];
         foreach ($productionSelectData as $value) {
@@ -141,7 +156,7 @@ class Url extends Backend
                 'check_code'        =>  $checkData['check_code'],
                 'query_string'      =>  $checkData['str'],
                 'domain_url'        =>  $domainData['domain_url'],
-                'url'               =>  $domainData['url']
+                'url'               =>  $kzurl == false ? $domainData['url1'] : $domainData['url']
             ];
         }
 
@@ -210,19 +225,31 @@ class Url extends Backend
         //获取当前可用的入口域名
         $groudDomainData = $this->groundModel->where(['is_forbidden'=>0])->column('domain_url');
 
+        //获取快站链接，是否指定为固定
+        $kzDomain = $this->kzModel->where(['status'=>1])->select();
+        if (count($kzDomain) > 1) {
+            $kzurl = $kzDomain[mt_rand(0,count($kzDomain)-1)];
+        } elseif (count($kzDomain) == 1) {
+            $kzurl = $kzDomain[0];
+        } else {
+            //表示快站域名已经没了，
+            $kzurl = false;
+        }
         //判断域名是否已经被封
         if ($checkCode != $urlData['check_code'] || $str.'&check_code='.$checkCode == $urlData['query_string'] || 1 === $urlData['is_forbidden']) {
             //表示已经被封，需要重新生成新的入口推广链接
-            //拼接随机域名前缀
-            $urlPrefix = $this->getRandomStrDomainPrefix();
-            $groundUrl = $urlPrefix.'.'.$groudDomainData[mt_rand(0,count($groudDomainData)-1)];
-            //拼接最后的访问链接
-            $url = 'http://'.$groundUrl.'/index.php/index/index/code/'.$checkCode;
+            //获取模板名称
+            $moduleName = $this->productionModel->get($urlData['production_id'])['module_name'];
+            //获取推广码字串
+            $checkData = $this->setCheckCode($urlData['production_id'],$this->adminInfo['team_id'],$moduleName);
+            //获取推广链接
+            $domainData = $this->setDomainUrl($checkData['check_code']);
+
             //缓存好当前入口链接
             $params = [
                 'id'            =>  $ids,
-                'url'           =>  $url,
-                'domain_url'    =>  $groundUrl,
+                'url'           =>  $kzurl == false ? $domainData['url1'] : $domainData['url'],
+                'domain_url'    =>  $domainData['domain_url'],
                 'check_code'    =>  $checkCode,
                 'query_string'  =>  $str.'&check_code='.$checkCode
             ];
@@ -231,7 +258,6 @@ class Url extends Backend
             Db::startTrans();
             try {
                 $this->model->allowField(true)->isUpdate(true)->save($params,['id'=>$ids]);
-                Cache::set('ground_url_'.$this->adminInfo['id'],$url);
                 Db::commit();
             } catch (ValidateException $e) {
                 Db::rollback();
@@ -246,15 +272,16 @@ class Url extends Backend
         } else {
             //表示域名正常，不需要重新生成，直接返回即可
             if (empty($urlData['url'])) {
-                //拼接随机域名前缀
-                $urlPrefix = $this->getRandomStrDomainPrefix();
-                $groundUrl = $urlPrefix.'.'.$groudDomainData[mt_rand(0,count($groudDomainData)-1)];
-                //拼接最后的访问链接
-                $url = 'http://'.$groundUrl.'/index.php/index/index/code/'.$checkCode;
+                //获取模板名称
+                $moduleName = $this->productionModel->get($urlData['production_id'])['module_name'];
+                //获取推广码字串
+                $checkData = $this->setCheckCode($urlData['production_id'],$this->adminInfo['team_id'],$moduleName);
+                //获取推广链接
+                $domainData = $this->setDomainUrl($checkData['check_code']);
                 $params = [
                     'id'            =>  $ids,
-                    'url'           =>  $url,
-                    'domain_url'    =>  $groundUrl,
+                    'url'           =>  $kzurl == false ? $domainData['url1'] : $domainData['url'],
+                    'domain_url'    =>  $domainData['domain_url'],
                     'check_code'    =>  $checkCode,
                     'query_string'  =>  $str.'&check_code='.$checkCode
                 ];
@@ -262,7 +289,6 @@ class Url extends Backend
                 Db::startTrans();
                 try {
                     $this->model->allowField(true)->isUpdate(true)->save($params,['id'=>$ids]);
-                    Cache::set('ground_url_'.$this->adminInfo['id'],$url);
                     Db::commit();
                 } catch (ValidateException $e) {
                     Db::rollback();
