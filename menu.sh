@@ -21,6 +21,7 @@ php think menu -c express/express
 php think menu -c express/sms
 php think menu -c sysconfig/pay
 php think menu -c sysconfig/consumables
+php think menu -c sysconfig/kzdomain
 php think menu -c sysconfig/ground
 php think menu -c sysconfig/wxdomain
 php think menu -c sysconfig/xpay

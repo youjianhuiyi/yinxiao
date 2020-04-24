@@ -25,19 +25,19 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                     [
                         {checkbox: true},
                         {field: 'id', title: __('Id'),operate:false},
-                        {field: 'domain_url', title: __('Domain_url'), formatter: Table.api.formatter.url},
+                        {field: 'domain_url', title: __('Domain_url')},
                         {field: 'count', title: __('Count')},
                         {field: 'team_id', title: __('Team_id'),operate:false,visible:false},
-                        {field: 'team_name', title: __('Team_name')},
-                        {field: 'is_rand', title: __('Is_rand'),formatter: function (data,value,index) {
-                            if (value == 0) {return "随机";}
-                            if (value == 1) {return "固定";}
+                        {field: 'team_name', title: __('Team_name'),operate: false,visible:false},
+                        {field: 'is_rand', title: __('Is_rand'),formatter: function (value,row,index) {
+                            if (value === 0) {return "随机";}
+                            if (value === 1) {return "固定";}
                             }},
-                        {field: 'status', title: __('Status'),formatter: function (data,value,index) {
-                                if (value == 0) {return "未使用";}
-                                if (value == 1) {return "使用中";}
-                                if (value == 2) {return "已封";}
-                            }},
+                        {field: 'status', title: __('Status'),searchList: {"0":"未使用","1": "使用中", "2": "已封"},formatter: function (value,row,index) {
+                                if (value === 0) {return "未使用";}
+                                if (value === 1) {return "使用中";}
+                                if (value === 2) {return "已封";}
+                            },},
                         {field: 'createtime', title: __('Createtime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
                         {field: 'updatetime', title: __('Updatetime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
                         {field: 'forbiddentime', title: __('Forbiddentime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},

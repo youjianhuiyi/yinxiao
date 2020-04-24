@@ -2,6 +2,7 @@
 
 namespace app\admin\controller\sysconfig;
 
+use app\admin\model\team\Team as TeamModel;
 use app\common\controller\Backend;
 
 /**
@@ -17,19 +18,26 @@ class Kzdomain extends Backend
      * @var \app\admin\model\sysconfig\Kzdomain
      */
     protected $model = null;
+    protected $teamModel = null;
 
     public function _initialize()
     {
         parent::_initialize();
         $this->model = new \app\admin\model\sysconfig\Kzdomain;
 
+        $this->teamModel = new TeamModel();
+
+        //团队数据
+        $teamData = collection($this->teamModel->column('name','id'))->toArray();
+        if ($this->adminInfo['id'] == 1 ) {
+            $teamData[0] = '自动新增团队请选择我(新加老板账号),否则下拉选择(新加非老板账号)';
+            ksort($teamData);
+            $newTeamData = $teamData;
+        } else {
+            $newTeamData[$this->adminInfo['team_id']] = $teamData[$this->adminInfo['team_id']];
+        }
+
+        $this->view->assign('teamData', $newTeamData);
     }
-    
-    /**
-     * 默认生成的控制器所继承的父类中有index/add/edit/del/multi五个基础方法、destroy/restore/recyclebin三个回收站方法
-     * 因此在当前控制器中可不用编写增删改查的代码,除非需要自己控制这部分逻辑
-     * 需要将application/admin/library/traits/Backend.php中对应的方法复制到当前控制器,然后进行修改
-     */
-    
 
 }
