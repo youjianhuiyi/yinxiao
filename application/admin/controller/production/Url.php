@@ -128,7 +128,7 @@ class Url extends Backend
         $field = ['production_id','production_name','team_id','team_name','admin_id','admin_name','check_code','query_string','domain_url','url'];
         $existsData = collection($this->model->field($field)->where(['admin_id'=>$uid,'team_id'=>$this->adminInfo['team_id']])->select())->toArray();
         //获取快站链接，是否指定为固定
-        $kzDomain = $this->kzModel->where(['status'=>1])->select();
+        $kzDomain = collection($this->kzModel->where('status','neq',2)->select())->toArray();
         if (count($kzDomain) > 1) {
             $kzurl = $kzDomain[mt_rand(0,count($kzDomain)-1)];
         } elseif (count($kzDomain) == 1) {
@@ -156,7 +156,7 @@ class Url extends Backend
                 'check_code'        =>  $checkData['check_code'],
                 'query_string'      =>  $checkData['str'],
                 'domain_url'        =>  $domainData['domain_url'],
-                'url'               =>  $kzurl == false ? $domainData['url1'] : $domainData['url']
+                'url'               =>  $kzurl ? $kzurl['domain_url'].$domainData['url'] : $domainData['url1']
             ];
         }
 
@@ -226,7 +226,7 @@ class Url extends Backend
         $groudDomainData = $this->groundModel->where(['is_forbidden'=>0])->column('domain_url');
 
         //获取快站链接，是否指定为固定
-        $kzDomain = $this->kzModel->where(['status'=>1])->select();
+        $kzDomain = collection($this->kzModel->where(['status'=>1])->select())->toArray();
         if (count($kzDomain) > 1) {
             $kzurl = $kzDomain[mt_rand(0,count($kzDomain)-1)];
         } elseif (count($kzDomain) == 1) {
@@ -248,7 +248,7 @@ class Url extends Backend
             //缓存好当前入口链接
             $params = [
                 'id'            =>  $ids,
-                'url'           =>  $kzurl == false ? $domainData['url1'] : $domainData['url'],
+                'url'           =>  $kzurl ? $kzurl['domain_url'].$domainData['url'] : $domainData['url1'],
                 'domain_url'    =>  $domainData['domain_url'],
                 'check_code'    =>  $checkCode,
                 'query_string'  =>  $str.'&check_code='.$checkCode
@@ -280,7 +280,7 @@ class Url extends Backend
                 $domainData = $this->setDomainUrl($checkData['check_code']);
                 $params = [
                     'id'            =>  $ids,
-                    'url'           =>  $kzurl == false ? $domainData['url1'] : $domainData['url'],
+                    'url'           =>  $kzurl ? $kzurl['domain_url'].$domainData['url'] : $domainData['url1'],
                     'domain_url'    =>  $domainData['domain_url'],
                     'check_code'    =>  $checkCode,
                     'query_string'  =>  $str.'&check_code='.$checkCode
