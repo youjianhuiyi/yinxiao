@@ -314,7 +314,8 @@ class Xpay extends Backend
             //判断访问链接，如果有微信授权链接参数，直接放行到落地页面。如果没有则进行微信授权认证
             $payInfo = $this->model->get($ids);
             Cache::set('back-payinfo',$payInfo,120);
-            $orderNo = mt_rand(1111,9999).time();
+            dump($payInfo);die;
+            $orderNo = mt_rand(11111,99999).time();
 
             $url = 'http://open.xiangqianpos.com/wxPayOauth/openid';
             $data = [
