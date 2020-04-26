@@ -177,25 +177,22 @@ class Notify extends Frontend
     {
         $orderInfo = $this->orderModel->where('notify_data','neq','')->where('transaction_id','')->where('xdd_trade_no','')->select();
 
-        if (is_array($orderInfo[0])) {
+        if (count($orderInfo) > 0) {
             foreach ($orderInfo as $key => $value) {
-                $notifyData = $this->do403Params($value['notify_data']);
                 //循环查询 数据并写入
                 $saveData  = [
-                    'id'             => $value['id'],
-                    'transaction_id' => $notifyData['trade_no'],/*微信支付订单号*/
+                    'transaction_id' => $this->do403Params($value['notify_data'])['trade_no'],/*微信支付订单号*/
                     'pay_type'       => 1,/*支付类型，0=微信，1=享钱*/
                     'pay_status'     => 1,/*支付状态，已经完成支付*/
                     'pay_id'         => $value['pay_id'],/*使用的支付id，支付链接在产生支付的时候进行写入*/
-                    'xdd_trade_no'   => $notifyData['xdd_trade_no'],/*使用的支付id，支付链接在产生支付的时候进行写入*/
+                    'xdd_trade_no'   => $this->do403Params($value['notify_data'])['xdd_trade_no'],/*使用的支付id，支付链接在产生支付的时候进行写入*/
                 ];
                 //更新数据
-                $this->orderModel->isUpdate(true)->saveAll($saveData);
+                $res = $this->orderModel->where(['id'=>$value['id']])->update($saveData);
                 //增加订单完成次数
                 $this->urlModel->where('admin_id',$value['admin_id'])->setInc('order_done');
             }
             echo "<script>alert('手动补单成功');</script>";
-            die;
         } else {
             echo "<script>alert('没有需要手动被的数据，请与支付平台联系。');</script>";
             die;
