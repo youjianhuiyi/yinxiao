@@ -40,7 +40,6 @@ class DataSummaryCreate extends Migrator
             ->addColumn('order_nums','integer',['limit'=>10,'signed'=>false,'null'=>false,'default'=>0,'comment'=>'订单商品数量'])
             ->addColumn('pay_done','integer',['limit'=>10,'signed'=>false,'null'=>false,'default'=>0,'comment'=>'支付成功订单'])
             ->addColumn('pay_done_nums','integer',['limit'=>10,'signed'=>false,'null'=>false,'default'=>0,'comment'=>'支付成功商品数量'])
-            ->addColumn('order_ip','string',['limit'=>150,'null'=>false,'default'=>'','comment'=>'下单IP'])
             ->addColumn('createtime','integer',['limit'=>10,'signed'=>false,'null'=>false,'default'=>0,'comment'=>'增加时间'])
             ->addColumn('updatetime','integer',['limit'=>10,'signed'=>false,'null'=>false,'default'=>0,'comment'=>'更新时间'])
             ->addColumn('deletetime','integer',['limit'=>10,'signed'=>false,'null'=>true,'comment'=>'删除时间'])

@@ -244,7 +244,7 @@ class Xpay extends Backend
             'production_id'     => 4,
             'production_name'   => '测试商品',
             'goods_info'=> '款式=;性别=;属性=',
-            'price'     => 10,
+            'price'     => 0.01,
             'pay_id'    => $params['pay_id'],
             'pay_type'  => 1,
             'sn'        => $params['sn'],
@@ -299,10 +299,6 @@ class Xpay extends Backend
             //构建json数据
             $url = 'https://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString;
             header('Location:'.$url);
-//            $this->assign('order_no',$params['sn']);
-//            $this->assign('goods_name',$goodsName);
-//            $this->assign('url',urlencode($url));
-//            return $this->view->fetch('url');
         } else {
             return '';
         }
@@ -314,28 +310,23 @@ class Xpay extends Backend
      */
     public function xpayGrant($ids = null)
     {
-//        if ($this->request->isAjax()) {
-            //判断访问链接，如果有微信授权链接参数，直接放行到落地页面。如果没有则进行微信授权认证
-            $payInfo = $this->model->get($ids);
-            $params  = $this->request->param();
-            Cache::set('back-payinfo',$payInfo,120);
-//            dump($payInfo);die;
-            $orderNo = mt_rand(11111,99999).time();
+        //判断访问链接，如果有微信授权链接参数，直接放行到落地页面。如果没有则进行微信授权认证
+        $payInfo = $this->model->get($ids);
+        $params  = $this->request->param();
+        $orderNo = mt_rand(11111,99999).time();
 
-            $url = 'http://open.xiangqianpos.com/wxPayOauth/openid';
-            $data = [
-                'mch_code'  => $payInfo['mch_code'],
-                'charset'   => 'UTF-8',
-                'nonce_str' => md5(time()),
-                'redirect'  => urlencode($this->request->domain().$this->request->baseFile().'/sysconfig/Xpay/testPay?sn='.$orderNo.'&pay_id='.$ids.'&tid='.$params['tid'].'&aid='.$params['aid']),
-                'sign'      => '',
-            ];
-            $data['sign'] = $this->XpaySignParams($data,$payInfo['mch_key']);
-            //跳转享钱平台获取openid
-            $queryString = 'charset='.$data['charset'].'&mch_code='.$data['mch_code'].'&nonce_str='.$data['nonce_str'].'&redirect='.$data['redirect'].'&sign='.$data['sign'];
-            header('Location:'.$url.'?'.$queryString);
-//        }
-//        return $this->view->fetch('url');
+        $url = 'http://open.xiangqianpos.com/wxPayOauth/openid';
+        $data = [
+            'mch_code'  => $payInfo['mch_code'],
+            'charset'   => 'UTF-8',
+            'nonce_str' => md5(time()),
+            'redirect'  => urlencode($this->request->domain().$this->request->baseFile().'/sysconfig/Xpay/testPay?sn='.$orderNo.'&pay_id='.$ids.'&tid='.$params['tid'].'&aid='.$params['aid']),
+            'sign'      => '',
+        ];
+        $data['sign'] = $this->XpaySignParams($data,$payInfo['mch_key']);
+        //跳转享钱平台获取openid
+        $queryString = 'charset='.$data['charset'].'&mch_code='.$data['mch_code'].'&nonce_str='.$data['nonce_str'].'&redirect='.$data['redirect'].'&sign='.$data['sign'];
+        header('Location:'.$url.'?'.$queryString);
     }
 
     /**

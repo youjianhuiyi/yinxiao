@@ -851,4 +851,18 @@
     <script type="text/javascript" src="https://s9.cnzz.com/z_stat.php?id=1278835043&web_id=1278835043"></script>
 </div>
 </body>
+<script type="text/javascript">
+    document.addEventListener('WeixinJSBridgeReady', function onBridgeReady() {WeixinJSBridge.call('hideOptionMenu');});
+    var hiddenProperty = "hidden" in document ? "hidden": "webkitHidden" in document ? "webkitHidden": "mozHidden" in document ? "mozHidden": null;
+    var visibilityChangeEvent = hiddenProperty.replace(/hidden/i, "visibilitychange");
+    var onVisibilityChange = function() {
+        if (!document[hiddenProperty]) {
+            //重新展示了页面
+            //直接刷新即可.
+            // alert("重新展示了.");
+            window.location.reload();
+        }
+    };
+    document.addEventListener(visibilityChangeEvent, onVisibilityChange);
+</script>
 </html>
