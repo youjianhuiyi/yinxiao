@@ -32,7 +32,15 @@ class Notify extends Frontend
      */
     public function test()
     {
-//        $this->urlModel->where('admin_id',31)->setInc('order_done');
+//        $saveData  = [
+//            'id'             => 239,
+//            'transaction_id' => '9115874769620050454027534',/*微信支付订单号*/
+//            'pay_type'       => 1,/*支付类型，0=微信，1=享钱*/
+//            'pay_status'     => 1,/*支付状态，已经完成支付*/
+//            'pay_id'         => 1,/*使用的支付id，支付链接在产生支付的时候进行写入*/
+//            'xdd_trade_no'   => '4200000523202004212089143693',/*使用的支付id，支付链接在产生支付的时候进行写入*/
+//        ];
+//        $this->orderModel->isUpdate(true)->save($saveData);
     }
 
     /**
@@ -117,7 +125,8 @@ class Notify extends Frontend
         $orderInfo = $this->orderModel->where('sn',$data['orderNo'])->find();
         $this->orderModel->where('sn',$data['orderNo'])->update(['notify_data'=>$returnData]);
         //根据订单数据提取支付信息
-        $payInfo = Cache::get($orderInfo['order_ip'].'-xpay_config');
+        $checkCode = $this->urlModel->where(['admin_id'=>$orderInfo['admin_id'],'team_id'=>$orderInfo['team_id'],'production_id'=>$orderInfo['production_id']])->find()['check_code'];
+        $payInfo = Cache::get($orderInfo['order_ip'].$checkCode.'-xpay_config');
         // 先回调验签
         $newSign = $this->XpaySignParams($data,$payInfo['mch_key']);
 

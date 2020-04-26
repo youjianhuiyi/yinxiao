@@ -28,3 +28,5 @@ php think menu -c sysconfig/xpay
 php think menu -c sysconfig/rypay
 php think menu -c sysconfig/payset
 php think menu -c data/visit
+php think menu -c data/day
+php think menu -c data/summary
