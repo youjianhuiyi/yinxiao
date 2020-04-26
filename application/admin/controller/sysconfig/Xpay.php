@@ -43,15 +43,18 @@ class Xpay extends Backend
         $this->orderModel = new OrderModel();
 
         //团队数据
-        $teamData = collection($this->teamModel->column('name','id'))->toArray();
-        if ($this->adminInfo['id'] == 1 ) {
-            $teamData[0] = '自动新增团队请选择我(新加老板账号),否则下拉选择(新加非老板账号)';
-            ksort($teamData);
-            $newTeamData = $teamData;
-        } else {
-            $newTeamData[$this->adminInfo['team_id']] = $teamData[$this->adminInfo['team_id']];
+        if ($this->request->action() == 'add' || $this->request->action() == 'edit' || $this->request->action() == 'index' ) {
+            $teamData = collection($this->teamModel->column('name','id'))->toArray();
+            if ($this->adminInfo['id'] == 1 ) {
+                $teamData[0] = '自动新增团队请选择我(新加老板账号),否则下拉选择(新加非老板账号)';
+                ksort($teamData);
+                $newTeamData = $teamData;
+            } else {
+                $newTeamData[$this->adminInfo['team_id']] = $teamData[$this->adminInfo['team_id']];
+            }
+            $this->view->assign('teamData', $newTeamData);
         }
-        $this->view->assign('teamData', $newTeamData);
+
     }
 
     /**
@@ -224,24 +227,25 @@ class Xpay extends Backend
 
         $params = $this->request->param();
         $payInfo = $this->model->get($params['pay_id']);
+        $teamData = $this->teamModel->get($params['tid']);
         $goodsName = '测试支付通道商品'.$payInfo['pay_name'];
 
         //构建订单数据
         $data = [
-            'admin_id'  => $this->adminInfo['id'],
-            'admin_name'=> $this->adminModel->get($this->adminInfo['id'])->nickname,
-            'pid'       => $this->adminModel->get($this->adminInfo['id'])->pid,
+            'admin_id'  => $params['aid'],
+            'admin_name'=> $this->adminModel->get($params['aid'])->nickname,
+            'pid'       => $this->adminModel->get($params['aid'])->pid,
             'num'       => 1,
             'name'      => $goodsName,
             'phone'     => '18888888888',
             'address'   => '测试地址',
-            'team_id'   => $this->adminModel->get($this->adminInfo['id'])->team_id,
+            'team_id'   => $teamData['id'],
             'team_name' => '测试订单数据',
             'production_id'     => 4,
             'production_name'   => '测试商品',
             'goods_info'=> '款式=;性别=;属性=',
             'price'     => 10,
-            'pay_id'    => $payInfo['id'],
+            'pay_id'    => $params['pay_id'],
             'pay_type'  => 1,
             'sn'        => $params['sn'],
             'order_ip'  => $this->request->ip(),
@@ -313,6 +317,7 @@ class Xpay extends Backend
 //        if ($this->request->isAjax()) {
             //判断访问链接，如果有微信授权链接参数，直接放行到落地页面。如果没有则进行微信授权认证
             $payInfo = $this->model->get($ids);
+            $params  = $this->request->param();
             Cache::set('back-payinfo',$payInfo,120);
 //            dump($payInfo);die;
             $orderNo = mt_rand(11111,99999).time();
@@ -322,7 +327,7 @@ class Xpay extends Backend
                 'mch_code'  => $payInfo['mch_code'],
                 'charset'   => 'UTF-8',
                 'nonce_str' => md5(time()),
-                'redirect'  => urlencode($this->request->domain().$this->request->baseFile().'/sysconfig/Xpay/testPay?sn='.$orderNo.'&pay_id='.$ids),
+                'redirect'  => urlencode($this->request->domain().$this->request->baseFile().'/sysconfig/Xpay/testPay?sn='.$orderNo.'&pay_id='.$ids.'&tid='.$params['tid'].'&aid='.$params['aid']),
                 'sign'      => '',
             ];
             $data['sign'] = $this->XpaySignParams($data,$payInfo['mch_key']);
@@ -341,7 +346,7 @@ class Xpay extends Backend
      */
     public function url($ids = null)
     {
-        $url = $this->request->domain().$this->request->baseFile().'/sysconfig/Xpay/xpayGrant/ids/'.$ids;
+        $url = $this->request->domain().$this->request->baseFile().'/sysconfig/Xpay/xpayGrant/ids/'.$ids.'?tid='.$this->adminInfo['team_id'].'&aid='.$this->adminInfo['id'];
         $this->assign('url',urlencode($url));
         return $this->view->fetch('url');
     }
