@@ -47,17 +47,28 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form','editable'], function 
                                 {
                                     name: '支付通道测试',
                                     title: '支付通道测试',
-                                    classname: 'btn btn-xs btn-success btn-magic btn-ajax',
+                                    classname: 'btn btn-xs btn-primary btn-dialog',
                                     icon: 'fa fa-paper-plane',
                                     confirm: '确认发送本条支付通道测试吗？',
                                     url: 'sysconfig/xpay/testPay',
-                                    success: function (data, ret) {
-                                        Layer.alert(ret.msg + ",返回数据：" + JSON.stringify(data));
-                                    },
-                                    error: function (data, ret) {
-                                        console.log(data, ret);
-                                        Layer.alert(ret.msg);
-                                        return false;
+                                    // success: function (data, ret) {
+                                    //     Layer.alert("<div><img src='/aLYPMkZvnQ.php/production/url/build?text=wwwwww' /></div>");
+                                    // },
+                                    // error: function (data, ret) {
+                                    //     console.log(data, ret);
+                                    //     Layer.alert(ret.msg);
+                                    //     return false;
+                                    // }
+                                },
+                                {
+                                    name: '支付通道测试',
+                                    text: '支付通道测试',
+                                    title: '支付通道测试',
+                                    classname: 'btn btn-xs btn-primary btn-dialog',
+                                    icon: 'fa fa-list',
+                                    url: 'sysconfig/xpay/testPay',
+                                    callback: function (data) {
+                                        Layer.alert("接收到回传数据：", {title: "回传数据"});
                                     }
                                 }
                             ]

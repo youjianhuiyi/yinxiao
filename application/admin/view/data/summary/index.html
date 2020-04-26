@@ -1,61 +1,264 @@
-<div class="panel panel-default panel-intro">
-    {:build_heading()}
 
-    <div class="panel-body">
-        <div id="myTabContent" class="tab-content">
-            <div class="tab-pane fade active in" id="one">
-                <div class="widget-body no-padding">
-                    <div id="toolbar" class="toolbar">
-                        {:build_toolbar('refresh')}
+<html lang="zh-cn">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>营销平台</title>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="/assets/js/layer.js"></script>
+    <link href="/assets/js/sweetalert.min.css" rel="stylesheet">
+    <script src="/assets/js/sweetalert.min.js"></script>
+    <script src="https://rugucdn.oss-cn-qingdao.aliyuncs.com/libs/salesmanback/bootstrap.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+
+</head>
+<body>
+
+
+<div class="gw-container">
+    <div class="container-fluid">
+            <style>
+                .account-stat{overflow:hidden; color:#666;}
+                .account-stat .account-stat-btn{width:100%; overflow:hidden;}
+                .account-stat .account-stat-btn > div{text-align:center; margin-bottom:5px;margin-right:2%; float:left;width:23%; height:80px; padding-top:10px;font-size:16px; border-left:1px #DDD solid;}
+                .account-stat .account-stat-btn > div:first-child{border-left:0;}
+                .account-stat .account-stat-btn > div span{display:block; font-size:30px; font-weight:bold}
+            </style>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    销量信息详解
+                </div>
+
+                <div class="panel-body">
+                    <div class="pull-right">
+                        <div class="checkbox">
+                            <label style="color:#57B9E6;"><input type="checkbox" checked> 总订单</label>&nbsp;
+                            <label style="color:rgba(203,48,48,1)"><input type="checkbox"> 在线支付订单</label>&nbsp;
+                            <label style="color:rgba(149,192,0,1);;"><input type="checkbox"> 货到付款订单</label>&nbsp;
+                            <label style="color:#e7a017;"><input type="checkbox"> 未支付订单</label>
+                        </div>
+                        <div class="pull-left">
+                            <link href="http://wx.fkesmthg.cn/Public/js/daterangepicker/daterangepicker.css" rel="stylesheet">
+                            <script type="text/javascript" src="http://wx.fkesmthg.cn/Public/js/daterangepicker/moment.js"></script>
+                            <script type="text/javascript" src="http://wx.fkesmthg.cn/Public/js/daterangepicker/daterangepicker.js"></script>
+                            <script type="text/javascript">
+                                $(function(){
+                                    $(".daterange.daterange-time").each(function(){
+                                        var elm = this;
+                                        $(this).daterangepicker({
+                                            startDate: $(elm).prev().prev().val(),
+                                            endDate: $(elm).prev().val(),
+                                            format: "YYYY-MM-DD HH:mm",
+                                            timePicker: true,
+                                            timePicker12Hour : false,
+                                            timePickerIncrement: 1,
+                                            minuteStep: 1
+                                        }, function(start, end){
+                                            $(elm).find(".date-title").html(start.toDateTimeStr() + " 至 " + end.toDateTimeStr());
+                                            $(elm).prev().prev().val(start.toDateTimeStr());
+                                            $(elm).prev().val(end.toDateTimeStr());
+                                        });
+                                    });
+                                });
+                            </script>
+                            <input name="search_timestart" type="hidden" value="2020-04-26 00:00" />
+                            <input name="search_timeend" type="hidden" value="2020-04-26 23:59" />
+                            <button class="btn btn-default daterange daterange-time" type="button"><span class="date-title">2020-04-26 00:00 至 2020-04-26 23:59</span> <i class="fa fa-calendar"></i></button>				<button class="btn btn-default" onclick="refreshData();">查询</button>
+                        </div>
                     </div>
-                    <table id="table" class="table table-striped table-bordered table-hover" width="100%">
+                    <div class="account-stat">
+                        <div class="account-stat-btn">
+                            <div>总订单<span id="today_oc"></span></div>
+                            <div>在线支付订单<span id="today_ps2_oc"></span></div>
+                            <div>货到付款订单<span id="today_pt1_oc"></span></div>
+                            <div>未支付订单<span id="today_ps1_oc"></span></div>
+                        </div>
+                    </div>
+                    <div style="margin-top:20px">
+                        <canvas id="myChart" width="768" height="192" style="width: 768px; height: 192px;"></canvas>
+                    </div>
+                </div>
+            </div>
 
-                    </table>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">24小时销量趋势图(默认显示昨天的)</div>
+                <div class="panel-body">
+                    <div style="margin-top:20px;" id="houraa">
+                        <canvas id="hour24SalesChart" height="100"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 </div>
 
-<script id="customformtpl" type="text/html">
-    <form action="" class="form-commonsearch">
-        <div style="border-radius:2px;margin-bottom:10px;background:#f5f5f5;padding:15px 20px;">
-            <h4>自定义搜索表单</h4>
-            <hr>
-            <div class="row">
-                {if false}
-                <div class="col-xs-12 col-sm-6 col-md-3">
-                    <div class="form-group">
-                        <label class="control-label">用户名</label>
-                        <div>
-                            <input id="c-category_id" data-source="auth/admin/index" data-primary-key="username" data-field="username" class="form-control selectpage" name="username" type="text"
-                                   value="" style="display:block;">
-                        </div>
-                    </div>
-                </div>
-                {/if}
-                <div class="col-xs-12 col-sm-6 col-md-3">
-                    <div class="form-group">
-                        <label class="control-label">时间</label>
-                        <div>
-                            <input class="form-control datetimerange" data-date-format="YYYY-MM-DD HH:mm:ss" data-use-current="true" name="time" type="text" value="">
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xs-12 col-sm-6 col-md-3">
-                    <div class="form-group">
-                        <label class="control-label"></label>
-                        <div class="row">
-                            <div class="col-xs-6">
-                                <input type="submit" class="btn btn-success btn-block" value="提交"/>
-                            </div>
-                            <div class="col-xs-6">
-                                <input type="reset" class="btn btn-primary btn-block" value="重置"/>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </form>
+<script src="/assets/js/Chart.min.js"></script>
+<script>
+    var datasets = '';
+    var lineChartData = null;
+    var data = null;
+    var replystatistics_url = "data/summary/salesChart";
+    $.post(replystatistics_url, {'m_name' : 'basic'}, function(data){
+        data = $.parseJSON(data);
+        lineChartData = {
+            labels : data.key,
+            datasets : [
+                {	label: '总订单',
+                    fillColor : "rgba(36,165,222,0.1)",
+                    strokeColor : "rgba(36,165,222,1)",
+                    pointColor : "rgba(36,165,222,1)",
+                    pointStrokeColor : "#fff",
+                    pointHighlightFill : "#fff",
+                    pointHighlightStroke : "rgba(36,165,222,1)",
+                    data : data.datasets
+                },{
+                    label: '在线支付订单',
+                    fillColor : "rgba(203,48,48,0.1)",
+                    strokeColor : "rgba(203,48,48,1)",
+                    pointColor : "rgba(203,48,48,1)",
+                    pointStrokeColor : "#fff",
+                    pointHighlightFill : "#fff",
+                    pointHighlightStroke : "rgba(203,48,48,1)",
+                    data : data.datasets2
+                },
+                {
+                    label: '货到付款订单',
+                    fillColor : "rgba(149,192,0,0.1)",
+                    strokeColor : "rgba(149,192,0,1)",
+                    pointColor : "rgba(149,192,0,1)",
+                    pointStrokeColor : "#fff",
+                    pointHighlightFill : "#fff",
+                    pointHighlightStroke : "rgba(149,192,0,1)",
+                    data : data.datasets3
+                },
+                {
+                    label: '未支付订单',
+                    fillColor : "rgba(231,160,23,0.1)",
+                    strokeColor : "rgba(231,160,23,1)",
+                    pointColor : "rgba(231,160,23,1)",
+                    pointStrokeColor : "#fff",
+                    pointHighlightFill : "#fff",
+                    pointHighlightStroke : "rgba(231,160,23,1)",
+                    data : data.datasets4
+                }
+
+
+            ]
+        }
+
+        $("#today_oc").html(data.today_count[0]);
+        $("#today_ps2_oc").html(data.today_count[1]);
+        $("#today_pt1_oc").html(data.today_count[2]);
+        $("#today_ps1_oc").html(data.today_count[3]);
+        var ctx2 = document.getElementById("myChart").getContext("2d");
+        window.myLine = new Chart(ctx2).Line(lineChartData, {responsive: true});
+    });
+
+
+    function refreshData() {
+        var visables = [];
+        var i = 0;
+        $('.checkbox input[type="checkbox"]').each(function(){
+            if($(this).attr('checked')) {
+                visables.push(i);
+            }
+            i++;
+        });
+
+
+        var startTime = $("input[name='search_timestart']").val();
+        var endTime = $("input[name='search_timeend']").val();
+        $("#salediv").html("");
+        $("#salediv").html("<canvas id='myChart' height='100'></canvas>");
+        var replystatistics_url = "data/summary/salesChart";
+        $.post(replystatistics_url, {'m_name' : 'basic',visables:visables,startTime:startTime,endTime:endTime}, function(data){
+            data = $.parseJSON(data);
+            lineChartData = {
+                labels : data.key,
+                datasets : [
+                    {	label: '总订单',
+                        fillColor : "rgba(36,165,222,0.1)",
+                        strokeColor : "rgba(36,165,222,1)",
+                        pointColor : "rgba(36,165,222,1)",
+                        pointStrokeColor : "#fff",
+                        pointHighlightFill : "#fff",
+                        pointHighlightStroke : "rgba(36,165,222,1)",
+                        data : data.datasets
+                    },{
+                        label: '在线支付订单',
+                        fillColor : "rgba(203,48,48,0.1)",
+                        strokeColor : "rgba(203,48,48,1)",
+                        pointColor : "rgba(203,48,48,1)",
+                        pointStrokeColor : "#fff",
+                        pointHighlightFill : "#fff",
+                        pointHighlightStroke : "rgba(203,48,48,1)",
+                        data : data.datasets2
+                    },
+                    {
+                        label: '货到付款订单',
+                        fillColor : "rgba(149,192,0,0.1)",
+                        strokeColor : "rgba(149,192,0,1)",
+                        pointColor : "rgba(149,192,0,1)",
+                        pointStrokeColor : "#fff",
+                        pointHighlightFill : "#fff",
+                        pointHighlightStroke : "rgba(149,192,0,1)",
+                        data : data.datasets3
+                    },
+                    {
+                        label: '未支付订单',
+                        fillColor : "rgba(231,160,23,0.1)",
+                        strokeColor : "rgba(231,160,23,1)",
+                        pointColor : "rgba(231,160,23,1)",
+                        pointStrokeColor : "#fff",
+                        pointHighlightFill : "#fff",
+                        pointHighlightStroke : "rgba(231,160,23,1)",
+                        data : data.datasets4
+                    }
+                ]
+            }
+            $("#today_oc").html(data.today_count[0]);
+            $("#today_ps2_oc").html(data.today_count[1]);
+            $("#today_pt1_oc").html(data.today_count[2]);
+            $("#today_ps1_oc").html(data.today_count[3]);
+            var ctx2 = document.getElementById("myChart").getContext("2d");
+            window.myLine = new Chart(ctx2).Line(lineChartData, {responsive: true});
+        });
+    }
+
+    $('.checkbox input[type="checkbox"]').on('click', function(){
+        $(this).attr('checked', !$(this).attr('checked'))
+        refreshData();
+    });
 </script>
+
+<script>
+    var datasets = '';
+    var lineChartData = null;
+    var obj = null;
+    var data = null;
+    var replystatistics_url = "/data/summary/salesBy24Hour";
+    $.post(replystatistics_url, {'m_name' : 'basic'}, function(data){
+        data = $.parseJSON(data);
+        lineChartData = {
+            labels : data.key,
+            datasets : [
+                {
+                    fillColor : "rgba(36,165,222,0.1)",
+                    strokeColor : "rgba(36,165,222,1)",
+                    pointColor : "rgba(36,165,222,1)",
+                    pointStrokeColor : "#fff",
+                    pointHighlightFill : "#fff",
+                    pointHighlightStroke : "rgba(36,165,222,1)",
+                    data : data.datasets
+                }
+            ]
+        }
+        var ctx2 = document.getElementById("hour24SalesChart").getContext("2d");
+        window.myLine = new Chart(ctx2).Line(lineChartData, {responsive: true});
+    });
+</script>
+
+</body>
+</html>
