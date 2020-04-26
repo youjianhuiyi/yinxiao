@@ -4,6 +4,7 @@ namespace app\admin\controller\sysconfig;
 
 use app\common\controller\Backend;
 use Endroid\QrCode\QrCode;
+use think\Cache;
 use think\Db;
 use think\exception\PDOException;
 use think\exception\ValidateException;
@@ -21,7 +22,9 @@ use think\Response;
  */
 class Xpay extends Backend
 {
-    
+    public $noNeedLogin = ['testPay','xpayGrant','url'];
+    public $noNeedRight = ['testPay','xpayGrant','url'];
+
     /**
      * Xpay模型对象
      */
@@ -213,14 +216,14 @@ class Xpay extends Backend
 
     /**
      * 支付测试
-     * @param integer $ids 获取当前id
      * @return bool|string
+     * @throws \think\Exception
      */
-    public function testPay($ids = null)
+    public function testPay()
     {
 
-        $payInfo = $this->model->get($ids);
-        $orderNo = mt_rand(1111,9999).time();
+        $params = $this->request->param();
+        $payInfo = $this->model->get($params['pay_id']);
         $goodsName = '测试支付通道商品'.$payInfo['pay_name'];
 
         //构建订单数据
@@ -240,11 +243,11 @@ class Xpay extends Backend
             'price'     => 10,
             'pay_id'    => $payInfo['id'],
             'pay_type'  => 1,
-            'sn'        => $orderNo,
+            'sn'        => $params['sn'],
             'order_ip'  => $this->request->ip(),
         ];
 
-        $result = $this->orderModel->isUpdate(false)->save($data);
+        $this->orderModel->isUpdate(false)->save($data);
 
         $data = [
             'ticket' => time(),/*用来匹配请求*/
@@ -255,13 +258,13 @@ class Xpay extends Backend
             'timestamp' => date('YmdHis', time()),/*时间戳 发送请求的时间，格式"yyyyMMddHHmmss"*/
             'sign' => '',/*签名*/
             'body' => [
-                'orderNo' => $orderNo,/*商户订单号 商户系统内部的订单号 ,32个字符内、 可包含字母,确保在商户系统唯一*/
+                'orderNo' => $params['sn'],/*商户订单号 商户系统内部的订单号 ,32个字符内、 可包含字母,确保在商户系统唯一*/
                 'order_info' => 'test',/*商品描述*/
                 'total_amount' => 1,/*总金额，以分为单位，不允许包含任何字、符号*/
                 'mch_create_ip' => $this->request->ip(),/*订单生成的机器 IP*/
                 'notify_url' => 'http://back.dehub.com.cn/index.php/index/notify/xpayNotify',
                 'sub_appid' => 'wx092575bf6bc1636d',/*wx092575bf6bc1636d*/
-                'sub_openid' => 'o7bjZwikvfMnmvuCy6fqvCBNF3sg',
+                'sub_openid' => $params['openid'],
             ],
         ];
         //缓存当前申请支付的临时订单与本订单之前的关系
@@ -279,25 +282,66 @@ class Xpay extends Backend
         $jsonData = [
             'casher_id' => $newData['body']['casher_id'],
             'mch_code'  => $payInfo['mch_code'],
-            'third_no'  => $orderNo,
+            'third_no'  => $params['sn'],
             'sign'      => ''
         ];
         //
         $cashSign = $this->XpaySignParams($jsonData,$payInfo['mch_key']);
         //构建跳转的参数
-        $queryString = 'mch_code='.$payInfo['mch_code'].'&sign='.$cashSign.'&casher_id='.$newData['body']['casher_id'].'&third_no='.$orderNo;
+        $queryString = 'mch_code='.$payInfo['mch_code'].'&sign='.$cashSign.'&casher_id='.$newData['body']['casher_id'].'&third_no='.$params['sn'];
 
         // 验证下单接口的签名，如果签名没问题，返回JSON数据跳转收银台，如果有问题则不跳转
         if ($newParams1 == $newData['sign']) {
             //构建json数据
             $url = 'https://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString;
-            $this->assign('order_no',$orderNo);
-            $this->assign('goods_name',$goodsName);
-            $this->assign('url',urlencode($url));
-            return $this->view->fetch('url');
+            header('Location:'.$url);
+//            $this->assign('order_no',$params['sn']);
+//            $this->assign('goods_name',$goodsName);
+//            $this->assign('url',urlencode($url));
+//            return $this->view->fetch('url');
         } else {
             return '';
         }
+    }
+
+    /**
+     * 享钱平台获取微信openid
+     * @param null $ids
+     */
+    public function xpayGrant($ids = null)
+    {
+//        if ($this->request->isAjax()) {
+            //判断访问链接，如果有微信授权链接参数，直接放行到落地页面。如果没有则进行微信授权认证
+            $payInfo = $this->model->get($ids);
+            $orderNo = mt_rand(1111,9999).time();
+
+            $url = 'http://open.xiangqianpos.com/wxPayOauth/openid';
+            $data = [
+                'mch_code'  => $payInfo['mch_code'],
+                'charset'   => 'UTF-8',
+                'nonce_str' => md5(time()),
+                'redirect'  => urlencode($this->request->domain().$this->request->baseFile().'/sysconfig/Xpay/testPay?sn='.$orderNo.'&pay_id='.$ids),
+                'sign'      => '',
+            ];
+            $data['sign'] = $this->XpaySignParams($data,$payInfo['mch_key']);
+            //跳转享钱平台获取openid
+            $queryString = 'charset='.$data['charset'].'&mch_code='.$data['mch_code'].'&nonce_str='.$data['nonce_str'].'&redirect='.$data['redirect'].'&sign='.$data['sign'];
+            header('Location:'.$url.'?'.$queryString);
+//        }
+//        return $this->view->fetch('url');
+    }
+
+    /**
+     * 生成二维码的入口链接
+     * @param integer $ids
+     * @return string
+     * @throws \think\Exception
+     */
+    public function url($ids = null)
+    {
+        $url = $this->request->domain().$this->request->baseFile().'/sysconfig/Xpay/xpayGrant/ids/'.$ids;
+        $this->assign('url',$url);
+        return $this->view->fetch('url');
     }
 
 }

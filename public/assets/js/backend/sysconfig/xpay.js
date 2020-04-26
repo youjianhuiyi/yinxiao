@@ -50,7 +50,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form','editable'], function 
                                     title: '支付通道测试',
                                     classname: 'btn btn-xs btn-primary btn-dialog',
                                     icon: 'fa fa-list',
-                                    url: 'sysconfig/xpay/testPay',
+                                    url: 'sysconfig/xpay/url',
                                     callback: function (data) {
                                         Layer.alert("接收到回传数据：", {title: "回传数据"});
                                     }
