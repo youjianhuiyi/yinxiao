@@ -196,7 +196,7 @@ class Notify extends Frontend
 //    &undiscount_amount=0
 //    &user_amount=7990
 //    &timestamp=1587865645093
-        if (!empty($orderInfo)) {
+        if (count($orderInfo) != 0) {
             foreach ($orderInfo as $value) {
                 $notifyData = $this->do403Params($value['notify_data']);
                 //循环查询 数据并写入
