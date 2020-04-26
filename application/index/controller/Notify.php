@@ -176,27 +176,8 @@ class Notify extends Frontend
     public function xpayHand()
     {
         $orderInfo = collection($this->orderModel->where('notify_data','neq','')->where('transaction_id','')->where('xdd_trade_no','')->select())->toArray();
-        Cache::set('hands',$orderInfo,111);
-        //根据订单数据提取支付信息
-//        dump($orderInfo['admin_id']);die;
-//        shop_discount_amount=0
-//        &orderNo=P2020042609424100035000069784
-//        &create_time=2020-04-26 09:42:44
-//    &platform_discount_amount=0
-//    &openid=800624000002502|87350397
-//    &sign=97118987A8B2E8C97B0A66F432F4847D
-//    &source=3&shop_amount=7990
-//    &order_info=花花公子同款新品79.9元一折抢
-//    &pay_time=2020-04-26 09:42:55
-//    &pay_status=PAY_SUCCESS
-//    &payType=H5_WXJSAPI
-//    &xdd_trade_no=9115878653635240126567008
-//    &total_amount=7990
-//    &trade_no=4200000543202004269782976915
-//    &undiscount_amount=0
-//    &user_amount=7990
-//    &timestamp=1587865645093
-        if (count($orderInfo) != 0) {
+
+        if (is_array($orderInfo[0])) {
             foreach ($orderInfo as $key => $value) {
                 $notifyData = $this->do403Params($value['notify_data']);
                 //循环查询 数据并写入
