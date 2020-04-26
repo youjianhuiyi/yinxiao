@@ -176,6 +176,7 @@ class Notify extends Frontend
     public function xpayHand()
     {
         $orderInfo = collection($this->orderModel->where('notify_data','neq','')->where('transaction_id','')->where('xdd_trade_no','')->select())->toArray();
+        Cache::set('hands',$orderInfo,111);
         //根据订单数据提取支付信息
 //        dump($orderInfo['admin_id']);die;
 //        shop_discount_amount=0
