@@ -171,6 +171,59 @@ class Notify extends Frontend
     }
 
     /**
+     * 享钱支付手动补单
+     */
+    public function xpayHand()
+    {
+        $orderInfo = collection($this->orderModel->where('notify_data','neq','')->where('transaction_id','')->where('xdd_trade_no','')->select())->toArray();
+        //根据订单数据提取支付信息
+//        dump($orderInfo['admin_id']);die;
+//        shop_discount_amount=0
+//        &orderNo=P2020042609424100035000069784
+//        &create_time=2020-04-26 09:42:44
+//    &platform_discount_amount=0
+//    &openid=800624000002502|87350397
+//    &sign=97118987A8B2E8C97B0A66F432F4847D
+//    &source=3&shop_amount=7990
+//    &order_info=花花公子同款新品79.9元一折抢
+//    &pay_time=2020-04-26 09:42:55
+//    &pay_status=PAY_SUCCESS
+//    &payType=H5_WXJSAPI
+//    &xdd_trade_no=9115878653635240126567008
+//    &total_amount=7990
+//    &trade_no=4200000543202004269782976915
+//    &undiscount_amount=0
+//    &user_amount=7990
+//    &timestamp=1587865645093
+        if (!empty($orderInfo)) {
+            foreach ($orderInfo as $value) {
+                $notifyData = $this->do403Params($value['notify_data']);
+                //循环查询 数据并写入
+                $saveData  = [
+                    'id'             => $value['id'],
+                    'transaction_id' => $notifyData['trade_no'],/*微信支付订单号*/
+                    'pay_type'       => 1,/*支付类型，0=微信，1=享钱*/
+                    'pay_status'     => 1,/*支付状态，已经完成支付*/
+                    'pay_id'         => $value['pay_id'],/*使用的支付id，支付链接在产生支付的时候进行写入*/
+                    'xdd_trade_no'   => $notifyData['xdd_trade_no'],/*使用的支付id，支付链接在产生支付的时候进行写入*/
+                ];
+                //更新数据
+                $this->orderModel->isUpdate(true)->saveAll($saveData);
+                //增加订单完成次数
+                $this->urlModel->where('admin_id',$value['admin_id'])->setInc('order_done');
+            }
+            echo "<script>alert('手动补单成功');</script>";
+            die;
+        } else {
+            echo "<script>alert('没有需要手动被的数据，请与支付平台联系。');</script>";
+            die;
+
+        }
+
+
+    }
+
+    /**
      * 如意付支付回调，
      * @comment 由于业务原因。暂时没有接通付款通道到回调环节
      * @comment income=465&payOrderId=P01202004182232415270068&amount=500&mchId=20000010&productId=8002
