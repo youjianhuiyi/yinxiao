@@ -221,6 +221,7 @@ class Xpay extends Backend
 
         $payInfo = $this->model->get($ids);
         $orderNo = mt_rand(1111,9999).time();
+        $goodsName = '测试支付通道商品'.$payInfo['pay_name'];
 
         //构建订单数据
         $data = [
@@ -228,7 +229,7 @@ class Xpay extends Backend
             'admin_name'=> $this->adminModel->get($this->adminInfo['id'])->nickname,
             'pid'       => $this->adminModel->get($this->adminInfo['id'])->pid,
             'num'       => 1,
-            'name'      => '测试支付通道商品'.$payInfo['pay_name'],
+            'name'      => $goodsName,
             'phone'     => '18888888888',
             'address'   => '测试地址',
             'team_id'   => $this->adminModel->get($this->adminInfo['id'])->team_id,
@@ -290,72 +291,13 @@ class Xpay extends Backend
         if ($newParams1 == $newData['sign']) {
             //构建json数据
             $url = 'https://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString;
+            $this->assign('order_no',$orderNo);
+            $this->assign('goods_name',$goodsName);
             $this->assign('url',urlencode($url));
             return $this->view->fetch('url');
         } else {
             return '';
         }
     }
-
-    /**
-     * 生成二维码
-     * @param $string
-     * @return Response
-     * @throws \Endroid\QrCode\Exceptions\DataDoesntExistsException
-     * @throws \Endroid\QrCode\Exceptions\ImageFunctionFailedException
-     * @throws \Endroid\QrCode\Exceptions\ImageFunctionUnknownException
-     * @throws \Endroid\QrCode\Exceptions\ImageTypeInvalidException
-     */
-    private function build($string)
-    {
-//        $text = $this->request->get('text', 'hello world');
-        $text = $string;
-        $size = $this->request->get('size', 250);
-        $padding = $this->request->get('padding', 15);
-        $errorcorrection = $this->request->get('errorcorrection', 'medium');
-        $foreground = $this->request->get('foreground', "#ffffff");
-        $background = $this->request->get('background', "#000000");
-        $logo = $this->request->get('logo');
-        $logosize = $this->request->get('logosize');
-        $label = $this->request->get('label');
-        $labelfontsize = $this->request->get('labelfontsize');
-        $labelhalign = $this->request->get('labelhalign');
-        $labelvalign = $this->request->get('labelvalign');
-
-        // 前景色
-        list($r, $g, $b) = sscanf($foreground, "#%02x%02x%02x");
-        $foregroundcolor = ['r' => $r, 'g' => $g, 'b' => $b];
-
-        // 背景色
-        list($r, $g, $b) = sscanf($background, "#%02x%02x%02x");
-        $backgroundcolor = ['r' => $r, 'g' => $g, 'b' => $b];
-
-        $qrCode = new QrCode();
-        $qrCode
-            ->setText($text)
-            ->setSize($size)
-            ->setPadding($padding)
-            ->setErrorCorrection($errorcorrection)
-            ->setForegroundColor($foregroundcolor)
-            ->setBackgroundColor($backgroundcolor)
-            ->setLogoSize($logosize)
-            ->setLabel($label)
-            ->setLabelFontSize($labelfontsize)
-            ->setLabelHalign($labelhalign)
-            ->setLabelValign($labelvalign)
-            ->setImageType(QrCode::IMAGE_TYPE_PNG);
-        $fontPath = ROOT_PATH . 'public/assets/fonts/SourceHanSansK-Regular.ttf';
-        if (file_exists($fontPath)) {
-            $qrCode->setLabelFontPath($fontPath);
-        }
-        if ($logo) {
-            $qrCode->setLogo(ROOT_PATH . 'public/assets/img/qrcode.png');
-        }
-        //也可以直接使用render方法输出结果
-//        $qrCode->render();
-//        return $qrCode->writeDataUri();
-        return new Response($qrCode->get(), 200, ['Content-Type' => $qrCode->getContentType()]);
-    }
-
 
 }

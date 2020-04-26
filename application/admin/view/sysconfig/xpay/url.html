@@ -1,8 +1,12 @@
-<div class="col-sm-4 col-md-3">
-    <div class="thumbnail example">
-        <img src="{:url('production/url/build?text=')}{$url}" style="width:100%;" alt="">
-        <img src="{:url('production/url/build?text=')}http://0eb32.080ce.f0468.yuanpingzx.cn/index.php&index&index&code&042b1f06865b5d569004087e71a8c369" style="width:100%;" alt="">
-        <img src="{:url('production/url/build?text=')}https://open.xiangqianpos.com/wxJsPayV3/casher?mch_code=621200010001&sign=0DB95EC8D407B02739301DABD1C0521A&casher_id=9115878891880670556858440&third_no=74111587889207" style="width:100%;" alt="">
+<div class="row">
+    <h2 style="text-align: center">请求测试成功，请扫码支付1分钟，再查看回调订单数据</h2>
+    <p style="text-align: center">订单号：{$order_no}</p>
+    <p style="text-align: center">商品名称：{$goods_name}</p>
+</div>
+<div class="row">
+    <div class="col-sm-6 col-md-6 col-sm-offset-3 col-md-offset-3">
+        <div class="thumbnail example" style="text-align: center">
+            <img src="{:url('production/url/build?text=')}{$url}" style="width:100%;" alt="">
+        </div>
     </div>
 </div>
-{:var_dump($url)}

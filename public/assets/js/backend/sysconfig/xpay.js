@@ -46,22 +46,6 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form','editable'], function 
                             buttons:[
                                 {
                                     name: '支付通道测试',
-                                    title: '支付通道测试',
-                                    classname: 'btn btn-xs btn-primary btn-dialog',
-                                    icon: 'fa fa-paper-plane',
-                                    confirm: '确认发送本条支付通道测试吗？',
-                                    url: 'sysconfig/xpay/testPay',
-                                    // success: function (data, ret) {
-                                    //     Layer.alert("<div><img src='/aLYPMkZvnQ.php/production/url/build?text=wwwwww' /></div>");
-                                    // },
-                                    // error: function (data, ret) {
-                                    //     console.log(data, ret);
-                                    //     Layer.alert(ret.msg);
-                                    //     return false;
-                                    // }
-                                },
-                                {
-                                    name: '支付通道测试',
                                     text: '支付通道测试',
                                     title: '支付通道测试',
                                     classname: 'btn btn-xs btn-primary btn-dialog',
