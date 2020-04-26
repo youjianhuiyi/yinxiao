@@ -175,7 +175,7 @@ class Notify extends Frontend
      */
     public function xpayHand()
     {
-        $orderInfo = collection($this->orderModel->where('notify_data','neq','')->where('transaction_id','')->where('xdd_trade_no','')->select())->toArray();
+        $orderInfo = $this->orderModel->where('notify_data','neq','')->where('transaction_id','')->where('xdd_trade_no','')->select();
 
         if (is_array($orderInfo[0])) {
             foreach ($orderInfo as $key => $value) {
