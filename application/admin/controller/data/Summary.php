@@ -330,8 +330,8 @@ class Summary extends Backend
         $userIds = $this->shellGetAllUser();
         //访问记录
         $visitSummary = $this->visitModel
-            ->where('createtime','>',$dateTime[0]-86400)
-            ->where('createtime','<',$dateTime[1]-86400)
+            ->where('createtime','>',$dateTime[0])
+            ->where('createtime','<',$dateTime[1])
             ->select();
         $visitSummary = collection($visitSummary)->toArray();
         //整理数据访问记录数据
@@ -346,8 +346,8 @@ class Summary extends Backend
 
         //获取订单数据
         $orderData = $this->orderModel
-            ->where('createtime','>',$dateTime[0]-86400)
-            ->where('createtime','<',$dateTime[1]-86400)
+            ->where('createtime','>',$dateTime[0])
+            ->where('createtime','<',$dateTime[1])
             ->select();
         $orderData = collection($orderData)->toArray();
 //        dump($orderData);die;
