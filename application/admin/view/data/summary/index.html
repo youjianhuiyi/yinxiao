@@ -1,264 +1,184 @@
+<style type="text/css">
+    .sm-st {
+        background: #fff;
+        padding: 20px;
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        border-radius: 3px;
+        margin-bottom: 20px;
+        -webkit-box-shadow: 0 1px 0px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 1px 0px rgba(0, 0, 0, 0.05);
+    }
 
-<html lang="zh-cn">
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>营销平台</title>
-    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <script src="/assets/js/layer.js"></script>
-    <link href="/assets/js/sweetalert.min.css" rel="stylesheet">
-    <script src="/assets/js/sweetalert.min.js"></script>
-    <script src="https://rugucdn.oss-cn-qingdao.aliyuncs.com/libs/salesmanback/bootstrap.min.js"></script>
-    <script src="https://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+    .sm-st-icon {
+        width: 60px;
+        height: 60px;
+        display: inline-block;
+        line-height: 60px;
+        text-align: center;
+        font-size: 30px;
+        background: #eee;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+        float: left;
+        margin-right: 10px;
+        color: #fff;
+    }
 
-</head>
-<body>
+    .sm-st-info {
+        font-size: 12px;
+        padding-top: 2px;
+    }
 
+    .sm-st-info span {
+        display: block;
+        font-size: 24px;
+        font-weight: 600;
+    }
 
-<div class="gw-container">
-    <div class="container-fluid">
-            <style>
-                .account-stat{overflow:hidden; color:#666;}
-                .account-stat .account-stat-btn{width:100%; overflow:hidden;}
-                .account-stat .account-stat-btn > div{text-align:center; margin-bottom:5px;margin-right:2%; float:left;width:23%; height:80px; padding-top:10px;font-size:16px; border-left:1px #DDD solid;}
-                .account-stat .account-stat-btn > div:first-child{border-left:0;}
-                .account-stat .account-stat-btn > div span{display:block; font-size:30px; font-weight:bold}
-            </style>
+    .orange {
+        background: #fa8564 !important;
+    }
 
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    销量信息详解
-                </div>
+    .tar {
+        background: #45cf95 !important;
+    }
 
-                <div class="panel-body">
-                    <div class="pull-right">
-                        <div class="checkbox">
-                            <label style="color:#57B9E6;"><input type="checkbox" checked> 总订单</label>&nbsp;
-                            <label style="color:rgba(203,48,48,1)"><input type="checkbox"> 在线支付订单</label>&nbsp;
-                            <label style="color:rgba(149,192,0,1);;"><input type="checkbox"> 货到付款订单</label>&nbsp;
-                            <label style="color:#e7a017;"><input type="checkbox"> 未支付订单</label>
-                        </div>
-                        <div class="pull-left">
-                            <link href="http://wx.fkesmthg.cn/Public/js/daterangepicker/daterangepicker.css" rel="stylesheet">
-                            <script type="text/javascript" src="http://wx.fkesmthg.cn/Public/js/daterangepicker/moment.js"></script>
-                            <script type="text/javascript" src="http://wx.fkesmthg.cn/Public/js/daterangepicker/daterangepicker.js"></script>
-                            <script type="text/javascript">
-                                $(function(){
-                                    $(".daterange.daterange-time").each(function(){
-                                        var elm = this;
-                                        $(this).daterangepicker({
-                                            startDate: $(elm).prev().prev().val(),
-                                            endDate: $(elm).prev().val(),
-                                            format: "YYYY-MM-DD HH:mm",
-                                            timePicker: true,
-                                            timePicker12Hour : false,
-                                            timePickerIncrement: 1,
-                                            minuteStep: 1
-                                        }, function(start, end){
-                                            $(elm).find(".date-title").html(start.toDateTimeStr() + " 至 " + end.toDateTimeStr());
-                                            $(elm).prev().prev().val(start.toDateTimeStr());
-                                            $(elm).prev().val(end.toDateTimeStr());
-                                        });
-                                    });
-                                });
-                            </script>
-                            <input name="search_timestart" type="hidden" value="2020-04-26 00:00" />
-                            <input name="search_timeend" type="hidden" value="2020-04-26 23:59" />
-                            <button class="btn btn-default daterange daterange-time" type="button"><span class="date-title">2020-04-26 00:00 至 2020-04-26 23:59</span> <i class="fa fa-calendar"></i></button>				<button class="btn btn-default" onclick="refreshData();">查询</button>
-                        </div>
-                    </div>
-                    <div class="account-stat">
-                        <div class="account-stat-btn">
-                            <div>总订单<span id="today_oc"></span></div>
-                            <div>在线支付订单<span id="today_ps2_oc"></span></div>
-                            <div>货到付款订单<span id="today_pt1_oc"></span></div>
-                            <div>未支付订单<span id="today_ps1_oc"></span></div>
-                        </div>
-                    </div>
-                    <div style="margin-top:20px">
-                        <canvas id="myChart" width="768" height="192" style="width: 768px; height: 192px;"></canvas>
-                    </div>
+    .sm-st .green {
+        background: #86ba41 !important;
+    }
+
+    .pink {
+        background: #AC75F0 !important;
+    }
+
+    .yellow-b {
+        background: #fdd752 !important;
+    }
+
+    .stat-elem {
+
+        background-color: #fff;
+        padding: 18px;
+        border-radius: 40px;
+
+    }
+
+    .stat-info {
+        text-align: center;
+        background-color: #fff;
+        border-radius: 5px;
+        margin-top: -5px;
+        padding: 8px;
+        -webkit-box-shadow: 0 1px 0px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 1px 0px rgba(0, 0, 0, 0.05);
+        font-style: italic;
+    }
+
+    .stat-icon {
+        text-align: center;
+        margin-bottom: 5px;
+    }
+
+    .st-red {
+        background-color: #F05050;
+    }
+
+    .st-green {
+        background-color: #27C24C;
+    }
+
+    .st-violet {
+        background-color: #7266ba;
+    }
+
+    .st-blue {
+        background-color: #23b7e5;
+    }
+
+    .stats .stat-icon {
+        color: #28bb9c;
+        display: inline-block;
+        font-size: 26px;
+        text-align: center;
+        vertical-align: middle;
+        width: 50px;
+        float: left;
+    }
+
+    .stat {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: inline-block;
+        margin-right: 10px;
+    }
+
+    .stat .value {
+        font-size: 20px;
+        line-height: 24px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-weight: 500;
+    }
+
+    .stat .name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .stat.lg .value {
+        font-size: 26px;
+        line-height: 28px;
+    }
+
+    .stat.lg .name {
+        font-size: 16px;
+    }
+
+    .stat-col .progress {
+        height: 2px;
+    }
+
+    .stat-col .progress-bar {
+        line-height: 2px;
+        height: 2px;
+    }
+
+    .item {
+        padding: 30px 0;
+    }
+</style>
+<div class="panel panel-default panel-intro">
+    <div class="panel-heading">
+        {:build_heading(null, false)}
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#one" data-toggle="tab">{:__('Dashboard')}</a></li>
+            <li><a href="#two" data-toggle="tab">{:__('Custom')}</a></li>
+        </ul>
+    </div>
+    <div class="panel-body">
+        <div id="myTabContent" class="tab-content">
+            <div class="tab-pane fade active in" id="one">
+                <div class="row">
+                    <div id="echart" class="btn-refresh" style="height:600px;width:100%;"></div>
                 </div>
             </div>
-
-
-            <div class="panel panel-default">
-                <div class="panel-heading">24小时销量趋势图(默认显示昨天的)</div>
-                <div class="panel-body">
-                    <div style="margin-top:20px;" id="houraa">
-                        <canvas id="hour24SalesChart" height="100"></canvas>
+            <div class="tab-pane fade" id="two">
+                <div class="row">
+                    <div class="col-xs-12">
+                        {:__('Custom zone')}
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 </div>
-
-<script src="/assets/js/Chart.min.js"></script>
 <script>
-    var datasets = '';
-    var lineChartData = null;
-    var data = null;
-    var replystatistics_url = "data/summary/salesChart";
-    $.post(replystatistics_url, {'m_name' : 'basic'}, function(data){
-        data = $.parseJSON(data);
-        lineChartData = {
-            labels : data.key,
-            datasets : [
-                {	label: '总订单',
-                    fillColor : "rgba(36,165,222,0.1)",
-                    strokeColor : "rgba(36,165,222,1)",
-                    pointColor : "rgba(36,165,222,1)",
-                    pointStrokeColor : "#fff",
-                    pointHighlightFill : "#fff",
-                    pointHighlightStroke : "rgba(36,165,222,1)",
-                    data : data.datasets
-                },{
-                    label: '在线支付订单',
-                    fillColor : "rgba(203,48,48,0.1)",
-                    strokeColor : "rgba(203,48,48,1)",
-                    pointColor : "rgba(203,48,48,1)",
-                    pointStrokeColor : "#fff",
-                    pointHighlightFill : "#fff",
-                    pointHighlightStroke : "rgba(203,48,48,1)",
-                    data : data.datasets2
-                },
-                {
-                    label: '货到付款订单',
-                    fillColor : "rgba(149,192,0,0.1)",
-                    strokeColor : "rgba(149,192,0,1)",
-                    pointColor : "rgba(149,192,0,1)",
-                    pointStrokeColor : "#fff",
-                    pointHighlightFill : "#fff",
-                    pointHighlightStroke : "rgba(149,192,0,1)",
-                    data : data.datasets3
-                },
-                {
-                    label: '未支付订单',
-                    fillColor : "rgba(231,160,23,0.1)",
-                    strokeColor : "rgba(231,160,23,1)",
-                    pointColor : "rgba(231,160,23,1)",
-                    pointStrokeColor : "#fff",
-                    pointHighlightFill : "#fff",
-                    pointHighlightStroke : "rgba(231,160,23,1)",
-                    data : data.datasets4
-                }
-
-
-            ]
-        }
-
-        $("#today_oc").html(data.today_count[0]);
-        $("#today_ps2_oc").html(data.today_count[1]);
-        $("#today_pt1_oc").html(data.today_count[2]);
-        $("#today_ps1_oc").html(data.today_count[3]);
-        var ctx2 = document.getElementById("myChart").getContext("2d");
-        window.myLine = new Chart(ctx2).Line(lineChartData, {responsive: true});
-    });
-
-
-    function refreshData() {
-        var visables = [];
-        var i = 0;
-        $('.checkbox input[type="checkbox"]').each(function(){
-            if($(this).attr('checked')) {
-                visables.push(i);
-            }
-            i++;
-        });
-
-
-        var startTime = $("input[name='search_timestart']").val();
-        var endTime = $("input[name='search_timeend']").val();
-        $("#salediv").html("");
-        $("#salediv").html("<canvas id='myChart' height='100'></canvas>");
-        var replystatistics_url = "data/summary/salesChart";
-        $.post(replystatistics_url, {'m_name' : 'basic',visables:visables,startTime:startTime,endTime:endTime}, function(data){
-            data = $.parseJSON(data);
-            lineChartData = {
-                labels : data.key,
-                datasets : [
-                    {	label: '总订单',
-                        fillColor : "rgba(36,165,222,0.1)",
-                        strokeColor : "rgba(36,165,222,1)",
-                        pointColor : "rgba(36,165,222,1)",
-                        pointStrokeColor : "#fff",
-                        pointHighlightFill : "#fff",
-                        pointHighlightStroke : "rgba(36,165,222,1)",
-                        data : data.datasets
-                    },{
-                        label: '在线支付订单',
-                        fillColor : "rgba(203,48,48,0.1)",
-                        strokeColor : "rgba(203,48,48,1)",
-                        pointColor : "rgba(203,48,48,1)",
-                        pointStrokeColor : "#fff",
-                        pointHighlightFill : "#fff",
-                        pointHighlightStroke : "rgba(203,48,48,1)",
-                        data : data.datasets2
-                    },
-                    {
-                        label: '货到付款订单',
-                        fillColor : "rgba(149,192,0,0.1)",
-                        strokeColor : "rgba(149,192,0,1)",
-                        pointColor : "rgba(149,192,0,1)",
-                        pointStrokeColor : "#fff",
-                        pointHighlightFill : "#fff",
-                        pointHighlightStroke : "rgba(149,192,0,1)",
-                        data : data.datasets3
-                    },
-                    {
-                        label: '未支付订单',
-                        fillColor : "rgba(231,160,23,0.1)",
-                        strokeColor : "rgba(231,160,23,1)",
-                        pointColor : "rgba(231,160,23,1)",
-                        pointStrokeColor : "#fff",
-                        pointHighlightFill : "#fff",
-                        pointHighlightStroke : "rgba(231,160,23,1)",
-                        data : data.datasets4
-                    }
-                ]
-            }
-            $("#today_oc").html(data.today_count[0]);
-            $("#today_ps2_oc").html(data.today_count[1]);
-            $("#today_pt1_oc").html(data.today_count[2]);
-            $("#today_ps1_oc").html(data.today_count[3]);
-            var ctx2 = document.getElementById("myChart").getContext("2d");
-            window.myLine = new Chart(ctx2).Line(lineChartData, {responsive: true});
-        });
-    }
-
-    $('.checkbox input[type="checkbox"]').on('click', function(){
-        $(this).attr('checked', !$(this).attr('checked'))
-        refreshData();
-    });
+    var Orderdata = {
+        column: {:json_encode(array_keys($paylist))},
+    paydata: {:json_encode(array_values($paylist))},
+    createdata: {:json_encode(array_values($createlist))},
+    };
 </script>
-
-<script>
-    var datasets = '';
-    var lineChartData = null;
-    var obj = null;
-    var data = null;
-    var replystatistics_url = "/data/summary/salesBy24Hour";
-    $.post(replystatistics_url, {'m_name' : 'basic'}, function(data){
-        data = $.parseJSON(data);
-        lineChartData = {
-            labels : data.key,
-            datasets : [
-                {
-                    fillColor : "rgba(36,165,222,0.1)",
-                    strokeColor : "rgba(36,165,222,1)",
-                    pointColor : "rgba(36,165,222,1)",
-                    pointStrokeColor : "#fff",
-                    pointHighlightFill : "#fff",
-                    pointHighlightStroke : "rgba(36,165,222,1)",
-                    data : data.datasets
-                }
-            ]
-        }
-        var ctx2 = document.getElementById("hour24SalesChart").getContext("2d");
-        window.myLine = new Chart(ctx2).Line(lineChartData, {responsive: true});
-    });
-</script>
-
-</body>
-</html>

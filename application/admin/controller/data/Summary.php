@@ -9,6 +9,7 @@ use app\admin\model\data\Visit as VisitModel;
 use app\admin\model\production\Url as UrlModel;
 use app\admin\model\Admin as AdminModel;
 use fast\Tree;
+use think\Config;
 
 /**
  * 总数据报表
@@ -103,7 +104,7 @@ class Summary extends Backend
     /**
      * 查看
      */
-    public function index()
+    public function index1()
     {
         if ($this->request->isPost()) {
 
@@ -403,5 +404,65 @@ class Summary extends Backend
         }
     }
 
+    public function salesChart()
+    {
+        $dateTime = $this->getBeginEndTime();
+        $data = $this->model
+            ->where('createtime','>',$dateTime[0])
+            ->where('createtime','<',$dateTime[1])
+            ->select();
+        $data = collection($data)->toArray();
+        $newData = [
+          'key' => ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+            'dataset1'=>[0, 10, 5, 2, 20, 30, 45],
+            'dataset2'=>[0, 10, 5, 2, 20, 30, 45],
+            'dataset3'=>[0, 10, 5, 2, 20, 30, 45],
+            'dataset4'=>[0, 10, 5, 2, 20, 30, 45],
+            'dataset5'=>[0, 10, 5, 2, 20, 30, 45]
+        ];
+        return $newData;
+    }
+
+    /**
+     * 查看
+     */
+    public function index()
+    {
+        $date = date('m-d',time());
+        $visit = collection($this->model->where('date',$date)->select())->toArray();
+
+        $seventtime = \fast\Date::unixtime('day', -7);
+        $paylist = $createlist = [];
+        for ($i = 0; $i < 7; $i++)
+        {
+            $day = date("Y-m-d", $seventtime + ($i * 86400));
+            $createlist[$day] = mt_rand(20, 200);
+            $paylist[$day] = mt_rand(1, mt_rand(1, $createlist[$day]));
+        }
+        $hooks = config('addons.hooks');
+        $uploadmode = isset($hooks['upload_config_init']) && $hooks['upload_config_init'] ? implode(',', $hooks['upload_config_init']) : 'local';
+        $addonComposerCfg = ROOT_PATH . '/vendor/karsonzhang/fastadmin-addons/composer.json';
+        Config::parse($addonComposerCfg, "json", "composer");
+        $config = Config::get("composer");
+        $addonVersion = isset($config['version']) ? $config['version'] : __('Unknown');
+        $this->view->assign([
+//            'totaluser'        => 35200,
+//            'totalviews'       => 219390,
+//            'totalorder'       => 32143,
+//            'totalorderamount' => 174800,
+//            'todayuserlogin'   => 321,
+//            'todayusersignup'  => 430,
+//            'todayorder'       => 2324,
+//            'unsettleorder'    => 132,
+//            'sevendnu'         => '80%',
+//            'sevendau'         => '32%',
+            'paylist'          => $paylist,
+            'createlist'       => $createlist,
+            'addonversion'       => $addonVersion,
+            'uploadmode'       => $uploadmode
+        ]);
+
+        return $this->view->fetch();
+    }
 
 }

@@ -1,59 +1,166 @@
-define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefined, Backend, Table, Form) {
+define(['jquery', 'bootstrap', 'backend', 'addtabs', 'table', 'echarts', 'echarts-theme', 'template'], function ($, undefined, Backend, Datatable, Table, Echarts, undefined, Template) {
+
     var Controller = {
         index: function () {
-            //
-            // 初始化表格参数配置
-            Table.api.init({
-                extend: {
-                    index_url: 'data/summary/index',
-                    add_url: 'data/summary/add',
-                    edit_url: 'data/summary/edit',
-                    del_url: 'data/summary/del',
-                    multi_url: 'data/summary/multi',
-                    table: '',
-                }
-            });
+            // 基于准备好的dom，初始化echarts实例
+            var myChart = Echarts.init(document.getElementById('echart'), 'walden');
 
-            var table = $("#table");
-
-            // 初始化表格
-            table.bootstrapTable({
-                url: $.fn.bootstrapTable.defaults.extend.index_url,
-                pk: 'id',
-                sortName: 'id',
-                searchFormVisible: true,
-                searchFormTemplate: 'customformtpl',
-                search:false,
-                showExport:false,
-                columns: [
-                    [
-                        {checkbox: true},
-                        {field: 'id', title: '编号', operate: false},
-                        {field: 'team_name', title: "团队名称",visible:false},
-                        {field: 'pid', title: "组长"},
-                        {field: 'admin_name', title: "业务员"},
-                        {field: 'visit', title:"访问量"},
-                        {field: 'order', title: "下单量"},
-                        {field: 'done', title: "成交量"},
-                        {field: 'createtime', title: __('Create time'), formatter: Table.api.formatter.datetime, operate: 'RANGE', addclass: 'datetimerange', sortable: true},
+            // 指定图表的配置项和数据
+            var option = {
+                title: {
+                    text: '',
+                    subtext: ''
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data: ['浏览数','订单数量','订单商品数量','支付成功订单','支付成功商品数量']
+                },
+                toolbox: {
+                    show: false,
+                    feature: {
+                        magicType: {show: true, type: ['stack', 'tiled']},
+                        saveAsImage: {show: true}
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: Orderdata.column
+                },
+                yAxis: {
+                    type:'value',
+                    boundaryGap:true,
+                    data:Orderdata.row
+                },
+                grid: [{
+                    left: 'left',
+                    top: 'top',
+                    right: '10',
+                    bottom: 30
+                }],
+                series: [
+                    {
+                        name: '浏览数',
+                        type: 'line',
+                        smooth: true,
+                        areaStyle: {
+                            normal: {}
+                        },
+                        lineStyle: {
+                            normal: {
+                                width: 1.5
+                            }
+                        },
+                        data: Orderdata.paydata
+                    },
+                    {
+                        name: '订单数量',
+                        type: 'line',
+                        smooth: true,
+                        areaStyle: {
+                            normal: {}
+                        },
+                        lineStyle: {
+                            normal: {
+                                width: 1.5
+                            }
+                        },
+                        data: Orderdata.createdata
+                    },
+                    {
+                        name: '订单商品数量',
+                        type: 'line',
+                        smooth: true,
+                        areaStyle: {
+                            normal: {}
+                        },
+                        lineStyle: {
+                            normal: {
+                                width: 1.5
+                            }
+                        },
+                        data: Orderdata.paydata
+                    },
+                    {
+                        name: '支付成功订单',
+                        type: 'line',
+                        smooth: true,
+                        areaStyle: {
+                            normal: {}
+                        },
+                        lineStyle: {
+                            normal: {
+                                width: 1.5
+                            }
+                        },
+                        data: Orderdata.paydata
+                    },
+                    {
+                        name: '支付成功商品数量',
+                        type: 'line',
+                        smooth: true,
+                        areaStyle: {
+                            normal: {}
+                        },
+                        lineStyle: {
+                            normal: {
+                                width: 1.5
+                            }
+                        },
+                        data: Orderdata.paydata
+                    }
                     ]
-                ]
+            };
+
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.setOption(option);
+
+            //动态添加数据，可以通过Ajax获取数据然后填充
+            // setInterval(function () {
+            //     Orderdata.column.push((new Date()).toLocaleTimeString().replace(/^\D*/, ''));
+            //     var amount = Math.floor(Math.random() * 200) + 20;
+            //     Orderdata.createdata.push(amount);
+            //     Orderdata.paydata.push(Math.floor(Math.random() * amount) + 1);
+            //
+            //     //按自己需求可以取消这个限制
+            //     if (Orderdata.column.length >= 20) {
+            //         //移除最开始的一条数据
+            //         Orderdata.column.shift();
+            //         Orderdata.paydata.shift();
+            //         Orderdata.createdata.shift();
+            //     }
+            //     myChart.setOption({
+            //         xAxis: {
+            //             data: Orderdata.column
+            //         },
+            //         series: [{
+            //             name: __('Sales'),
+            //             data: Orderdata.paydata
+            //         },
+            //             {
+            //                 name: __('Orders'),
+            //                 data: Orderdata.createdata
+            //             }]
+            //     });
+            // }, 2000);
+            $(window).resize(function () {
+                myChart.resize();
             });
 
-            // 为表格绑定事件
-            Table.api.bindevent(table);
-        },
-        add: function () {
-            Controller.api.bindevent();
-        },
-        edit: function () {
-            Controller.api.bindevent();
-        },
-        api: {
-            bindevent: function () {
-                Form.api.bindevent($("form[role=form]"));
-            }
+            $(document).on("click", ".btn-checkversion", function () {
+                top.window.$("[data-toggle=checkupdate]").trigger("click");
+            });
+
+            $(document).on("click", ".btn-refresh", function () {
+                setTimeout(function () {
+                    myChart.resize();
+                }, 0);
+            });
+
         }
     };
+
     return Controller;
 });

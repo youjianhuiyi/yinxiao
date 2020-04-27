@@ -30,7 +30,7 @@ class DataSummaryAddDate extends Migrator
     {
         $table = $this->table('data_summary');
         $table
-            ->addColumn('gid','integer',['limit'=>10,'after'=>'admin_id','signed'=>false,'null'=>false,'default'=>'','comment'=>'商品ID'])
+            ->addColumn('gid','integer',['limit'=>10,'after'=>'admin_id','signed'=>false,'null'=>false,'default'=>0,'comment'=>'商品ID'])
             ->addColumn('date','string',['limit'=>10,'after'=>'admin_id','null'=>false,'default'=>'','comment'=>'日期'])
             ->changeColumn('check_code','string',['limit'=>32,'null'=>false,'default'=>'','comment'=>'推广码'])
             ->update();
