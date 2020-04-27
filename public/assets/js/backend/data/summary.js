@@ -53,7 +53,7 @@ define(['jquery', 'bootstrap', 'backend', 'addtabs', 'table', 'echarts', 'echart
                                 width: 1.5
                             }
                         },
-                        data: Orderdata.paydata
+                        data: Orderdata.visit_data
                     },
                     {
                         name: '订单数量',
@@ -67,7 +67,7 @@ define(['jquery', 'bootstrap', 'backend', 'addtabs', 'table', 'echarts', 'echart
                                 width: 1.5
                             }
                         },
-                        data: Orderdata.createdata
+                        data: Orderdata.order_count
                     },
                     {
                         name: '订单商品数量',
@@ -81,7 +81,7 @@ define(['jquery', 'bootstrap', 'backend', 'addtabs', 'table', 'echarts', 'echart
                                 width: 1.5
                             }
                         },
-                        data: Orderdata.paydata
+                        data: Orderdata.order_nums
                     },
                     {
                         name: '支付成功订单',
@@ -95,7 +95,7 @@ define(['jquery', 'bootstrap', 'backend', 'addtabs', 'table', 'echarts', 'echart
                                 width: 1.5
                             }
                         },
-                        data: Orderdata.paydata
+                        data: Orderdata.pay_done
                     },
                     {
                         name: '支付成功商品数量',
@@ -109,7 +109,7 @@ define(['jquery', 'bootstrap', 'backend', 'addtabs', 'table', 'echarts', 'echart
                                 width: 1.5
                             }
                         },
-                        data: Orderdata.paydata
+                        data: Orderdata.pay_done_nums
                     }
                     ]
             };

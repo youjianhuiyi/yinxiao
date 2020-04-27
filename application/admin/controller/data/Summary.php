@@ -8,6 +8,7 @@ use app\admin\model\team\Team as TeamModel;
 use app\admin\model\data\Visit as VisitModel;
 use app\admin\model\production\Url as UrlModel;
 use app\admin\model\Admin as AdminModel;
+use fast\Date;
 use fast\Tree;
 use think\Config;
 
@@ -28,6 +29,7 @@ class Summary extends Backend
     protected $urlModel = null;
     protected $adminModel = null;
     protected $teamModel = null;
+    protected $model  = null;
 
     public function _initialize()
     {
@@ -429,37 +431,61 @@ class Summary extends Backend
     public function index()
     {
         $date = date('m-d',time());
-        $visit = collection($this->model->where('date',$date)->select())->toArray();
-
-        $seventtime = \fast\Date::unixtime('day', -7);
-        $paylist = $createlist = [];
-        for ($i = 0; $i < 7; $i++)
-        {
-            $day = date("Y-m-d", $seventtime + ($i * 86400));
-            $createlist[$day] = mt_rand(20, 200);
-            $paylist[$day] = mt_rand(1, mt_rand(1, $createlist[$day]));
+        $dataSummary = collection($this->model->select())->toArray();
+        //先将所有数据按日期分类
+        $data = [];
+        $dateData = [];
+        foreach ($dataSummary as $item) {
+            $data[$item['date']][] = $item;
+            $dateData[$item['date']]['visit_nums'] = 0;
+            $dateData[$item['date']]['order_count'] = 0;
+            $dateData[$item['date']]['order_nums'] = 0;
+            $dateData[$item['date']]['pay_done'] = 0;
+            $dateData[$item['date']]['pay_done_nums'] = 0;
         }
-        $hooks = config('addons.hooks');
-        $uploadmode = isset($hooks['upload_config_init']) && $hooks['upload_config_init'] ? implode(',', $hooks['upload_config_init']) : 'local';
-        $addonComposerCfg = ROOT_PATH . '/vendor/karsonzhang/fastadmin-addons/composer.json';
-        Config::parse($addonComposerCfg, "json", "composer");
-        $config = Config::get("composer");
-        $addonVersion = isset($config['version']) ? $config['version'] : __('Unknown');
+        //再将分类好的日期数据归总数值
+        foreach ($data as $key => $value) {
+            foreach ($value as $v) {
+                $dateData[$key]['visit_nums'] += $v['visit_nums'];
+                $dateData[$key]['order_count'] += $v['order_count'];
+                $dateData[$key]['order_nums'] += $v['order_nums'];
+                $dateData[$key]['pay_done'] += $v['pay_done'];
+                $dateData[$key]['pay_done_nums'] += $v['pay_done_nums'];
+            }
+        }
+//        dump($dateData);die;
+
+        //构建图标需要的数值
+        $newArr = [];
+        foreach ($dateData as $key => $value) {
+            $newArr['visit_nums'][$key] =  $value['visit_nums'];
+            $newArr['order_count'][$key] =  $value['order_count'];
+            $newArr['order_nums'][$key] =  $value['order_nums'];
+            $newArr['pay_done'][$key] =  $value['pay_done'];
+            $newArr['pay_done_nums'][$key] =  $value['pay_done_nums'];
+        }
+
+
+//        dump($newArr);die;
+//        $sevenTime = Date::unixtime('day', -7);
+//        $payList = $createList = [];
+//        for ($i = 0; $i < 7; $i++)
+//        {
+//            $day = date("Y-m-d", $sevenTime + ($i * 86400));
+//            $createList[$day] = mt_rand(20, 200);
+//            $payList[$day] = mt_rand(1, mt_rand(1, $createList[$day]));
+//        }
+//
+//        dump($createList);
+//        dump($payList);die;
         $this->view->assign([
-//            'totaluser'        => 35200,
-//            'totalviews'       => 219390,
-//            'totalorder'       => 32143,
-//            'totalorderamount' => 174800,
-//            'todayuserlogin'   => 321,
-//            'todayusersignup'  => 430,
-//            'todayorder'       => 2324,
-//            'unsettleorder'    => 132,
-//            'sevendnu'         => '80%',
-//            'sevendau'         => '32%',
-            'paylist'          => $paylist,
-            'createlist'       => $createlist,
-            'addonversion'       => $addonVersion,
-            'uploadmode'       => $uploadmode
+            'paylist'          => $dateData,
+            'createlist'       => $dateData,
+            'visit'            => $newArr['visit_nums'],
+            'order_count'      => $newArr['order_count'],
+            'order_nums'       => $newArr['order_nums'],
+            'pay_done'         => $newArr['pay_done'],
+            'pay_done_nums'    => $newArr['pay_done_nums'],
         ]);
 
         return $this->view->fetch();

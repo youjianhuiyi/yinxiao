@@ -171,19 +171,23 @@
                             <th>组长</th>
                             <th>业务员</th>
                             <th>访问量</th>
-                            <th>下单量</th>
-                            <th>成交量</th>
+                            <th>订单量</th>
+                            <th>订单商品量</th>
+                            <th>支付订单量</th>
+                            <th>支付商品量</th>
                         </tr>
-                        {foreach name="userInfoData" item="vo"}
+                        {foreach name="data" item="vo"}
                         <tr>
                             {if $user.id == 1}
                             <td>{:isset($teamData[$vo.team_id]) ? $teamData[$vo.team_id] : ''}</td>
                             {/if}
-                            <td>{:isset($adminName[$vo.pid]) ? $adminName[$vo.pid] : $adminName[$vo.id]}</td>
-                            <td>{$vo.nickname}</td>
-                            <td>{$visitData[$vo.id]}</td>
-                            <td>{$orderData[$vo.id]}</td>
-                            <td>{$orderDoneData[$vo.id]}</td>
+                            <td>{:isset($adminName[$vo.pid]) ? $adminName[$vo.pid] : ''}</td>
+                            <td>{$vo.name}</td>
+                            <td>{$vo.visit_nums}</td>
+                            <td>{$vo.order_count}</td>
+                            <td>{$vo.order_nums}</td>
+                            <td>{$vo.pay_done}</td>
+                            <td>{$vo.pay_done_nums}</td>
                         </tr>
                         {/foreach}
                     </table>
