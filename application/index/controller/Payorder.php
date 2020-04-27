@@ -141,6 +141,8 @@ class PayOrder extends Frontend
         }
 
         /**********************************下单完成处理的逻辑*************************************************/
+        //商户统计
+        $this->doPaySummary($payInfo['id'],1,['type'=>'use_count','nums'=>1]);
         //接收请求下单接口回来的数据
         $newData = json_decode($result,true);
         //计算下单接口返回过来数据的签名

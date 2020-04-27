@@ -9,6 +9,7 @@ use app\admin\model\sysconfig\Pay as PayModel;
 use app\admin\model\sysconfig\Xpay as XPayModel;
 use app\admin\model\sysconfig\Rypay as RyPayModel;
 use app\admin\model\data\DataSummary as DataSummaryModel;
+use app\admin\model\data\PayRecord as PayRecordModel;
 use app\admin\model\production\Url as UrlModel;
 use WeChat\Oauth;
 use app\admin\model\Admin as AdminModel;
@@ -41,6 +42,7 @@ class Frontend extends Controller
     protected $rypayModel = null;
     protected $urlModel = null;
     protected $dataSummaryModel = null;
+    protected $payRecordMode = null;
 
     public function _initialize()
     {
@@ -51,6 +53,7 @@ class Frontend extends Controller
         $this->rypayModel = new RyPayModel();
         $this->urlModel = new UrlModel();
         $this->dataSummaryModel = new DataSummaryModel();
+        $this->payRecordMode = new PayRecordModel();
     }
 
     /**
@@ -560,6 +563,85 @@ class Frontend extends Controller
             }
             //初始化数据
             $result = $this->dataSummaryModel->isUpdate(false)->saveAll($newData);
+            return $result ? true : false;
+        }
+    }
+
+    /**
+     * 统计支付商户号收钱数据
+     * @comment 当天只要有一个访问，则自动生成所有记录关系。
+     * @param $payId    integer    支付ID
+     * @param $payType  integer     0=微信支付，1=享钱支付，2=如意支付
+     * @param $data array  统计数据类型 type => use_count|pay_nums|money; nums=>1,2,3
+     * @return bool
+     */
+    public function doPaySummary($payId,$payType,$data)
+    {
+        //通过当前时间戳计划当前日期
+        $date = date('m-d',time());
+        //查询当前统计数据是否有当前的初始化数据
+        $isExistsData = $this->payRecordMode->where('date',$date)->find();
+        if ($isExistsData) {
+            //表示已经存在，则直接进行相应数据的更新操作。增加一次访问记录。
+            $where = ['pay_id'=>$payId,'pay_type'=>$payType];
+            if ($data['type'] == 'use_count') {
+                $result = $this->payRecordMode->where($where)->setInc('use_count');
+            } elseif ($data['type'] == 'pay_nums') {
+                $result = $this->payRecordMode->where($where)->setInc('pay_nums');
+            } elseif ($data['type'] == 'money') {
+                $result = $this->payRecordMode->where($where)->setInc('money',$data['nums']);
+            } else {
+                $result = false;
+            }
+            //返回更新结果
+            return $result ? true : false;
+        } else {
+            //表示没有数据，先初始化数据，再进行相应数据的更新操作。
+            //获取所有推广码。
+            $xpayData = collection($this->xpayModel->select())->toArray();/*享钱支付*/
+            $rypayData = collection($this->rypayModel->select())->toArray();/*如意支付*/
+            $payData = collection($this->payModel->select())->toArray();/*微信支付*/
+            $newData = [];
+            foreach ($xpayData as $value) {
+                $newData[] = [
+                    'date'          => $date,
+                    'team_id'       => $value['team_id'],
+                    'pay_id'        => $value['id'],
+                    'pay_type'      => 1,
+//                    'check_code'    => $value['check_code'],
+                    'use_count'     => 0,
+                    'pay_nums'      => 0,
+                    'money'         => 0.00,
+                ];
+            }
+            //
+            foreach ($rypayData as $value) {
+                $newData[] = [
+                    'date'          => $date,
+                    'team_id'       => $value['team_id'],
+                    'pay_id'        => $value['id'],
+                    'pay_type'      => 2,
+//                    'check_code'    => $value['check_code'],
+                    'use_count'     => 0,
+                    'pay_nums'      => 0,
+                    'money'         => 0.00,
+                ];
+            }
+
+            foreach ($payData as $value) {
+                $newData[] = [
+                    'date'          => $date,
+                    'team_id'       => $value['team_id'],
+                    'pay_id'        => $value['id'],
+                    'pay_type'      => 0,
+//                    'check_code'    => $value['check_code'],
+                    'use_count'     => 0,
+                    'pay_nums'      => 0,
+                    'money'         => 0.00,
+                ];
+            }
+            //初始化数据
+            $result = $this->payRecordMode->isUpdate(false)->saveAll($newData);
             return $result ? true : false;
         }
     }

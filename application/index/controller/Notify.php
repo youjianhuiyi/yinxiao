@@ -149,6 +149,9 @@ class Notify extends Frontend
                 //数据统计
                 $this->doDataSummary($checkCode,['type'=>'pay_done','nums'=>1]);
                 $this->doDataSummary($checkCode,['type'=>'pay_nums','nums'=>$orderInfo['num']]);
+                //支付商户统计
+                $this->doPaySummary($payInfo['id'],1,['type'=>'money','nums'=>$data['amount']/100]);
+                $this->doPaySummary($payInfo['id'],1,['type'=>'pay_nums','nums'=>1]);
                 Db::commit();
             } catch (ValidateException $e) {
                 Db::rollback();
