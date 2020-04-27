@@ -65,13 +65,13 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                                 }},
                             {field: 'order_status', title: __('Order_status'),searchList: {
                                     "0":"正在出库中",
-                                    "1":"退货",
+                                    "1":"已发货",
                                     "2":"补货",
                                     "3":"退款",
                                     "4":"退货退款",
                                 },formatter:function (value,row,index) {
                                     if (value ===0){return '正在出库中';}
-                                    if (value ===1){return '退货';}
+                                    if (value ===1){return '已发货';}
                                     if (value ===2){return '补货';}
                                     if (value ===3){return '退款';}
                                     if (value ===4){return '退货退款';}
@@ -143,13 +143,13 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                                 }},
                             {field: 'order_status', title: __('Order_status'),searchList:{
                                     "0":"正在出库中",
-                                    "1":"退货",
+                                    "1":"已发货",
                                     "2":"补货",
                                     "3":"退款",
                                     "4":"退货退款"
                                 },formatter:function (value,row,index) {
                                     if (value ===0){return '正在出库中';}
-                                    if (value ===1){return '退货';}
+                                    if (value ===1){return '已发货';}
                                     if (value ===2){return '补货';}
                                     if (value ===3){return '退款';}
                                     if (value ===4){return '退货退款';}
@@ -221,13 +221,13 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                                 }},
                             {field: 'order_status',title: __('Order_status'),searchList: {
                                     "0":"正在出库中",
-                                    "1":"退货",
+                                    "1":"已发货",
                                     "2":"补货",
                                     "3":"退款",
                                     "4":"退货退款"
                                 },formatter:function (value,row,index) {
                                     if (value ===0){return '正在出库中';}
-                                    if (value ===1){return '退货';}
+                                    if (value ===1){return '已发货';}
                                     if (value ===2){return '补货';}
                                     if (value ===3){return '退款';}
                                     if (value ===4){return '退货退款';}

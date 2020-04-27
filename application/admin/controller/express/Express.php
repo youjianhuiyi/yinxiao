@@ -366,7 +366,15 @@ class Express extends Backend
 
         $this->orderModel->isUpdate(true)->saveAll($newArr);
     }
-    
+
+
+    /**
+     * 导入快递成功发送短信
+     */
+    public function sendSms()
+    {
+
+    }
     
 
     /**
