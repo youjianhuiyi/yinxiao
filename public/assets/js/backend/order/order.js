@@ -34,7 +34,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                             {field: 'sn', title: __('Sn')},
                             {field: 'transaction_id', title: __('Transaction_id'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
                             {field: 'team_id', title: __('Team_id'),operate:false,visible:false},
-                            {field: 'team_name_text', title: __('Team_name'),operate:false},
+                            {field: 'team_name_text', title: __('Team_name'),operate:false,visible:false},
                             {field: 'name', title: __('Name'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
                             {field: 'phone', title: __('Phone'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
                             {field: 'production_id', title: __('Production_id'),operate:false,visible:false},
@@ -52,7 +52,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                             {field: 'openid', title: __('openid'),operate:false,visible:false},
                             {field: 'pay_id', title: __('pay_id'),operate:false,visible:false},
                             {field: 'order_ip', title: __('order_ip'),operate:false,visible:false},
-                            {field: 'xdd_trade_no', title: '享钱单号',operate:false},
+                            {field: 'xdd_trade_no', title: '享钱单号',operate:false,visible:false},
                             {field: 'ry_order_no', title: '如意单号',operate:false,visible:false},
                             {field: 'pay_type', title: __('Pay_type'),searchList: {"0":"微信支付", "1": "其他支付"},visible:false,formatter:function (value,row,index) {
                                     if (value ===0){return '微信支付';}

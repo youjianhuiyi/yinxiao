@@ -1,6 +1,7 @@
 <?php
 namespace app\admin\controller\data;
 
+use app\admin\model\data\DataSummary as DataSummaryModel;
 use app\common\controller\Backend;
 use app\admin\model\order\Order as OrderModel;
 use app\admin\model\team\Team as TeamModel;
@@ -30,6 +31,7 @@ class Summary extends Backend
     public function _initialize()
     {
         parent::_initialize();
+        $this->model = new DataSummaryModel();
         $this->orderModel = new OrderModel();
         $this->urlModel = new UrlModel();
         $this->visitModel = new VisitModel();
@@ -45,14 +47,14 @@ class Summary extends Backend
     public function countNums($data)
     {
         $tmp = [];
+        $tmp['order_nums'] = 0;
+        $tmp['pay_done'] = 0;
+        $tmp['pay_done_nums'] = 0;
         foreach ($data as $key => $value) {
-            $tmp['order_nums'] = 0;
-            $tmp['pay_done'] = 0;
-            $tmp['pay_done_nums'] = 0;
             $tmp['order_nums'] += $value['num'];
             if ($value['pay_status'] == 1) {
                 $tmp['pay_done'] += 1;
-                $tmp['pay_done_nums'] +=1;
+                $tmp['pay_done_nums'] += $value['num'];
             }
         }
         return $tmp;
@@ -328,8 +330,8 @@ class Summary extends Backend
         $userIds = $this->shellGetAllUser();
         //访问记录
         $visitSummary = $this->visitModel
-            ->where('updatetime','>',$dateTime[0])
-            ->where('updatetime','<',$dateTime[1])
+            ->where('updatetime','>',$dateTime[0]-86400)
+            ->where('updatetime','<',$dateTime[1]-86400)
             ->select();
         $visitSummary = collection($visitSummary)->toArray();
         //整理数据访问记录数据
@@ -342,57 +344,63 @@ class Summary extends Backend
             $newVisitSummary[$key] = count($value);
         }
 
-//        dump($newVisitSummary);die;
         //获取订单数据
         $orderData = $this->orderModel
-            ->where('updatetime','>',$dateTime[0])
-            ->where('updatetime','<',$dateTime[1])
+            ->where('updatetime','>',$dateTime[0]-86400)
+            ->where('updatetime','<',$dateTime[1]-86400)
             ->select();
         $orderData = collection($orderData)->toArray();
+//        dump($orderData);die;
         //整理订单数据
         $newOrderData = [];
         foreach ($orderData as $value) {
             $newOrderData[$value['admin_id']][] = $value;
-//                [
-//                'pid' =>  $value['pid'],
-//                'admin_id'  => $value['admin_id'],
-//                'team_id'   => $value['team_id'],
-//                'check_code' => $this->urlModel->where(['production_id'=>$value['production_id'],'admin_id'=>$value['admin_id']])->find()['check_code'],
-//                'visit_nums' => isset($newVisitSummary[$value['admin_id']]) ? $newVisitSummary[$value['admin_id']] : 0,
-//            ];
         }
-        $newResOrderData = [];
-        foreach ($newOrderData as $key => $item) {
-            $newResOrderData[]  = [
-                'team_id'       => $this->adminModel->get($key)['team_id'],
-                'pid'           => $this->adminModel->get($key)['pid'],
-                'admin_id'      => $key,
-                'check_code'    => $this->urlModel->where(['production_id'=>$item[0]['production_id'],'admin_id'=>$key])->find()['check_code'],
-                'visit_nums'    => isset($newVisitSummary[$key]) ? $newVisitSummary[$key] : 0,
-                'order_count'   => count($item),
-                'oder_nums'     => $this->countNums($item)['order_nums'],
-                'pay_done'      => $this->countNums($item)['pay_done'],
-                'pay_done_nums' => $this->countNums($item)['pay_done_nums']
-            ];
-        }
-        //将所有人员的数据拼接进去。
+
+        $adminIds = array_keys($newOrderData);
+        //根据用户ID进行判断。
         foreach ($userIds as $userId) {
-            $newResOrderData[] = [
-                'team_id'       => $this->adminModel->get($userId)['team_id'],
-                'pid'           => $this->adminModel->get($userId)['pid'],
-                'admin_id'      => $userId,
-                'check_code'    => '',
-                'visit_nums'    => 0,
-                'order_count'   => 0,
-                'oder_nums'     => 0,
-                'pay_done'      => 0,
-                'pay_done_nums' => 0
-            ];
+            if (!in_array($userId,$adminIds)) {
+                $newOrderData[$userId] = '';
+            }
         }
 
+        $newResOrderData = [];
 
+        foreach ($newOrderData as $key => $item) {
+            if (!empty($item)) {
+                $newResOrderData[]  = [
+                    'team_id'       => $this->adminModel->get($key)['team_id'],
+                    'pid'           => $this->adminModel->get($key)['pid'],
+                    'admin_id'      => $key,
+                    'visit_nums'    => isset($newVisitSummary[$key]) ? $newVisitSummary[$key] : 0,
+                    'order_count'   => count($item),
+                    'order_nums'    => $this->countNums($item)['order_nums'],
+                    'pay_done'      => $this->countNums($item)['pay_done'],
+                    'pay_done_nums' => $this->countNums($item)['pay_done_nums']
+                ];
+            } else {
+                $newResOrderData[] = [
+                    'team_id'       => $this->adminModel->get($key)['team_id'],
+                    'pid'           => $this->adminModel->get($key)['pid'],
+                    'admin_id'      => $key,
+                    'visit_nums'    => 0,
+                    'order_count'   => 0,
+                    'order_nums'    => 0,
+                    'pay_done'      => 0,
+                    'pay_done_nums' => 0
+                ];
+            }
+        }
 
-        dump($newResOrderData);die;
+        $result = $this->model->isUpdate(false)->saveAll($newResOrderData);
+        if ($result) {
+            echo 'OK';
+            die();
+        } else {
+            echo 'failure';
+            die();
+        }
     }
 
 

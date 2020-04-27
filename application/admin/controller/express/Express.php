@@ -350,7 +350,7 @@ class Express extends Backend
 
 
     /**
-     * 联动写入
+     * 联动写入订单信息到订单表
      * @param $data
      */
     private function setExpressToOrder($data)
@@ -360,7 +360,8 @@ class Express extends Backend
             $newArr[]= [
                 'id'            =>  $value['order_id'],
                 'express_no'    =>  $value['express_no'],
-                'express_com'   =>  $value['express_com']
+                'express_com'   =>  $value['express_com'],
+                'order_status'  =>  1
             ];
         }
 
