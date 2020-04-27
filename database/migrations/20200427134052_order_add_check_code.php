@@ -3,7 +3,7 @@
 use think\migration\Migrator;
 use think\migration\db\Column;
 
-class PaySetAddTotalMoney extends Migrator
+class OrderAddCheckCode extends Migrator
 {
     /**
      * Change Method.
@@ -28,6 +28,9 @@ class PaySetAddTotalMoney extends Migrator
      */
     public function change()
     {
-
+        $table = $this->table('order');
+        $table
+            ->addColumn('check_code','string',['limit'=>32,'after'=>'openid','null'=>false,'default'=>'','comment'=>'推广码'])
+            ->update();
     }
 }

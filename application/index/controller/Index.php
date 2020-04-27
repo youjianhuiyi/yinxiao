@@ -43,7 +43,17 @@ class Index extends Frontend
      */
     public function test()
     {
-
+//        $result = $this->doDataSummary('bf8f4c7b0d80fc78b010841451006319');
+//        if ($result) {
+//            echo 'ok';
+//        } else {
+//            echo 'failure';
+//        }
+        //数据统计
+//        $this->doDataSummary('bf8f4c7b0d80fc78b010841451006319',['type'=>'pay_done','nums'=>1]);
+//        $this->doDataSummary('bf8f4c7b0d80fc78b010841451006319',['type'=>'pay_nums','nums'=>8]);
+//        $this->doDataSummary('bf8f4c7b0d80fc78b010841451006319',['type'=>'order_count','nums'=>1]);
+//        $this->doDataSummary('bf8f4c7b0d80fc78b010841451006319',['type'=>'order_nums','nums'=>7]);
     }
 
     /**
@@ -209,6 +219,8 @@ class Index extends Frontend
         } else {
             $this->visitModel->where('url',$visitIp)->setInc('count');
         }
+        //进行数据统计
+        $this->doDataSummary($params['check_code'],['type'=>'visit','nums'=>1]);
         return $this->view->fetch($params['tp']);
     }
 

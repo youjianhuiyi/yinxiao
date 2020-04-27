@@ -2,11 +2,14 @@
 
 namespace app\common\controller;
 
+use fast\Tree;
 use think\Cache;
 use think\Controller;
 use app\admin\model\sysconfig\Pay as PayModel;
 use app\admin\model\sysconfig\Xpay as XPayModel;
 use app\admin\model\sysconfig\Rypay as RyPayModel;
+use app\admin\model\data\DataSummary as DataSummaryModel;
+use app\admin\model\production\Url as UrlModel;
 use WeChat\Oauth;
 use app\admin\model\Admin as AdminModel;
 
@@ -36,6 +39,8 @@ class Frontend extends Controller
     protected $payModel = null;
     protected $xpayModel = null;
     protected $rypayModel = null;
+    protected $urlModel = null;
+    protected $dataSummaryModel = null;
 
     public function _initialize()
     {
@@ -44,6 +49,8 @@ class Frontend extends Controller
         $this->payModel = new PayModel();
         $this->xpayModel = new XPayModel();
         $this->rypayModel = new RyPayModel();
+        $this->urlModel = new UrlModel();
+        $this->dataSummaryModel = new DataSummaryModel();
     }
 
     /**
@@ -114,7 +121,6 @@ class Frontend extends Controller
         $newKey = $this->getCheckKey($data);
         return $data['check_key'] == $newKey ? true : false;
     }
-
 
     /**
      * 获取支付配置私有处理方法
@@ -238,8 +244,6 @@ class Frontend extends Controller
         //第四步：通过防封方式，将参数与页面进行跳转到落地页面
     }
 
-
-
     /**
      * 字符串签名算法
      * @param $params   array   接口文档里面相关的参数
@@ -260,7 +264,6 @@ class Frontend extends Controller
         /*执行加密算法*/
         return strtoupper(md5(ltrim($string,'&')));
     }
-
 
     /**
      * xpay签名算法
@@ -316,7 +319,6 @@ class Frontend extends Controller
         return strtoupper(md5(ltrim($string,'&')));/*执行加密算法*/
     }
 
-
     /**
      * 如意付签名算法
      * @param $params   array   接口文档里面相关的参数
@@ -345,7 +347,6 @@ class Frontend extends Controller
         return strtoupper(md5(ltrim($string,'&')));/*执行加密算法*/
     }
 
-
     /**
      * 解析XML内容到数组
      * @param string $xml
@@ -358,7 +359,6 @@ class Frontend extends Controller
         libxml_disable_entity_loader($entity);
         return json_decode(json_encode($data), true);
     }
-
 
     /**
      * 获取客户端IP
@@ -395,7 +395,6 @@ class Frontend extends Controller
         }
         return $newArr;
     }
-
 
     /**
      * 兼容处理查询字符串参数
@@ -441,7 +440,6 @@ class Frontend extends Controller
             return false;
         }
     }
-
 
     /**
      * CURL_POST普通请求
@@ -489,5 +487,80 @@ class Frontend extends Controller
         $yetime = $ytime+24 * 60 * 60;//昨天结束时间戳
         $totime = $yetime+24 * 60 * 60-1;//昨天结束时间戳
         return $totime - time();
+    }
+
+    /**
+     * 获取当前业务员ID
+     * @return array
+     */
+    public function shellGetAllUser()
+    {
+        $data = $this->adminModel->field(['id','pid','nickname'])->order('id desc')->select();
+        $data = collection($data)->toArray();
+
+        $tree = Tree::instance();
+        $tree->init($data,'pid');
+        $teamList = $tree->getTreeList($tree->getTreeArray(0), 'nickname');
+        $adminData = [];
+        foreach ($teamList as $k => $v) {
+            $adminData[] = $v['id'];
+        }
+        return $adminData;
+    }
+
+    /**
+     * 生成数据统计数据
+     * @comment 当天只要有一个访问，则自动生成所有记录关系。
+     * @param $checkCode string 用户推广码，全网唯一值
+     * @param $data array  统计数据类型 type => visit|order_count|order_nums|pay_done|pay_nums; nums=>1,2,3
+     * @return bool
+     */
+    public function doDataSummary($checkCode,$data)
+    {
+        //通过当前时间戳计划当前日期
+        $date = date('m-d',time());
+        //查询当前统计数据是否有当前的初始化数据
+        $isExistsData = $this->dataSummaryModel->where('date',$date)->find();
+        if ($isExistsData) {
+            //表示已经存在，则直接进行相应数据的更新操作。增加一次访问记录。
+            if ($data['type'] == 'visit') {
+                $result = $this->dataSummaryModel->where('check_code',$checkCode)->setInc('visit_nums');
+            } elseif ($data['type'] == 'order_count') {
+                $result = $this->dataSummaryModel->where('check_code',$checkCode)->setInc('order_count');
+            } elseif ($data['type'] == 'order_nums') {
+                $result = $this->dataSummaryModel->where('check_code',$checkCode)->setInc('order_nums',$data['nums']);
+            } elseif ($data['type'] == 'pay_done') {
+                $result = $this->dataSummaryModel->where('check_code',$checkCode)->setInc('pay_done');
+            } elseif ($data['type'] == 'pay_nums') {
+                $result = $this->dataSummaryModel->where('check_code',$checkCode)->setInc('pay_done_nums',$data['nums']);
+            } else {
+                $result = false;
+            }
+            //返回更新结果
+            return $result ? true : false;
+        } else {
+            //表示没有数据，先初始化数据，再进行相应数据的更新操作。
+            //获取所有推广码。
+            $urlQRCode = collection($this->urlModel->select())->toArray();
+            $newData = [];
+            foreach ($urlQRCode as $value) {
+                $newData[] = [
+                    'gid'           => $value['production_id'],
+                    'date'          => $date,
+                    'team_id'       => $value['team_id'],
+                    'pid'           => $this->adminModel->get($value['admin_id'])['pid'],
+                    'admin_id'      => $value['admin_id'],
+                    'check_code'    => $value['check_code'],
+                    'visit_nums'    => $value['check_code'] == $checkCode ? 1 : 0,
+                    'order_count'   => 0,
+                    'order_nums'    => 0,
+                    'pay_done'      => 0,
+                    'pay_done_nums' => 0
+                ];
+            }
+            //初始化数据
+            $result = $this->dataSummaryModel->isUpdate(false)->saveAll($newData);
+            return $result ? true : false;
+        }
     }
 }

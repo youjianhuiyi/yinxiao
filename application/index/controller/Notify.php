@@ -146,6 +146,9 @@ class Notify extends Frontend
                 $this->orderModel->isUpdate(true)->save($saveData);
                 //增加订单完成次数
                 $this->urlModel->where('admin_id',$orderInfo['admin_id'])->setInc('order_done');
+                //数据统计
+                $this->doDataSummary($checkCode,['type'=>'pay_done','nums'=>1]);
+                $this->doDataSummary($checkCode,['type'=>'pay_nums','nums'=>$orderInfo['num']]);
                 Db::commit();
             } catch (ValidateException $e) {
                 Db::rollback();
