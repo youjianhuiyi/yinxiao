@@ -138,7 +138,7 @@ class Xpay extends Backend
             //表示当前是禁用操作。
             $result = $this->paysetModel->destroy(['pay_id'=>$payId,'type'=>1]);
         } else {
-            $result = true;
+            $result = $this->addPayManagement($data,$payId);
         }
         return $result;
     }
@@ -176,7 +176,7 @@ class Xpay extends Backend
                         'date'          => date('m-d',time()),
                         'team_id'       => $params['team_id'],
                         'pay_id'        => $this->model->id,
-                        'pay_type'      => 0,
+                        'pay_type'      => 1,
                         'use_count'     => 0,
                         'pay_nums'      => 0,
                         'money'         => 0.00,
@@ -246,8 +246,9 @@ class Xpay extends Backend
                     }
                     $result = $row->allowField(true)->save($params);
                     //修改支付数据，需要同步到支付管理里面，如果是禁用修改的话，直接将支付管理里面关闭或者删除
+                    $params['team_id'] = $row['team_id'];
+                    $params['pay_name'] = $row['pay_name'];
                     $result1 = $this->editPayManagement($params,$ids);
-
                     Db::commit();
                 } catch (ValidateException $e) {
                     Db::rollback();
@@ -259,7 +260,7 @@ class Xpay extends Backend
                     Db::rollback();
                     $this->error($e->getMessage());
                 }
-                if ($result !== false) {
+                if ($result !== false && $result1 !== false) {
                     $this->success();
                 } else {
                     $this->error(__('No rows were updated'));
@@ -269,6 +270,44 @@ class Xpay extends Backend
         }
         $this->view->assign("row", $row);
         return $this->view->fetch();
+    }
+
+    /**
+     * 删除
+     */
+    public function del($ids = "")
+    {
+        if ($ids) {
+            $pk = $this->model->getPk();
+            $adminIds = $this->getDataLimitAdminIds();
+            if (is_array($adminIds)) {
+                $this->model->where($this->dataLimitField, 'in', $adminIds);
+            }
+            $list = $this->model->where($pk, 'in', $ids)->select();
+
+            $count = 0;
+            Db::startTrans();
+            try {
+                foreach ($list as $k => $v) {
+                    $count += $v->delete();
+                }
+                //删除支付管理里面的商户号
+                $this->editPayManagement(['status'=>0],$ids);
+                Db::commit();
+            } catch (PDOException $e) {
+                Db::rollback();
+                $this->error($e->getMessage());
+            } catch (\Exception $e) {
+                Db::rollback();
+                $this->error($e->getMessage());
+            }
+            if ($count) {
+                $this->success();
+            } else {
+                $this->error(__('No rows were deleted'));
+            }
+        }
+        $this->error(__('Parameter %s can not be empty', 'ids'));
     }
 
     /**

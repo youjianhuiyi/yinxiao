@@ -3,6 +3,7 @@
 namespace app\admin\controller\sysconfig;
 
 use app\admin\model\data\PayRecord as PayRecordModel;
+use app\admin\model\sysconfig\Payset as PaySetModel;
 use app\common\controller\Backend;
 use think\Db;
 use think\exception\PDOException;
@@ -26,6 +27,7 @@ class Pay extends Backend
     protected $teamModel = null;
     protected $wxdomainModel = null;
     protected $payRecordMode = null;
+    protected $paysetModel = null;
 
     public function _initialize()
     {
@@ -34,6 +36,8 @@ class Pay extends Backend
         $this->model = new \app\admin\model\sysconfig\Pay;
         $this->wxdomainModel = new WxDomainModel();
         $this->payRecordMode = new PayRecordModel();
+        $this->paysetModel = new PaySetModel();
+
         //团队数据
         $teamData = collection($this->teamModel->column('name','id'))->toArray();
         if ($this->adminInfo['id'] == 1 ) {
@@ -101,24 +105,79 @@ class Pay extends Backend
         $this->request->filter(['strip_tags']);
         if ($this->request->isAjax()) {
             list($where, $sort, $order, $offset, $limit) = $this->buildparams();
-            $total = $this->model
-                ->onlyTrashed()
-                ->where($where)
-                ->order($sort, $order)
-                ->count();
+            if ($this->adminInfo['id'] == 1) {
+                $total = $this->model
+                    ->onlyTrashed()
+                    ->where($where)
+                    ->order($sort, $order)
+                    ->count();
 
-            $list = $this->model
-                ->onlyTrashed()
-                ->where($where)
-                ->order($sort, $order)
-                ->limit($offset, $limit)
-                ->select();
+                $list = $this->model
+                    ->onlyTrashed()
+                    ->where($where)
+                    ->order($sort, $order)
+                    ->limit($offset, $limit)
+                    ->select();
+            } else {
+                $total = $this->model
+                    ->where($where)
+                    ->where('team_id',$this->adminInfo['team_id'])
+                    ->order($sort, $order)
+                    ->count();
+
+                $list = $this->model
+                    ->where($where)
+                    ->where('team_id',$this->adminInfo['team_id'])
+                    ->order($sort, $order)
+                    ->limit($offset, $limit)
+                    ->select();
+            }
+
 
             $result = array("total" => $total, "rows" => $list);
 
             return json($result);
         }
         return $this->view->fetch();
+    }
+
+
+    /**
+     * 新增支付同步更新支付管理表
+     * @param $data array   更新数据
+     * @param $payId    integer     支付ID
+     * @return bool
+     */
+    protected function addPayManagement($data,$payId)
+    {
+        $newArr = [
+            'type'              =>  0,/*表示微信支付类型*/
+            'pay_id'            =>  $payId,
+            'pay_channel'       =>  $data['pay_name'],
+            'team_id'           =>  $data['team_id'],
+            'team_name'         =>  $this->teamModel->get($data['team_id'])['name'],
+            'is_multiple'       =>  1,
+            'status'            =>  1,
+        ];
+        $result = $this->paysetModel->isUpdate(false)->save($newArr);
+        return $result ? true : false;
+    }
+
+    /**
+     * 编辑同步更新支付管理表
+     * @param $data array   更新数据
+     * @param $payId    integer     支付ID
+     * @return bool
+     */
+    protected function editPayManagement($data,$payId)
+    {
+        if ($data['status'] == 0) {
+            //表示当前是禁用操作。
+            $result = $this->paysetModel->destroy(['pay_id'=>$payId,'type'=>0]);
+        } else {
+            $result = $this->addPayManagement($data,$payId);
+        }
+        return $result;
     }
 
     /**
@@ -137,7 +196,7 @@ class Pay extends Backend
                 if ($this->dataLimit && $this->dataLimitFieldAutoFill) {
                     $params[$this->dataLimitField] = $this->auth->id;
                 }
-                $result = $result1 = false;
+                $result = $result1 = $result2 = false;
                 Db::startTrans();
                 try {
                     //是否采用模型验证
@@ -164,6 +223,8 @@ class Pay extends Backend
                         'money'         => 0.00,
                     ];
                     $result1 = $this->payRecordMode->isUpdate(false)->save($newData);
+                    //如果是新加商户，直接同步到支付管理表。并开启
+                    $result2 = $this->addPayManagement($params,$this->model->id);
                     Db::commit();
                 } catch (ValidateException $e) {
                     Db::rollback();
@@ -175,7 +236,7 @@ class Pay extends Backend
                     Db::rollback();
                     $this->error($e->getMessage());
                 }
-                if ($result !== false && $result1 !== false) {
+                if ($result !== false && $result1 !== false && $result2 !== false) {
                     $this->success();
                 } else {
                     $this->error(__('No rows were inserted'));
@@ -211,8 +272,7 @@ class Pay extends Backend
             }
             if ($params) {
                 $params = $this->preExcludeFields($params);
-                $params['status'] = 1;
-                $result = false;
+                $result = $result1 = false;
                 Db::startTrans();
                 try {
                     //是否采用模型验证
@@ -228,7 +288,10 @@ class Pay extends Backend
                         $this->wxdomainModel->allowField(true)->saveAll($res[0]);
                         $this->wxdomainModel->allowField(true)->saveAll($res[1]);
                     }
-                    //将本团队的商品数据缓存起来
+                    //修改支付数据，需要同步到支付管理里面，如果是禁用修改的话，直接将支付管理里面关闭或者删除
+                    $params['team_id'] = $row['team_id'];
+                    $params['pay_name'] = $row['pay_name'];
+                    $result1 = $this->editPayManagement($params,$ids);
                     Db::commit();
                 } catch (ValidateException $e) {
                     Db::rollback();
@@ -240,7 +303,7 @@ class Pay extends Backend
                     Db::rollback();
                     $this->error($e->getMessage());
                 }
-                if ($result !== false) {
+                if ($result !== false && $result1 !== false) {
                     $this->success();
                 } else {
                     $this->error(__('No rows were updated'));
@@ -335,4 +398,41 @@ class Pay extends Backend
         return [$newPay,$newGrant];
     }
 
+    /**
+     * 删除
+     */
+    public function del($ids = "")
+    {
+        if ($ids) {
+            $pk = $this->model->getPk();
+            $adminIds = $this->getDataLimitAdminIds();
+            if (is_array($adminIds)) {
+                $this->model->where($this->dataLimitField, 'in', $adminIds);
+            }
+            $list = $this->model->where($pk, 'in', $ids)->select();
+
+            $count = 0;
+            Db::startTrans();
+            try {
+                foreach ($list as $k => $v) {
+                    $count += $v->delete();
+                }
+                //删除支付管理里面的商户号
+                $this->editPayManagement(['status'=>0],$ids);
+                Db::commit();
+            } catch (PDOException $e) {
+                Db::rollback();
+                $this->error($e->getMessage());
+            } catch (\Exception $e) {
+                Db::rollback();
+                $this->error($e->getMessage());
+            }
+            if ($count) {
+                $this->success();
+            } else {
+                $this->error(__('No rows were deleted'));
+            }
+        }
+        $this->error(__('Parameter %s can not be empty', 'ids'));
+    }
 }
