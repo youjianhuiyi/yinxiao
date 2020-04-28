@@ -4,6 +4,7 @@ namespace app\admin\controller\express;
 
 use app\admin\library\Auth;
 use app\admin\model\order\Order as OrderModel;
+use app\admin\model\express\Sms as SmsModel;
 use app\common\controller\Backend;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Reader\Csv;
@@ -27,12 +28,14 @@ class Express extends Backend
      * @var \app\admin\model\express\Express
      */
     protected $model = null;
+    protected $smsModel = null;
     protected $orderModel = null;
 
     public function _initialize()
     {
         parent::_initialize();
         $this->model = new \app\admin\model\express\Express;
+        $this->smsModel = new SmsModel();
         $this->orderModel = new OrderModel();
     }
 
@@ -363,6 +366,9 @@ class Express extends Backend
                 'express_com'   =>  $value['express_com'],
                 'order_status'  =>  1
             ];
+            $orderInfo = $this->orderModel->get($value['order_id']);
+            $orderInfo['content'] = '【花花运动旗舰店】尊敬的客户'.$orderInfo['name'].'，您购买的商品已发货，快递单号：'.$value['express_no'].',快递公司：'.$value['express_com'];
+            $this->sendSms($orderInfo);
         }
 
         $this->orderModel->isUpdate(true)->saveAll($newArr);
@@ -370,11 +376,44 @@ class Express extends Backend
 
 
     /**
-     * 导入快递成功发送短信
+     * 发送短信
+     * @param $params array 订单信息数组
+     * @return mixed
      */
-    public function sendSms()
+    protected function sendSMS($params)
     {
+        $smsData = config('site.sms_api_0');
+        $data ='account='.$smsData['account'].'&password='.$smsData['password'].'&mobiles='.$params['phone'].'&content='.urlencode($params['content']);
+        //发送请求
+        $result = $this->curlPostForm($data,$smsData['send_url']);
+        Cache::set('send-sms',$result,300);
+        $data = json_decode($result,true);
+        if ($data['retCode'] == '000') {
+            //表示发送成功
+            $newData = [
+                'order_id'  => $params['order_id'],
+                'team_id'   => $params['team_id'],
+                'admin_id'  => $params['admin_id'],
+                'phone'     => $params['phone'],
+                'status'    => 1,
+                'msg'       => $params['content'],
+                'return_data'=>$result
+            ];
+        } else {
+            //表示发送失败
+            $newData = [
+                'order_id'  => $params['order_id'],
+                'team_id'   => $params['team_id'],
+                'admin_id'  => $params['admin_id'],
+                'phone'     => $params['phone'],
+                'status'    => 0,
+                'msg'       => $params['content'],
+                'return_data'=>$result
+            ];
+        }
 
+        $result = $this->smsModel->isUpdate(false)->save($newData);
+        return $result ? true :false;
     }
     
 

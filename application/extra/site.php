@@ -35,4 +35,17 @@ return array (
   'mail_smtp_pass' => 'password',
   'mail_verify_type' => '2',
   'mail_from' => '10000@qq.com',
+  'sms_account_0' => 'lcwabh',
+  'sms_password_0' => 'lcwabh0408',
+  'sendSMSUrl' => 'http://139.186.39.24:8081/user/send',
+  'api_uid_0' => 'TMHC10270',
+  'api_key_0' => 'f0743b11fa4abd1550c167cc40d81202',
+  'sms_api_0' => 
+  array (
+    'account' => 'lcwabh',
+    'password' => 'lcwabh0408',
+    'send_url' => 'http://139.186.39.24:8081/user/send',
+    'api_uid' => 'TMHC10270',
+    'api_key' => 'f0743b11fa4abd1550c167cc40d81202',
+  ),
 );

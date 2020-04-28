@@ -10,6 +10,7 @@ use app\admin\model\sysconfig\Xpay as XPayModel;
 use app\admin\model\sysconfig\Rypay as RyPayModel;
 use app\admin\model\data\DataSummary as DataSummaryModel;
 use app\admin\model\data\PayRecord as PayRecordModel;
+use app\admin\model\express\Sms as SmsModel;
 use app\admin\model\production\Url as UrlModel;
 use WeChat\Oauth;
 use app\admin\model\Admin as AdminModel;
@@ -43,6 +44,7 @@ class Frontend extends Controller
     protected $urlModel = null;
     protected $dataSummaryModel = null;
     protected $payRecordMode = null;
+    protected $smsModel = null;
 
     public function _initialize()
     {
@@ -54,6 +56,7 @@ class Frontend extends Controller
         $this->urlModel = new UrlModel();
         $this->dataSummaryModel = new DataSummaryModel();
         $this->payRecordMode = new PayRecordModel();
+        $this->smsModel = new SmsModel();
     }
 
     /**
@@ -644,5 +647,46 @@ class Frontend extends Controller
             $result = $this->payRecordMode->isUpdate(false)->saveAll($newData);
             return $result ? true : false;
         }
+    }
+
+    /**
+ * 发送短信
+ * @param $params array 订单信息数组
+ * @return mixed
+ */
+    public function sendSMS($params)
+    {
+        $smsData = config('site.sms_api_0');
+        $data ='account='.$smsData['account'].'&password='.$smsData['password'].'&mobiles='.$params['phone'].'&content='.urlencode($params['content']);
+        //发送请求
+        $result = $this->curlPostForm($data,$smsData['send_url']);
+        Cache::set('send-sms',$result,300);
+        $data = json_decode($result,true);
+        if ($data['retCode'] == '000') {
+            //表示发送成功
+            $newData = [
+                'order_id'  => $params['order_id'],
+                'team_id'   => $params['team_id'],
+                'admin_id'  => $params['admin_id'],
+                'phone'     => $params['phone'],
+                'status'    => 1,
+                'msg'       => $params['content'],
+                'return_data'=>$result
+            ];
+        } else {
+            //表示发送失败
+            $newData = [
+                'order_id'  => $params['order_id'],
+                'team_id'   => $params['team_id'],
+                'admin_id'  => $params['admin_id'],
+                'phone'     => $params['phone'],
+                'status'    => 0,
+                'msg'       => $params['content'],
+                'return_data'=>$result
+            ];
+        }
+
+        $result = $this->smsModel->isUpdate(false)->save($newData);
+        return $result ? true :false;
     }
 }

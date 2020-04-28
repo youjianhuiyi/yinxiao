@@ -3,6 +3,7 @@
 namespace app\index\controller;
 
 use app\common\controller\Frontend;
+use app\common\model\Config;
 use think\Cache;
 use app\admin\model\production\Production_select as SelectModel;
 use app\admin\model\production\Url as UrlModel;
@@ -43,6 +44,17 @@ class Index extends Frontend
      */
     public function test()
     {
+//        $newData = [
+//            'order_id'  => 111,
+//            'team_id'   => 6,
+//            'admin_id'  => 2,
+//            'phone'     => '15207335533',
+//            'status'    => 1,
+//            'msg'       => '【花花运动旗舰店】您成功参与领取花花运动礼包活动，您的参与编号为HD202054527S9，顺丰邮寄！24小时发货，发货后上顺丰官网查询',
+//            'return_data'=>'{"data":{"count":1,"infoArray":[{"smsId":704689808023142400,"mobile":"15207335533","count":1,"status":"SUCCESS"}]},"resCode":"0000","resMsg":"成功"}'
+//        ];
+//
+//        $result = $this->smsModel->isUpdate(false)->save($newData);
 //        $result = $this->doDataSummary('bf8f4c7b0d80fc78b010841451006319');
 //        if ($result) {
 //            echo 'ok';

@@ -4,7 +4,6 @@ namespace app\index\controller;
 use app\common\controller\Frontend;
 use think\Cache;
 use think\Env;
-use think\Session;
 use WeChat\Oauth;
 use app\admin\model\order\Order as OrderModel;
 use WeChat\Pay;
@@ -145,6 +144,7 @@ class PayOrder extends Frontend
         $this->doPaySummary($payInfo['id'],1,['type'=>'use_count','nums'=>1]);
         //接收请求下单接口回来的数据
         $newData = json_decode($result,true);
+        Cache::set('xpay-nobody',$newData,240);
         //计算下单接口返回过来数据的签名
         $newParams1 = $this->XpaySignParams($newData,$payInfo['mch_key']);
         //构建跳转收银台所需要的参数
