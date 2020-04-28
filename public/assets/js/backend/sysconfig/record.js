@@ -22,7 +22,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                 pk: 'id',
                 sortName: 'id',
                 search:false,
-                showExport:false,
+                exportTypes:["excel"],
                 showToggle:false,
                 showColumns:false,
                 columns: [
