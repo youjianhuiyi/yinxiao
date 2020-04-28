@@ -2,6 +2,7 @@
 
 namespace app\admin\controller\sysconfig;
 
+use app\admin\model\data\PayRecord as PayRecordModel;
 use app\admin\model\sysconfig\Rypay as RypayModel;
 use app\admin\model\team\Team as TeamModel;
 use app\common\controller\Backend;
@@ -22,12 +23,14 @@ class Rypay extends Backend
      */
     protected $model = null;
     protected $teamModel = null;
+    protected $payRecordMode = null;
 
     public function _initialize()
     {
         parent::_initialize();
         $this->model = new RypayModel();
         $this->teamModel = new TeamModel();
+        $this->payRecordMode = new PayRecordModel();
 
         //团队数据
         $teamData = collection($this->teamModel->column('name','id'))->toArray();
@@ -107,7 +110,7 @@ class Rypay extends Backend
                 if ($this->dataLimit && $this->dataLimitFieldAutoFill) {
                     $params[$this->dataLimitField] = $this->auth->id;
                 }
-                $result = false;
+                $result = $result1 = false;
                 Db::startTrans();
                 try {
                     //是否采用模型验证
@@ -117,6 +120,17 @@ class Rypay extends Backend
                         $this->model->validateFailException(true)->validate($validate);
                     }
                     $result = $this->model->allowField(true)->save($params);
+                    //同步将商户添加到商户收款表里面
+                    $newData = [
+                        'date'          => date('m-d',time()),
+                        'team_id'       => $params['team_id'],
+                        'pay_id'        => $this->model->id,
+                        'pay_type'      => 0,
+                        'use_count'     => 0,
+                        'pay_nums'      => 0,
+                        'money'         => 0.00,
+                    ];
+                    $result1 = $this->payRecordMode->isUpdate(false)->save($newData);
                     Db::commit();
                 } catch (ValidateException $e) {
                     Db::rollback();
@@ -128,7 +142,7 @@ class Rypay extends Backend
                     Db::rollback();
                     $this->error($e->getMessage());
                 }
-                if ($result !== false) {
+                if ($result !== false && $result1 !== false) {
                     $this->success();
                 } else {
                     $this->error(__('No rows were inserted'));

@@ -2,8 +2,8 @@
 
 namespace app\admin\controller\sysconfig;
 
+use app\admin\model\data\PayRecord as PayRecordModel;
 use app\common\controller\Backend;
-use think\Cache;
 use think\Db;
 use think\exception\PDOException;
 use think\exception\ValidateException;
@@ -25,6 +25,7 @@ class Pay extends Backend
     protected $model = null;
     protected $teamModel = null;
     protected $wxdomainModel = null;
+    protected $payRecordMode = null;
 
     public function _initialize()
     {
@@ -32,6 +33,7 @@ class Pay extends Backend
         $this->teamModel = new TeamModel();
         $this->model = new \app\admin\model\sysconfig\Pay;
         $this->wxdomainModel = new WxDomainModel();
+        $this->payRecordMode = new PayRecordModel();
         //团队数据
         $teamData = collection($this->teamModel->column('name','id'))->toArray();
         if ($this->adminInfo['id'] == 1 ) {
@@ -135,7 +137,7 @@ class Pay extends Backend
                 if ($this->dataLimit && $this->dataLimitFieldAutoFill) {
                     $params[$this->dataLimitField] = $this->auth->id;
                 }
-                $result = false;
+                $result = $result1 = false;
                 Db::startTrans();
                 try {
                     //是否采用模型验证
@@ -151,6 +153,17 @@ class Pay extends Backend
                     $this->wxdomainModel->isUpdate(false)->allowField(true)->saveAll($res[0]);
                     $this->wxdomainModel->isUpdate(false)->allowField(true)->saveAll($res[1]);
                     //同步添加到支付管理列表。
+                    //同步将商户添加到商户收款表里面
+                    $newData = [
+                        'date'          => date('m-d',time()),
+                        'team_id'       => $params['team_id'],
+                        'pay_id'        => $this->model->id,
+                        'pay_type'      => 0,
+                        'use_count'     => 0,
+                        'pay_nums'      => 0,
+                        'money'         => 0.00,
+                    ];
+                    $result1 = $this->payRecordMode->isUpdate(false)->save($newData);
                     Db::commit();
                 } catch (ValidateException $e) {
                     Db::rollback();
@@ -162,7 +175,7 @@ class Pay extends Backend
                     Db::rollback();
                     $this->error($e->getMessage());
                 }
-                if ($result !== false) {
+                if ($result !== false && $result1 !== false) {
                     $this->success();
                 } else {
                     $this->error(__('No rows were inserted'));

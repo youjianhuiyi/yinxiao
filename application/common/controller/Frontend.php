@@ -601,9 +601,9 @@ class Frontend extends Controller
         } else {
             //表示没有数据，先初始化数据，再进行相应数据的更新操作。
             //获取所有推广码。
-            $xpayData = collection($this->xpayModel->where('status',1)->select())->toArray();/*享钱支付*/
-            $rypayData = collection($this->rypayModel->where('status',1)->select())->toArray();/*如意支付*/
-            $payData = collection($this->payModel->where('status',1)->select())->toArray();/*微信支付*/
+            $xpayData = collection($this->xpayModel->select())->toArray();/*享钱支付*/
+            $rypayData = collection($this->rypayModel->select())->toArray();/*如意支付*/
+            $payData = collection($this->payModel->select())->toArray();/*微信支付*/
             $newData = [];
             foreach ($xpayData as $value) {
                 $newData[] = [
