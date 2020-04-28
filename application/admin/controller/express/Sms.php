@@ -48,8 +48,9 @@ class Sms extends Backend
         //发送请求
         $result = $this->curlPostForm($data,$this->getSMSGetBalance);
         $data = json_decode($result,true);
+        $smsData = $this->model->order('createtime','desc')->limit(50)->select();
         $this->assign('data',$data);
-
+        $this->assign('smsData',$smsData);
     }
 
 
