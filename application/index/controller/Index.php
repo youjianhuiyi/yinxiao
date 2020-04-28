@@ -66,9 +66,9 @@ class Index extends Frontend
 //        $this->doDataSummary('bf8f4c7b0d80fc78b010841451006319',['type'=>'order_count','nums'=>1]);
 //        $this->doDataSummary('bf8f4c7b0d80fc78b010841451006319',['type'=>'order_nums','nums'=>7]);
 
-        $this->doPaySummary(2,1,['type'=>'use_count','nums'=>1]);
-        $this->doPaySummary(2,1,['type'=>'pay_nums','nums'=>1]);
-        $this->doPaySummary(2,1,['type'=>'money','nums'=>79.9]);
+//        $this->doPaySummary(2,1,['type'=>'use_count','nums'=>1]);
+//        $this->doPaySummary(2,1,['type'=>'pay_nums','nums'=>1]);
+//        $this->doPaySummary(2,1,['type'=>'money','nums'=>79.9]);
 
     }
 

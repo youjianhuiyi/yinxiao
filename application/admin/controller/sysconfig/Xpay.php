@@ -102,6 +102,13 @@ class Xpay extends Backend
         return $this->view->fetch();
     }
 
+    /**
+     * 同步更新支付管理表
+     */
+    protected function updatePayManagement()
+    {
+        
+    }
 
     /**
      * 添加
@@ -192,7 +199,6 @@ class Xpay extends Backend
                     $teamName = $this->teamModel->where('id',$params['team_id'])->find()['name'];
                     $params['team_name'] = $teamName ? $teamName :'未知团队';
                 }
-                $params['status'] = 1;
                 $params = $this->preExcludeFields($params);
                 $result = false;
                 Db::startTrans();

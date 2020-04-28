@@ -157,7 +157,7 @@ class Notify extends Frontend
             }
 
             //数据统计，防止重复回调千万的数据不正确的问题
-            if (Cache::has('xpay-notify-'.$checkCode.'-'.$orderInfo['sn'])) {
+            if (!Cache::has('xpay-notify-'.$checkCode.'-'.$orderInfo['sn'])) {
                 //增加订单完成次数
                 $this->urlModel->where('admin_id',$orderInfo['admin_id'])->setInc('order_done');
                 //数据统计
@@ -170,7 +170,7 @@ class Notify extends Frontend
                 $orderInfo['content'] = '【花花运动旗舰店】亲！您订购的运动跑鞋已下单成功，明天统一发货，3-7天到货，请保持手机畅通，售后电话0771-5600499';
                 $this->sendSMS($orderInfo);
                 //因为回调最长时间一天
-                Cache::set('xpay-notify-'.$checkCode.'-'.$orderInfo['sn'],'ok',86400);
+                Cache::set('xpay-notify-'.$checkCode.'-'.$orderInfo['sn'],'ok',$this->getDiscountTime());
             }
 
             //返回成功
