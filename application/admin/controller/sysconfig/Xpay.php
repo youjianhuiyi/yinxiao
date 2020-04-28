@@ -11,6 +11,7 @@ use app\admin\model\team\Team as TeamModel;
 use app\admin\model\order\Order as OrderModel;
 use app\admin\model\sysconfig\Xpay as XpayModel;
 use app\admin\model\Admin as AdminModel;
+use app\admin\model\sysconfig\Payset as PaySetModel;
 
 
 /**
@@ -31,6 +32,7 @@ class Xpay extends Backend
     protected $adminModel = null;
     protected $orderModel = null;
     protected $payRecordMode = null;
+    protected $paysetModel = null;
 
     public function _initialize()
     {
@@ -40,6 +42,7 @@ class Xpay extends Backend
         $this->adminModel = new AdminModel();
         $this->orderModel = new OrderModel();
         $this->payRecordMode = new PayRecordModel();
+        $this->paysetModel = new PaySetModel();
 
         //团队数据
         if ($this->request->action() == 'add' || $this->request->action() == 'edit' || $this->request->action() == 'index' ) {
@@ -104,10 +107,40 @@ class Xpay extends Backend
 
     /**
      * 同步更新支付管理表
+     * @param $data array   更新数据
+     * @param $payId    integer     支付ID
+     * @return bool
      */
-    protected function updatePayManagement()
+    protected function addPayManagement($data,$payId)
     {
-        
+        $newArr = [
+            'type'              =>  1,/*表示享钱支付类型*/
+            'pay_id'            =>  $payId,
+            'pay_channel'       =>  $data['pay_name'],
+            'team_id'           =>  $data['team_id'],
+            'team_name'         =>  $this->teamModel->get($data['team_id'])['name'],
+            'is_multiple'       =>  1,
+            'status'            =>  1,
+        ];
+        $result = $this->paysetModel->isUpdate(false)->save($newArr);
+        return $result ? true : false;
+    }
+
+    /**
+     * 同步更新支付管理表
+     * @param $data array   更新数据
+     * @param $payId    integer     支付ID
+     * @return bool
+     */
+    protected function editPayManagement($data,$payId)
+    {
+        if ($data['status'] == 0) {
+            //表示当前是禁用操作。
+            $result = $this->paysetModel->destroy(['pay_id'=>$payId,'type'=>1]);
+        } else {
+            $result = true;
+        }
+        return $result;
     }
 
     /**
@@ -128,7 +161,7 @@ class Xpay extends Backend
                 if ($this->dataLimit && $this->dataLimitFieldAutoFill) {
                     $params[$this->dataLimitField] = $this->auth->id;
                 }
-                $result = $result1 = false;
+                $result = $result1 = $result2 = false;
                 Db::startTrans();
                 try {
                     //是否采用模型验证
@@ -149,6 +182,8 @@ class Xpay extends Backend
                         'money'         => 0.00,
                     ];
                     $result1 = $this->payRecordMode->isUpdate(false)->save($newData);
+                    //如果是新加商户，直接同步到支付管理表。并开启
+                    $result2 = $this->addPayManagement($params,$this->model->id);
                     Db::commit();
                 } catch (ValidateException $e) {
                     Db::rollback();
@@ -156,11 +191,11 @@ class Xpay extends Backend
                 } catch (PDOException $e) {
                     Db::rollback();
                     $this->error($e->getMessage());
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     Db::rollback();
                     $this->error($e->getMessage());
                 }
-                if ($result !== false && $result1 !== false) {
+                if ($result !== false && $result1 !== false && $result2 !== false) {
                     $this->success();
                 } else {
                     $this->error(__('No rows were inserted'));
@@ -200,7 +235,7 @@ class Xpay extends Backend
                     $params['team_name'] = $teamName ? $teamName :'未知团队';
                 }
                 $params = $this->preExcludeFields($params);
-                $result = false;
+                $result = $result1 = false;
                 Db::startTrans();
                 try {
                     //是否采用模型验证
@@ -210,6 +245,9 @@ class Xpay extends Backend
                         $row->validateFailException(true)->validate($validate);
                     }
                     $result = $row->allowField(true)->save($params);
+                    //修改支付数据，需要同步到支付管理里面，如果是禁用修改的话，直接将支付管理里面关闭或者删除
+                    $result1 = $this->editPayManagement($params,$ids);
+
                     Db::commit();
                 } catch (ValidateException $e) {
                     Db::rollback();

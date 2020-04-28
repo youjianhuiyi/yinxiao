@@ -48,20 +48,33 @@ class Payset extends Backend
             if ($this->request->request('keyField')) {
                 return $this->selectpage();
             }
-            list($where, $sort, $order, $offset, $limit) = $this->buildparams();
-            $total = $this->model
-                ->where($where)
-                ->where('team_id',$this->adminInfo['team_id'])
-                ->order($sort, $order)
-                ->count();
+            if ($this->adminInfo['id'] == 1) {
+                list($where, $sort, $order, $offset, $limit) = $this->buildparams();
+                $total = $this->model
+                    ->where($where)
+                    ->order($sort, $order)
+                    ->count();
 
-            $list = $this->model
-                ->where($where)
-                ->where('team_id',$this->adminInfo['team_id'])
-                ->order($sort, $order)
-                ->limit($offset, $limit)
-                ->select();
+                $list = $this->model
+                    ->where($where)
+                    ->order($sort, $order)
+                    ->limit($offset, $limit)
+                    ->select();
+            } else {
+                list($where, $sort, $order, $offset, $limit) = $this->buildparams();
+                $total = $this->model
+                    ->where($where)
+                    ->where('team_id',$this->adminInfo['team_id'])
+                    ->order($sort, $order)
+                    ->count();
 
+                $list = $this->model
+                    ->where($where)
+                    ->where('team_id',$this->adminInfo['team_id'])
+                    ->order($sort, $order)
+                    ->limit($offset, $limit)
+                    ->select();
+            }
             $list = collection($list)->toArray();
             $result = array("total" => $total, "rows" => $list);
 
@@ -79,6 +92,7 @@ class Payset extends Backend
      */
     public function sync()
     {
+        die;
         $uid = $this->adminInfo['id'];
         //查找出当前团队所选择的产品模板数据
         $payData = $this->payModel->where(['team_id'=>$this->adminInfo['team_id'],'status'=>1])->select();
