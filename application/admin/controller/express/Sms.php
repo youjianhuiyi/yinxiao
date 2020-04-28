@@ -69,7 +69,7 @@ class Sms extends Backend
         if ($data['resCode'] == '000') {
             //表示发送成功
             $newData = [
-                'order_id'  => $params['order_id'],
+                'order_id'  => $params['id'],
                 'team_id'   => $params['team_id'],
                 'admin_id'  => $params['admin_id'],
                 'phone'     => $params['phone'],
@@ -80,7 +80,7 @@ class Sms extends Backend
         } else {
             //表示发送失败
             $newData = [
-                'order_id'  => $params['order_id'],
+                'order_id'  => $params['id'],
                 'team_id'   => $params['team_id'],
                 'admin_id'  => $params['admin_id'],
                 'phone'     => $params['phone'],
