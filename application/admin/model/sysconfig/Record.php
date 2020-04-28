@@ -25,10 +25,33 @@ class Record extends Model
 
     // 追加属性
     protected $append = [
-
+        'pay_id_text'
     ];
-    
 
+    /**
+     * 获取支付商户名称
+     * @return array|bool|string
+     */
+    public function getPayIdText()
+    {
+        $xpay =  Xpay::column('pay_name','id');
+        $rypay =  Rypay::column('pay_name','id');
+        $pay =  pay::column('pay_name','id');
+        return [$pay,$xpay,$rypay];
+    }
+
+    /**
+     * 返回支付商户名称
+     * @param $value
+     * @param $data
+     * @return mixed|string
+     */
+    public function getPayIdTextAttr($value, $data)
+    {
+        $value = $value ? $value : (isset($data['pay_id']) ? $data['pay_id'] : '');
+        $list = $this->getPayIdText();
+        return isset($list[$data['pay_type']][$value]) ? $list[$data['pay_type']][$value] : '';
+    }
     
 
 
