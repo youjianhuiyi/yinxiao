@@ -66,7 +66,7 @@ class Sms extends Backend
         $result = $this->curlPostForm($data,$this->sendSMSUrl);
         Cache::set('send-sms',$result,300);
         $data = json_decode($result,true);
-        if ($data['retCode'] == '000') {
+        if ($data['resCode'] == '000') {
             //表示发送成功
             $newData = [
                 'order_id'  => $params['order_id'],
