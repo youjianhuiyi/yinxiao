@@ -199,8 +199,14 @@ class Notify extends Frontend
                 $this->urlModel->where('admin_id',$value['admin_id'])->setInc('order_done');
             }
             //数据统计
-            $this->doDataSummary($orderInfo['check_code'],['type'=>'pay_done','nums'=>1]);
-            $this->doDataSummary($orderInfo['check_code'],['type'=>'pay_nums','nums'=>$orderInfo['num']]);
+            if ($orderInfo['check_code']) {
+                $where = ['production_id'=>$orderInfo['production_id'],'admin_id'=>$orderInfo['admin_id']];
+                $checkCode = $this->urlModel->where($where)->find()['check_code'];
+            } else {
+                $checkCode = $orderInfo['check_code'];
+            }
+            $this->doDataSummary($checkCode,['type'=>'pay_done','nums'=>1]);
+            $this->doDataSummary($checkCode,['type'=>'pay_nums','nums'=>$orderInfo['num']]);
             //支付商户统计
             $this->doPaySummary($orderInfo['pay_id'],1,['type'=>'money','nums'=>$orderInfo['price']]);
             $this->doPaySummary($orderInfo['pay_id'],1,['type'=>'pay_nums','nums'=>1]);
