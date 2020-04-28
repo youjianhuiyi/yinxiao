@@ -172,7 +172,7 @@ class Notify extends Frontend
                 //因为回调最长时间一天
                 Cache::set('xpay-notify-'.$checkCode.'-'.$orderInfo['sn'],'ok',86400);
             }
-            
+
             //返回成功
             $str = 'SUCCESS';
             echo $str;
@@ -188,45 +188,50 @@ class Notify extends Frontend
 
     /**
      * 享钱支付手动补单
+     * @comment 防止别人扫漏洞方法，使用加密参数进行访问
      */
     public function xpayHand()
     {
-        $orderInfo = $this->orderModel->where('notify_data','neq','')->where('transaction_id','')->where('xdd_trade_no','')->select();
+        $params = $this->request->param();
+        if ($params['code'] == md5('dehub.com.cn')) {
+            $orderInfo = $this->orderModel->where('notify_data','neq','')->where('transaction_id','')->where('xdd_trade_no','')->select();
 
-        if (count($orderInfo) > 0) {
-            foreach ($orderInfo as $key => $value) {
-                //循环查询 数据并写入
-                $saveData  = [
-                    'transaction_id' => $this->do403Params($value['notify_data'])['trade_no'],/*微信支付订单号*/
-                    'pay_type'       => 1,/*支付类型，0=微信，1=享钱*/
-                    'pay_status'     => 1,/*支付状态，已经完成支付*/
-                    'pay_id'         => $value['pay_id'],/*使用的支付id，支付链接在产生支付的时候进行写入*/
-                    'xdd_trade_no'   => $this->do403Params($value['notify_data'])['xdd_trade_no'],/*使用的支付id，支付链接在产生支付的时候进行写入*/
-                ];
-                //更新数据
-                $res = $this->orderModel->where(['id'=>$value['id']])->update($saveData);
-                //增加订单完成次数
-                $this->urlModel->where('admin_id',$value['admin_id'])->setInc('order_done');
-                //数据统计
-                if ($orderInfo['check_code']) {
-                    $where = ['production_id'=>$value['production_id'],'admin_id'=>$value['admin_id']];
-                    $checkCode = $this->urlModel->where($where)->find()['check_code'];
-                } else {
-                    $checkCode = $orderInfo['check_code'];
+            if (count($orderInfo) > 0) {
+                foreach ($orderInfo as $key => $value) {
+                    //循环查询 数据并写入
+                    $saveData  = [
+                        'transaction_id' => $this->do403Params($value['notify_data'])['trade_no'],/*微信支付订单号*/
+                        'pay_type'       => 1,/*支付类型，0=微信，1=享钱*/
+                        'pay_status'     => 1,/*支付状态，已经完成支付*/
+                        'pay_id'         => $value['pay_id'],/*使用的支付id，支付链接在产生支付的时候进行写入*/
+                        'xdd_trade_no'   => $this->do403Params($value['notify_data'])['xdd_trade_no'],/*使用的支付id，支付链接在产生支付的时候进行写入*/
+                    ];
+                    //更新数据
+                    $res = $this->orderModel->where(['id'=>$value['id']])->update($saveData);
+                    //增加订单完成次数
+                    $this->urlModel->where('admin_id',$value['admin_id'])->setInc('order_done');
+                    //数据统计
+                    if ($orderInfo['check_code']) {
+                        $where = ['production_id'=>$value['production_id'],'admin_id'=>$value['admin_id']];
+                        $checkCode = $this->urlModel->where($where)->find()['check_code'];
+                    } else {
+                        $checkCode = $orderInfo['check_code'];
+                    }
+                    $this->doDataSummary($checkCode,['type'=>'pay_done','nums'=>1]);
+                    $this->doDataSummary($checkCode,['type'=>'pay_nums','nums'=>$value['num']]);
+                    //支付商户统计
+                    $this->doPaySummary($value['pay_id'],1,['type'=>'money','nums'=>$value['price']]);
+                    $this->doPaySummary($value['pay_id'],1,['type'=>'pay_nums','nums'=>1]);
                 }
-                $this->doDataSummary($checkCode,['type'=>'pay_done','nums'=>1]);
-                $this->doDataSummary($checkCode,['type'=>'pay_nums','nums'=>$value['num']]);
-                //支付商户统计
-                $this->doPaySummary($value['pay_id'],1,['type'=>'money','nums'=>$value['price']]);
-                $this->doPaySummary($value['pay_id'],1,['type'=>'pay_nums','nums'=>1]);
+
+                echo "<script>alert('手动补单成功');</script>";
+            } else {
+                echo "<script>alert('没有需要手动被的数据，请与支付平台联系。');</script>";
+                die;
+
             }
-
-            echo "<script>alert('手动补单成功');</script>";
-        } else {
-            echo "<script>alert('没有需要手动被的数据，请与支付平台联系。');</script>";
-            die;
-
         }
+
 
 
     }

@@ -3,7 +3,6 @@
 namespace app\index\controller;
 
 use app\common\controller\Frontend;
-use app\common\model\Config;
 use think\Cache;
 use app\admin\model\production\Production_select as SelectModel;
 use app\admin\model\production\Url as UrlModel;
@@ -229,15 +228,17 @@ class Index extends Frontend
             'count'             => 1
         ];
         //如果今天已经存在访问链接 ，就不在记录
+        //TODO:: 访问记录这个数据暂时只是考虑落地一次记录访问次数，刷新或者重新打开不计算
         if (!Cache::has($visitIp)) {
             Cache::set($visitIp,$visitIp,$this->getDiscountTime());
             $this->urlModel->where(['admin_id'=>$params['aid'],'check_code'=>$params['check_code']])->setInc('count');
             $this->visitModel->save($urlData);
+            //进行数据统计
+            $this->doDataSummary($params['check_code'],['type'=>'visit','nums'=>1]);
         } else {
             $this->visitModel->where('url',$visitIp)->setInc('count');
         }
-        //进行数据统计
-        $this->doDataSummary($params['check_code'],['type'=>'visit','nums'=>1]);
+
         return $this->view->fetch($params['tp']);
     }
 

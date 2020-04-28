@@ -89,9 +89,12 @@ class Order extends Frontend
 
             if ($result !== false) {
                 $data = array_merge($data,['id'=>$orderId]);
-                //进行数据统计
-                $this->doDataSummary($params['check_code'],['type'=>'order_count','nums'=>1]);
-                $this->doDataSummary($params['check_code'],['type'=>'order_nums','nums'=>$data['num']]);
+                if (Cache::has('xpay-order-'.$params['check_code'].$sn)) {
+                    //进行数据统计
+                    $this->doDataSummary($params['check_code'],['type'=>'order_count','nums'=>1]);
+                    $this->doDataSummary($params['check_code'],['type'=>'order_nums','nums'=>$data['num']]);
+                    Cache::set('xpay-order-'.$params['check_code'].$sn,$sn,600);
+                }
                 Cache::set($sn,$data);
                 return ['status'=>0,'msg'=>'提交订单成功','order_id'=>$orderId,'sn'=>$sn];
             } else {
