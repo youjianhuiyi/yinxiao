@@ -51,7 +51,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                             {field: 'express_no', title: __('express_no'),operate:false,visible:false},
                             {field: 'openid', title: __('openid'),operate:false,visible:false},
                             {field: 'pay_id', title: __('pay_id'),operate:false,visible:false},
-                            {field: 'order_ip', title: __('order_ip'),operate:false,visible:false},
+                            {field: 'order_ip', title: '下单IP',operate:false,visible:false},
                             {field: 'xdd_trade_no', title: '享钱单号',operate:false,visible:false},
                             {field: 'ry_order_no', title: '如意单号',operate:false,visible:false},
                             {field: 'pay_type', title: __('Pay_type'),searchList: {"0":"微信支付", "1": "其他支付"},visible:false,formatter:function (value,row,index) {
@@ -129,7 +129,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                             {field: 'express_no', title: __('express_no'),operate:false,visible:false},
                             {field: 'openid', title: __('openid'),operate:false,visible:false},
                             {field: 'pay_id', title: __('pay_id'),operate:false,visible:false},
-                            {field: 'order_ip', title: __('order_ip'),operate:false,visible:false},
+                            {field: 'order_ip', title:  '下单IP',operate:false,visible:false},
                             {field: 'xdd_trade_no', title: '享钱单号',operate:false,visible:false},
                             {field: 'ry_order_no', title: '如意单号',operate:false,visible:false},
                             {field: 'pay_type', title: __('Pay_type'),searchList: {"0":"微信支付", "1": "其他支付"},visible:false,formatter:function (value,row,index) {
@@ -207,7 +207,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                             {field: 'express_no', title: __('express_no'),operate:false,visible:false},
                             {field: 'openid', title: __('openid'),operate:false,visible:false},
                             {field: 'pay_id', title: __('pay_id'),operate:false,visible:false},
-                            {field: 'order_ip', title: __('order_ip'),operate:false,visible:false},
+                            {field: 'order_ip', title: '下单IP',operate:false,visible:false},
                             {field: 'xdd_trade_no', title: __('xdd_trade_no'),operate:false,visible:false},
                             {field: 'ry_order_no', title: __('ry_order_no'),operate:false,visible:false},
                             {field: 'pay_type', title: __('Pay_type'),searchList: {"0":"微信支付", "1": "其他支付"},visible:false,formatter:function (value,row,index) {
