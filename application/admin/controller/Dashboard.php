@@ -26,6 +26,8 @@ class Dashboard extends Backend
     protected $adminModel = null;
     protected $teamModel = null;
     protected $dataSummaryModel = null;
+    protected $noNeedLogin = ['test'];
+    protected $noNeedRight = ['test'];
 
     public function _initialize()
     {
@@ -38,14 +40,33 @@ class Dashboard extends Backend
         $this->dataSummaryModel = new DataSummaryModel();
     }
 
+
+    public function test()
+    {
+        $this->getYesterDayTime();
+    }
+
+
     /**
      * 获取当天0点到当天23点59分59秒的时间戳
      * @internal
      */
-    public function getBeginEndTime()
+    protected function getBeginEndTime()
     {
         $ytime = strtotime(date("Y-m-d",strtotime("-1 day")));//昨天开始时间戳
         $zerotime = $ytime+24 * 60 * 60;//昨天23点59分59秒+1秒
+        $totime = $zerotime+24 * 60 * 60-1;//今天结束时间戳 23点59分59秒。
+        return [$zerotime,$totime];
+    }
+
+
+    /**
+     * 获取昨天的时间戳
+     */
+    protected function getYesterDayTime()
+    {
+        $ytime = strtotime(date("Y-m-d",strtotime("-2 day")));//昨天开始时间戳
+        $zerotime = $ytime+24 * 60 * 60;//昨天23点59分59秒
         $totime = $zerotime+24 * 60 * 60-1;//今天结束时间戳 23点59分59秒。
         return [$zerotime,$totime];
     }
@@ -81,7 +102,7 @@ class Dashboard extends Backend
      * @return \think\response\Json|void
      * @throws \think\Exception
      */
-    public function index()
+    public function index2()
     {
         //获取当前用户信息
         $userInfo = $this->adminInfo;
@@ -311,7 +332,7 @@ class Dashboard extends Backend
     /**
      * 查看
      */
-    public function index2()
+    public function index()
     {
         $date = date('m-d',time());
         //获取当天所有用户的报表
@@ -326,13 +347,49 @@ class Dashboard extends Backend
         //构建图标需要的数值
         $newArr = [];
         foreach ($data as $key => $value) {
-            $newArr['visit_nums'][$key] =  $value['visit_nums'];
-            $newArr['order_count'][$key] =  $value['order_count'];
-            $newArr['order_nums'][$key] =  $value['order_nums'];
-            $newArr['pay_done'][$key] =  $value['pay_done'];
-            $newArr['pay_done_nums'][$key] =  $value['pay_done_nums'];
+            $newArr['visit_nums'][$key]     =  $value['visit_nums'];
+            $newArr['order_count'][$key]    =  $value['order_count'];
+            $newArr['order_nums'][$key]     =  $value['order_nums'];
+            $newArr['pay_done'][$key]       =  $value['pay_done'];
+            $newArr['pay_done_nums'][$key]  =  $value['pay_done_nums'];
         }
 
+        //渲染昨天数据汇总
+        $yesterDayTime = $this->getYesterDayTime();
+        $yseterDayData = collection($this->dataSummaryModel->where('createtime','>',$yesterDayTime[0])->where('createtime','<',$yesterDayTime[1])->select())->toArray();
+        $newYesData = [
+            'visit'         => 0,
+            'order_count'   => 0,
+            'order_nums'    => 0,
+            'pay_done'      => 0,
+            'pay_done_nums' => 0
+        ];
+        foreach ($yseterDayData as $value) {
+            $newYesData['visit']            += $value['visit_nums'];
+            $newYesData['order_count']      += $value['order_count'];
+            $newYesData['order_nums']       += $value['order_nums'];
+            $newYesData['pay_done']         += $value['pay_done'];
+            $newYesData['pay_done_nums']    += $value['pay_done_nums'];
+        }
+        $this->assign('yesterdayData',$newYesData);
+        //渲染历史数据汇总
+        $historyData = collection($this->dataSummaryModel->select())->toArray();
+        $newHisData = [
+            'visit'         =>  0,
+            'order_count'   =>  0,
+            'order_nums'    =>  0,
+            'pay_done'      =>  0,
+            'pay_done_nums' =>  0
+        ];
+        foreach ($historyData as $value) {
+            $newHisData['visit']        += $value['visit_nums'];
+            $newHisData['order_count']  += $value['order_count'];
+            $newHisData['order_nums']   += $value['order_nums'];
+            $newHisData['pay_done']     += $value['pay_done'];
+            $newHisData['pay_done_nums'] += $value['pay_done_nums'];
+        }
+        $this->assign('historyData',$newHisData);
+        //历史数据
         $this->view->assign([
             'paylist'          => $data,
             'visit'            => $newArr['visit_nums'],
