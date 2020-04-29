@@ -435,7 +435,9 @@ class Express extends Backend
                 ];
             }
         }
-        $this->model->isUpdate(true)->saveAll($newExpressData);
+        if ($newExpressData) {
+            $this->model->isUpdate(true)->saveAll($newExpressData);
+        }
         $this->smsModel->isUpdate(false)->saveAll($newData);
         $this->success('已经全部发送成功！');
     }
