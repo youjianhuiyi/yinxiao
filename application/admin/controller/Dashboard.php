@@ -43,7 +43,7 @@ class Dashboard extends Backend
 
     public function test()
     {
-        $this->getYesterDayTime();
+        dump($this->getTimeDate());
     }
 
 
@@ -71,6 +71,20 @@ class Dashboard extends Backend
         return [$zerotime,$totime];
     }
 
+
+    /**
+     * 获取当天时间小时段
+     */
+    protected function getTimeDate()
+    {
+        $time = $this->getBeginEndTime();
+        $newArr = [];
+        for ($i = 1; $i <= 24; $i++) {
+            $newArr[] = $time[0]+3600*$i;
+        }
+        return $newArr;
+    }
+
     /**
      * @description:根据数据
      * @internal
@@ -96,239 +110,6 @@ class Dashboard extends Backend
         return $newArr;
     }
 
-
-    /**
-     * 查看
-     * @return \think\response\Json|void
-     * @throws \think\Exception
-     */
-    public function index2()
-    {
-        //获取当前用户信息
-        $userInfo = $this->adminInfo;
-        $date = date('m-d',time());
-        $teamData = $this->teamModel->column('name','id');
-        $adminName = $this->adminModel->column('nickname','id');
-        //先将所有数据按日期分类
-        $data = [];
-
-        if ($userInfo['id'] == 1) {
-            //表示是平台总管理员，可以查看所有记录
-            //获取当天时间 0点到23点59分59秒的订单数量。
-            //获取当天所有用户的报表
-            $dataSummary = collection($this->dataSummaryModel->where('date',$date)->select())->toArray();
-            foreach ($dataSummary as &$item) {
-                $name = $this->adminModel->get($item['admin_id'])['nickname'];
-                $item['name'] = $name;
-                $data[] = $item;
-            }
-
-        } elseif ($userInfo['pid'] == 0 && $userInfo['id'] != 1) {
-            //老板查看团队所有人员的数据
-            //获取团队下所有的用户数据
-            //获取当天所有用户的报表
-            $dataSummary = $this->dataSummaryModel
-                ->where('date',$date)
-                ->where('team_id',$this->adminInfo['team_id'])
-                ->select();
-            $dataSummary = collection($dataSummary)->toArray();
-            foreach ($dataSummary as &$item) {
-                $name = $this->adminModel->get($item['admin_id'])['nickname'];
-                $item['name'] = $name;
-                $data[] = $item;
-            }
-
-        } elseif ($userInfo['pid'] != 0 && $userInfo['level'] != 2) {
-            //组长查看自己及以下员工的数据
-            $userIds = $this->getUserLower();
-            $dataSummary = $this->dataSummaryModel
-                ->where('date',$date)
-                ->where('admin_id','in',$userIds)
-                ->select();
-            $dataSummary = collection($dataSummary)->toArray();
-            foreach ($dataSummary as &$item) {
-                $name = $this->adminModel->get($item['admin_id'])['nickname'];
-                $item['name'] = $name;
-                $data[] = $item;
-            }
-
-        } else {
-            //业务员只能查看自己的订单数据
-            $dataSummary = $this->dataSummaryModel
-                ->where('date',$date)
-                ->where('admin_id',$this->adminInfo['id'])
-                ->select();
-            $dataSummary = collection($dataSummary)->toArray();
-            foreach ($dataSummary as &$item) {
-                $name = $this->adminModel->get($item['admin_id'])['nickname'];
-                $item['name'] = $name;
-                $data[] = $item;
-            }
-
-        }
-        $this->assign('user',$this->adminInfo);/*当前用户信息*/
-        $this->assign('teamData',$teamData);/*团队数据*/
-        $this->assign('adminName',$adminName);/*业务员ID=>名称数据*/
-        $this->assign('data',$data);
-        return $this->view->fetch();
-    }
-
-    /**
-     * 查看
-     */
-    public function index1()
-    {
-        //获取当前用户信息
-        $userInfo = $this->adminInfo;
-        $timeData = $this->getBeginEndTime();
-        $teamData = $this->teamModel->column('name','id');
-        $adminName = $this->adminModel->column('nickname','id');
-        $userIds = $this->getUserLower();
-
-        if ($userInfo['id'] == 1) {
-            //表示是平台总管理员，可以查看所有记录
-            $userInfoData = collection($this->adminModel->select())->toArray();
-            //获取当天时间 0点到23点59分59秒的订单数量。
-            $orderDoneData = $this->orderModel
-                ->where('createtime','>',$timeData[0])
-                ->where('createtime','<',$timeData[1])
-                ->where('pay_status',1)
-                ->select();
-            $orderDoneData = collection($orderDoneData)->toArray();
-            $orderDoneData = $this->dataGroup($orderDoneData,'admin_id',$userIds);
-
-            $orderData = $this->orderModel
-                ->where('createtime','>',$timeData[0])
-                ->where('createtime','<',$timeData[1])
-                ->select();
-            $orderData = collection($orderData)->toArray();
-            $orderData = $this->dataGroup($orderData,'admin_id',$userIds);
-
-            $visitData = $this->visitModel
-                ->where('createtime','>',$timeData[0])
-                ->where('createtime','<',$timeData[1])
-                ->select();
-            $visitData = collection($visitData)->toArray();
-            $visitData = $this->dataGroup($visitData,'admin_id',$userIds);
-
-        } elseif ($userInfo['pid'] == 0 && $userInfo['id'] != 1) {
-            //老板查看团队所有人员的数据
-            //获取团队下所有的用户数据
-            $userInfoData = $this->adminModel->where('team_id',$userInfo['team_id'])->select();
-            $userInfoData  = collection($userInfoData)->toArray();
-            //获取当前此团队下订单的所有数量
-            $orderData = $this->orderModel
-                ->where('createtime','>',$timeData[0])
-                ->where('createtime','<',$timeData[1])
-                ->where('team_id',$userInfo['team_id'])
-                ->select();
-            $orderData = collection($orderData)->toArray();
-            $orderData = $this->dataGroup($orderData,'admin_id',$userIds);
-
-            //获取当前此团队成交订单的所有数量
-            $orderDoneData = $this->orderModel
-                ->where('createtime','>',$timeData[0])
-                ->where('createtime','<',$timeData[1])
-                ->where('team_id',$userInfo['team_id'])
-                ->where('pay_status',1)
-                ->select();
-            $orderDoneData = collection($orderDoneData)->toArray();
-            $orderDoneData = $this->dataGroup($orderDoneData,'admin_id',$userIds);
-
-            //获取当前团队下所有用户的访问数量
-            $visitData = $this->visitModel
-                ->where('updatetime','>',$timeData[0])
-                ->where('updatetime','<',$timeData[1])
-                ->where('team_id',$userInfo['team_id'])
-                ->select();
-            $visitData = collection($visitData)->toArray();
-            $visitData = $this->dataGroup($visitData,'admin_id',$userIds);
-
-        } elseif ($userInfo['pid'] != 0 && $userInfo['level'] != 2) {
-            //组长查看自己及以下员工的数据
-            $userInfoData = $this->adminModel
-                ->where('team_id',$userInfo['team_id'])
-                ->where('id','in',$userIds)
-                ->select();
-            $userInfoData  = collection($userInfoData)->toArray();
-            //订单下单量
-            $orderData = $this->orderModel
-                ->where('updatetime','>',$timeData[0])
-                ->where('updatetime','<',$timeData[1])
-                ->where('team_id',$userInfo['team_id'])
-                ->where('admin_id','in',$userIds)
-                ->select();
-            $orderData = collection($orderData)->toArray();
-            $orderData = $this->dataGroup($orderData,'admin_id',$userIds);
-
-            //获取当前此团队成交订单的所有数量
-            $orderDoneData = $this->orderModel
-                ->where('updatetime','>',$timeData[0])
-                ->where('updatetime','<',$timeData[1])
-                ->where('team_id',$userInfo['team_id'])
-                ->where('admin_id','in',$userIds)
-                ->where('pay_status',1)
-                ->select();
-            $orderDoneData = collection($orderDoneData)->toArray();
-            $orderDoneData = $this->dataGroup($orderDoneData,'admin_id',$userIds);
-
-            //获取当前团队下所有用户的访问数量
-            $visitData = $this->visitModel
-                ->where('updatetime','>',$timeData[0])
-                ->where('updatetime','<',$timeData[1])
-                ->where('team_id',$userInfo['team_id'])
-                ->where('admin_id','in',$userIds)
-                ->select();
-            $visitData = collection($visitData)->toArray();
-            $visitData = $this->dataGroup($visitData,'admin_id',$userIds);
-
-        } else {
-            //业务员只能查看自己的订单数据
-            //获取当前此团队下订单的所有数量
-            $userInfoData = $this->adminModel
-                ->where('team_id',$userInfo['team_id'])
-                ->where('id',$userIds[0])
-                ->select();
-            $userInfoData  = collection($userInfoData)->toArray();
-
-            $orderData = $this->orderModel
-                ->where('updatetime','>',$timeData[0])
-                ->where('updatetime','<',$timeData[1])
-                ->where('id',$userInfo['id'])
-                ->select();
-            $orderData = collection($orderData)->toArray();
-            $orderData = $this->dataGroup($orderData,'admin_id',$userIds);
-
-            //获取当前此团队成交订单的所有数量
-            $orderDoneData = $this->orderModel
-                ->where('updatetime','>',$timeData[0])
-                ->where('updatetime','<',$timeData[1])
-                ->where('admin_id',$userInfo['id'])
-                ->where('pay_status',1)
-                ->select();
-            $orderDoneData = collection($orderDoneData)->toArray();
-            $orderDoneData = $this->dataGroup($orderDoneData,'admin_id',$userIds);
-
-            //获取当前团队下所有用户的访问数量
-            $visitData = $this->visitModel
-                ->where('updatetime','>',$timeData[0])
-                ->where('updatetime','<',$timeData[1])
-                ->where('admin_id',$userInfo['id'])
-                ->select();
-            $visitData = collection($visitData)->toArray();
-            $visitData = $this->dataGroup($visitData,'admin_id',$userIds);
-        }
-
-        $this->assign('orderDoneData',$orderDoneData);/*成交数量*/
-        $this->assign('orderData',$orderData);/*下单数量*/
-        $this->assign('visitData',$visitData);/*访问数量*/
-        $this->assign('userInfoData',$userInfoData);/*用户数据*/
-        $this->assign('teamData',$teamData);/*团队数据*/
-        $this->assign('adminName',$adminName);/*业务员ID=>名称数据*/
-        $this->assign('user',$this->adminInfo);/*当前用户信息*/
-        return $this->view->fetch();
-    }
-
     /**
      * 查看
      */
@@ -338,23 +119,24 @@ class Dashboard extends Backend
         //获取当天所有用户的报表
         $dataSummary = collection($this->dataSummaryModel->where('date',$date)->select())->toArray();
         //先将所有数据按日期分类
-        $data = [];
-        foreach ($dataSummary as $item) {
-            $name = $this->adminModel->get($item['admin_id'])['nickname'];
-            $data[$name] = $item;
+        $data = [
+            'visit'         => 0,
+            'order_count'   => 0,
+            'order_nums'    => 0,
+            'pay_done'      => 0,
+            'pay_done_nums' => 0
+        ];
+        foreach ($dataSummary as $value) {
+            $data['visit']            += $value['visit_nums'];
+            $data['order_count']      += $value['order_count'];
+            $data['order_nums']       += $value['order_nums'];
+            $data['pay_done']         += $value['pay_done'];
+            $data['pay_done_nums']    += $value['pay_done_nums'];
         }
+        //渲染当前实时变量
+        $this->assignconfig('data',$data);
 
-        //构建图标需要的数值
-        $newArr = [];
-        foreach ($data as $key => $value) {
-            $newArr['visit_nums'][$key]     =  $value['visit_nums'];
-            $newArr['order_count'][$key]    =  $value['order_count'];
-            $newArr['order_nums'][$key]     =  $value['order_nums'];
-            $newArr['pay_done'][$key]       =  $value['pay_done'];
-            $newArr['pay_done_nums'][$key]  =  $value['pay_done_nums'];
-        }
-
-        //渲染昨天数据汇总
+        //昨天数据汇总
         $yesterDayTime = $this->getYesterDayTime();
         $yseterDayData = collection($this->dataSummaryModel->where('createtime','>',$yesterDayTime[0])->where('createtime','<',$yesterDayTime[1])->select())->toArray();
         $newYesData = [
@@ -371,6 +153,7 @@ class Dashboard extends Backend
             $newYesData['pay_done']         += $value['pay_done'];
             $newYesData['pay_done_nums']    += $value['pay_done_nums'];
         }
+        //渲染模板变量
         $this->assign('yesterdayData',$newYesData);
         //渲染历史数据汇总
         $historyData = collection($this->dataSummaryModel->select())->toArray();
@@ -390,14 +173,14 @@ class Dashboard extends Backend
         }
         $this->assign('historyData',$newHisData);
         //历史数据
-        $this->view->assign([
-            'paylist'          => $data,
-            'visit'            => $newArr['visit_nums'],
-            'order_count'      => $newArr['order_count'],
-            'order_nums'       => $newArr['order_nums'],
-            'pay_done'         => $newArr['pay_done'],
-            'pay_done_nums'    => $newArr['pay_done_nums'],
-        ]);
+//        $this->view->assign([
+//            'paylist'          => $data,
+//            'visit'            => $newArr['visit_nums'],
+//            'order_count'      => $newArr['order_count'],
+//            'order_nums'       => $newArr['order_nums'],
+//            'pay_done'         => $newArr['pay_done'],
+//            'pay_done_nums'    => $newArr['pay_done_nums'],
+//        ]);
 
         return $this->view->fetch();
     }
