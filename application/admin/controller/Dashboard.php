@@ -79,6 +79,7 @@ class Dashboard extends Backend
     /**
      * 查看
      * @return \think\response\Json|void
+     * @throws \think\Exception
      */
     public function index()
     {
@@ -144,7 +145,6 @@ class Dashboard extends Backend
             }
 
         }
-//        dump($data);die;
         $this->assign('user',$this->adminInfo);/*当前用户信息*/
         $this->assign('teamData',$teamData);/*团队数据*/
         $this->assign('adminName',$adminName);/*业务员ID=>名称数据*/

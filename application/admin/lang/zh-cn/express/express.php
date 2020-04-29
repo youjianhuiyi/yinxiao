@@ -9,6 +9,7 @@ return [
     'Express_no'  => '快递单号',
     'Phone'       => '手机号',
     'Express_com' => '快递公司',
+    'Is_send'     => '是否发送短信',
     'Createtime'  => '创建时间',
     'Updatetime'  => '更新时间',
     'Deletetime'  => '删除时间'

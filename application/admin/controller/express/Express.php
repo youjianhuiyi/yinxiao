@@ -331,13 +331,19 @@ class Express extends Backend
             }
 
             foreach ($insert as $key => &$value) {
-                $value['team_id'] = $this->adminInfo['team_id'];
-                $value['team_name'] = $this->adminInfo['team_name'];
-                $value['express_no'] = (string)$value['express_no'];
-                $value['order_id'] = $this->orderModel->where(['sn'=>$value['order_sn']])->find()['id'] ? : 0;
+                if ($value['order_sn'] == '') {
+                    unset($insert[$key]);
+                } else {
+                    $value['team_id'] = $this->adminInfo['team_id'];
+                    $value['team_name'] = $this->adminInfo['team_name'];
+                    $value['express_no'] = (string)$value['express_no'];
+                    $value['order_id'] = $this->orderModel->where(['sn'=>$value['order_sn']])->find()['id'] ? : 0;
+                }
+
             }
-            $this->model->saveAll($insert);
+//            dump($insert);die;
             $this->setExpressToOrder($insert);
+            $this->model->saveAll($insert);
         } catch (PDOException $exception) {
             $msg = $exception->getMessage();
             if (preg_match("/.+Integrity constraint violation: 1062 Duplicate entry '(.+)' for key '(.+)'/is", $msg, $matches)) {
@@ -366,9 +372,9 @@ class Express extends Backend
                 'express_com'   =>  $value['express_com'],
                 'order_status'  =>  1
             ];
-            $orderInfo = $this->orderModel->get($value['order_id']);
-            $orderInfo['content'] = '【花花运动旗舰店】尊敬的客户'.$orderInfo['name'].'，您购买的商品已发货，快递单号：'.$value['express_no'].',快递公司：'.$value['express_com'];
-            $this->sendSms($orderInfo);
+//            $orderInfo = $this->orderModel->get($value['order_id'])->toArray();
+//            $orderInfo['content'] = '【花花运动旗舰店】尊敬的客户'.$orderInfo['name'].'，您购买的商品已发货，快递单号：'.$value['express_no'].',快递公司：'.$value['express_com'];
+//            $this->sendSms($orderInfo);
         }
 
         $this->orderModel->isUpdate(true)->saveAll($newArr);
@@ -377,43 +383,61 @@ class Express extends Backend
 
     /**
      * 发送短信
-     * @param $params array 订单信息数组
      * @return mixed
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
-    protected function sendSMS($params)
+    public function sendSMS()
     {
         $smsData = config('site.sms_api_0');
-        $data ='account='.$smsData['account'].'&password='.$smsData['password'].'&mobiles='.$params['phone'].'&content='.urlencode($params['content']);
-        //发送请求
-        $result = $this->curlPostForm($data,$smsData['send_url']);
-        Cache::set('send-sms',$result,300);
-        $data = json_decode($result,true);
-        if ($data['resCode'] == '000') {
-            //表示发送成功
-            $newData = [
-                'order_id'  => $params['id'],
-                'team_id'   => $params['team_id'],
-                'admin_id'  => $params['admin_id'],
-                'phone'     => $params['phone'],
-                'status'    => 1,
-                'msg'       => $params['content'],
-                'return_data'=>$result
-            ];
-        } else {
-            //表示发送失败
-            $newData = [
-                'order_id'  => $params['id'],
-                'team_id'   => $params['team_id'],
-                'admin_id'  => $params['admin_id'],
-                'phone'     => $params['phone'],
-                'status'    => 0,
-                'msg'       => $params['content'],
-                'return_data'=>$result
-            ];
+        //查找当前导入的数据里面有没有发送短信成功
+        $expressData = collection($this->model->where('is_send',0)->select())->toArray();
+        //进行发送短信
+        $newData = $newExpressData =  [];
+        foreach ($expressData as $value) {
+            $orderInfo = $this->orderModel->get($value['order_id']);
+            //拼接短信内容模板
+            $content = '【花花运动旗舰店】尊敬的客户'.$orderInfo['name'].'，您购买的商品已发货，快递单号：'.$value['express_no'].',快递公司：'.$value['express_com'];
+            // 构建发送短信内容
+            $data ='account='.$smsData['account'].'&password='.$smsData['password'].'&mobiles='.$value['phone'].'&content='.urlencode($content);
+            //发送请求
+            $result = $this->curlPostForm($data,$smsData['send_url']);
+//            $result = '{"data":{"count":1,"infoArray":[{"smsId":705064331251728384,"mobile":"13517683440","count":1,"status":"SUCCESS"}]},"resCode":"0000","resMsg":"成功"}';
+            Cache::set('send-sms',$result,300);
+            $res = json_decode($result,true);
+            if ($res['resCode'] == '0000') {
+                //表示发送成功
+                $newData[] = [
+                    'order_id'  => $value['order_id'],
+                    'team_id'   => $value['team_id'],
+                    'admin_id'  => $orderInfo['admin_id'],
+                    'phone'     => $value['phone'],
+                    'status'    => 1,
+                    'msg'       => $content,
+                    'return_data'=>$result
+                ];
+                //构建发货通通知
+                $newExpressData[] = [
+                    'id'    =>  $value['id'],
+                    'is_send'   => 1
+                ];
+            } else {
+                //表示发送失败
+                $newData[] = [
+                    'order_id'  => $value['order_id'],
+                    'team_id'   => $value['team_id'],
+                    'admin_id'  => $orderInfo['admin_id'],
+                    'phone'     => $value['phone'],
+                    'status'    => 0,
+                    'msg'       => $content,
+                    'return_data'=>$result
+                ];
+            }
         }
-
-        $result = $this->smsModel->isUpdate(false)->save($newData);
-        return $result ? true :false;
+        $this->model->isUpdate(true)->saveAll($newExpressData);
+        $this->smsModel->isUpdate(false)->saveAll($newData);
+        $this->success('已经全部发送成功！');
     }
     
 
