@@ -128,7 +128,7 @@ class Url extends Backend
         $field = ['production_id','production_name','team_id','team_name','admin_id','admin_name','check_code','query_string','domain_url','url'];
         $existsData = collection($this->model->field($field)->where(['admin_id'=>$uid,'team_id'=>$this->adminInfo['team_id']])->select())->toArray();
         //获取快站链接，是否指定为固定
-        $kzDomain = collection($this->kzModel->where('status','neq',2)->select())->toArray();
+        $kzDomain = collection($this->kzModel->where('status',1)->select())->toArray();
         if (count($kzDomain) > 1) {
             $kzurl = $kzDomain[mt_rand(0,count($kzDomain)-1)];
         } elseif (count($kzDomain) == 1) {
