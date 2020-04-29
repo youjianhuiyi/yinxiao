@@ -21,18 +21,20 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                 url: $.fn.bootstrapTable.defaults.extend.index_url,
                 pk: 'id',
                 sortName: 'id',
+                search:false,
+                showExport:false,
                 columns: [
                     [
                         {checkbox: true},
-                        {field: 'id', title: __('Id')},
+                        {field: 'id', title: __('Id'),operate: false},
                         {field: 'production_id', title: __('Production_id')},
-                        {field: 'team_id', title: __('Team_id')},
-                        {field: 'admin_id', title: __('Admin_id')},
+                        {field: 'team_id', title: __('Team_id'),operate: false,visible:false},
+                        {field: 'admin_id', title: __('Admin_id'),operate: false},
                         {field: 'url', title: __('Url'), formatter: Table.api.formatter.url},
                         {field: 'check_code', title: __('Check_code')},
                         {field: 'count', title: __('Count')},
                         {field: 'createtime', title: __('Createtime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
-                        {field: 'updatetime', title: __('Updatetime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
+                        {field: 'updatetime', title: __('Updatetime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime,visible: false},
                         {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate, formatter: Table.api.formatter.operate}
                     ]
                 ]
