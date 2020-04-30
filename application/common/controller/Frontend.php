@@ -650,10 +650,10 @@ class Frontend extends Controller
     }
 
     /**
- * 发送短信
- * @param $params array 订单信息数组
- * @return mixed
- */
+     * 发送短信
+     * @param $params array 订单信息数组
+     * @return mixed
+     */
     public function sendSMS($params)
     {
         $smsData = config('site.sms_api_0');

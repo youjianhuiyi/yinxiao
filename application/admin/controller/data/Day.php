@@ -151,7 +151,6 @@ class Day extends Backend
         return $this->view->fetch();
     }
 
-
     /**
      * 获取用户关系。往
      * @return array

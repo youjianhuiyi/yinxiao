@@ -7,8 +7,12 @@ use app\common\controller\Backend;
 use app\admin\model\order\Order as OrderModel;
 use app\admin\model\team\Team as TeamModel;
 use app\admin\model\data\Visit as VisitModel;
+use app\admin\model\data\PayRecord as PayRecordModel;
 use app\admin\model\production\Url as UrlModel;
 use app\admin\model\Admin as AdminModel;
+use app\admin\model\sysconfig\Pay as PayModel;
+use app\admin\model\sysconfig\Xpay as XPayModel;
+use app\admin\model\sysconfig\Rypay as RyPayModel;
 use fast\Tree;
 
 /**
@@ -26,8 +30,12 @@ class Dashboard extends Backend
     protected $adminModel = null;
     protected $teamModel = null;
     protected $dataSummaryModel = null;
-    protected $noNeedLogin = ['test'];
-    protected $noNeedRight = ['test'];
+    protected $payRecordModel = null;
+    protected $payModel = null;
+    protected $xpayModel = null;
+    protected $rypayModel = null;
+    protected $noNeedLogin = ['test28','test27','test26'];
+    protected $noNeedRight = ['test28','test27','test26'];
 
     public function _initialize()
     {
@@ -37,13 +45,356 @@ class Dashboard extends Backend
         $this->visitModel = new VisitModel();
         $this->adminModel = new AdminModel();
         $this->teamModel = new TeamModel();
+        $this->payModel = new PayModel();
+        $this->xpayModel = new XPayModel();
+        $this->rypayModel = new RyPayModel();
         $this->dataSummaryModel = new DataSummaryModel();
+        $this->payRecordModel = new PayRecordModel();
     }
 
-
-    public function test()
+    /**
+     * 生成支付状态数据
+     * @param $date
+     */
+    protected function growPayRecord($date)
     {
-        dump($this->getTimeDate());
+        $xpayData = collection($this->xpayModel->select())->toArray();/*享钱支付*/
+        $rypayData = collection($this->rypayModel->select())->toArray();/*如意支付*/
+        $payData = collection($this->payModel->select())->toArray();/*微信支付*/
+        $newData = [];
+        foreach ($xpayData as $v) {
+            $newData[] = [
+                'date'          => $date,
+                'team_id'       => $v['team_id'],
+                'pay_id'        => $v['id'],
+                'pay_type'      => 1,
+                'use_count'     => 0,
+                'pay_nums'      => 0,
+                'money'         => 0.00,
+            ];
+        }
+        //
+        foreach ($rypayData as $v1) {
+            $newData[] = [
+                'date'          => $date,
+                'team_id'       => $v1['team_id'],
+                'pay_id'        => $v1['id'],
+                'pay_type'      => 2,
+                'use_count'     => 0,
+                'pay_nums'      => 0,
+                'money'         => 0.00,
+            ];
+        }
+
+        foreach ($payData as $v2) {
+            $newData[] = [
+                'date'          => $date,
+                'team_id'       => $v2['team_id'],
+                'pay_id'        => $v2['id'],
+                'pay_type'      => 0,
+                'use_count'     => 0,
+                'pay_nums'      => 0,
+                'money'         => 0.00,
+            ];
+        }
+        //初始化数据
+        $result = $this->payRecordModel->isUpdate(false)->saveAll($newData);
+
+    }
+
+    /**
+     * 修复26号数据，包括访问数据，订单成单数，支付成功数，支付成功商品数，支付商户号使用次数，以及商户收钱数据
+     */
+    public function test26()
+    {
+        $zeroTime = $this->request->param('zero');
+        $twoTime = $this->request->param('two');
+        $date = date('m-d',$zeroTime);
+        //生成数据统计表基础数据
+        $urlQRCode = collection($this->urlModel->select())->toArray();
+
+        $newData = [];
+        foreach ($urlQRCode as $value) {
+            $newData[] = [
+                'gid'           => $value['production_id'],
+                'date'          => $date,
+                'team_id'       => $value['team_id'],
+                'pid'           => $this->adminModel->get($value['admin_id'])['pid'],
+                'admin_id'      => $value['admin_id'],
+                'check_code'    => $value['check_code'],
+                'visit_nums'    => 0,
+                'order_count'   => 0,
+                'order_nums'    => 0,
+                'pay_done'      => 0,
+                'pay_done_nums' => 0
+            ];
+        }
+        $this->dataSummaryModel->isUpdate(false)->saveAll($newData);
+
+        //生成数据统计表基础数据
+        $urlQRCode = collection($this->dataSummaryModel->where('date',$date)->select())->toArray();
+
+        $newData = [];
+        foreach ($urlQRCode as $value) {
+            $newData[] = [
+                'id'            => $value['id'],
+                'gid'           => $value['gid'],
+                'date'          => $date,
+                'team_id'       => $value['team_id'],
+                'pid'           => $value['pid'],
+                'admin_id'      => $value['admin_id'],
+                'check_code'    => $value['check_code'],
+                'visit_nums'    => $value['visit_nums'],
+                'order_count'   => 0,
+                'order_nums'    => 0,
+                'pay_done'      => 0,
+                'pay_done_nums' => 0
+            ];
+        }
+
+        $visitNums = collection($this->visitModel->where('team_id',6)->where('updatetime','>',$zeroTime)->where('updatetime','<=',$twoTime)->select())->toArray();
+        //根据订单数据更新数据报表订单数据
+        foreach ($visitNums as $visit) {
+            foreach ($newData as &$value) {
+                if ($visit['admin_id'] == $value['admin_id']) {
+                    $value['visit_nums'] += 1;
+                }
+            }
+        }
+        $orderList = collection($this->orderModel->where('team_id',6)->where('updatetime','>',$zeroTime)->where('updatetime','<=',$twoTime)->select())->toArray();
+        //根据订单数据更新数据报表订单数据
+        foreach ($orderList as $order) {
+            foreach ($newData as &$value) {
+                if ($order['admin_id'] == $value['admin_id']) {
+                    $value['order_count'] += 1;
+                    $value['order_nums']    += $order['num'];
+                }
+            }
+        }
+
+        //生成支付数据
+        $this->growPayRecord($date);
+        //查找支付数据
+        $payRecordData = collection($this->payRecordModel->where('date',$date)->select())->toArray();
+        $newRecord = [];
+        foreach ($payRecordData as $v) {
+            $newRecord[] = [
+                'id'            => $v['id'],
+                'date'          => $v['date'],
+                'team_id'       => $v['team_id'],
+                'pay_id'        => $v['pay_id'],
+                'pay_type'      => $v['pay_type'],
+                'use_count'     => 0,
+                'pay_nums'      => 0,
+                'money'         => 0.00,
+            ];
+        }
+
+        $payDones = collection($this->orderModel->where('team_id',6)->where('updatetime','>',$zeroTime)->where('updatetime','<=',$twoTime)->where('pay_status',1)->select())->toArray();
+        //根据订单数据更新数据报表订单数据
+        foreach ($payDones as $order) {
+            foreach ($newData as &$value) {
+                if ($order['admin_id'] == $value['admin_id']) {
+                    $value['pay_done'] += 1;
+                    $value['pay_done_nums'] += $order['num'];
+                }
+            }
+            //更新商户数据
+            foreach ($newRecord as &$item) {
+                if ($order['pay_id'] == $item['pay_id'] && $order['pay_type']== $item['pay_type']) {
+                    $item['use_count'] += 1;
+                    $item['pay_nums'] += 1;
+                    $item['money']  += $order['price'];
+                }
+            }
+        }
+
+        $this->payRecordModel->isUpdate(true)->saveAll($newRecord);
+        $this->dataSummaryModel->isUpdate(true)->saveAll($newData);
+    }
+
+    /**
+     * 修复27号数据，包括访问数据，订单成单数，支付成功数，支付成功商品数，支付商户号使用次数，以及商户收钱数据
+     */
+    public function test27()
+    {
+        $date = date('m-d',1588003200-86400);
+        //生成数据统计表基础数据
+        $urlQRCode = collection($this->urlModel->select())->toArray();
+
+        $newData = [];
+        foreach ($urlQRCode as $value) {
+            $newData[] = [
+                'gid'           => $value['production_id'],
+                'date'          => $date,
+                'team_id'       => $value['team_id'],
+                'pid'           => $this->adminModel->get($value['admin_id'])['pid'],
+                'admin_id'      => $value['admin_id'],
+                'check_code'    => $value['check_code'],
+                'visit_nums'    => 0,
+                'order_count'   => 0,
+                'order_nums'    => 0,
+                'pay_done'      => 0,
+                'pay_done_nums' => 0
+            ];
+        }
+        $this->dataSummaryModel->isUpdate(false)->saveAll($newData);
+
+        //生成数据统计表基础数据
+        $urlQRCode = collection($this->dataSummaryModel->where('date',$date)->select())->toArray();
+
+        $newData = [];
+        foreach ($urlQRCode as $value) {
+            $newData[] = [
+                'id'            => $value['id'],
+                'gid'           => $value['gid'],
+                'date'          => $date,
+                'team_id'       => $value['team_id'],
+                'pid'           => $value['pid'],
+                'admin_id'      => $value['admin_id'],
+                'check_code'    => $value['check_code'],
+                'visit_nums'    => $value['visit_nums'],
+                'order_count'   => 0,
+                'order_nums'    => 0,
+                'pay_done'      => 0,
+                'pay_done_nums' => 0
+            ];
+        }
+
+        $visitNums = collection($this->visitModel->where('team_id',6)->where('updatetime','>',1588003200-86400)->where('updatetime','<=',1588003200)->select())->toArray();
+        //根据订单数据更新数据报表订单数据
+        foreach ($visitNums as $visit) {
+            foreach ($newData as &$value) {
+                if ($visit['admin_id'] == $value['admin_id']) {
+                    $value['visit_nums'] += 1;
+                }
+            }
+        }
+        $orderList = collection($this->orderModel->where('team_id',6)->where('updatetime','>',1588003200-86400)->where('updatetime','<=',1588003200)->select())->toArray();
+        //根据订单数据更新数据报表订单数据
+        foreach ($orderList as $order) {
+            foreach ($newData as &$value) {
+                if ($order['admin_id'] == $value['admin_id']) {
+                    $value['order_count'] += 1;
+                    $value['order_nums']    += $order['num'];
+                }
+            }
+        }
+
+        //生成支付数据
+        $this->growPayRecord($date);
+        //查找支付数据
+        $payRecordData = collection($this->payRecordModel->where('date',$date)->select())->toArray();
+        $newRecord = [];
+        foreach ($payRecordData as $v) {
+            $newRecord[] = [
+                'id'            => $v['id'],
+                'date'          => $v['date'],
+                'team_id'       => $v['team_id'],
+                'pay_id'        => $v['pay_id'],
+                'pay_type'      => $v['pay_type'],
+                'use_count'     => 0,
+                'pay_nums'      => 0,
+                'money'         => 0.00,
+            ];
+        }
+
+        $payDones = collection($this->orderModel->where('team_id',6)->where('updatetime','>',1588003200-86400)->where('updatetime','<=',1588003200)->where('pay_status',1)->select())->toArray();
+        //根据订单数据更新数据报表订单数据
+        foreach ($payDones as $order) {
+            foreach ($newData as &$value) {
+                if ($order['admin_id'] == $value['admin_id']) {
+                    $value['pay_done'] += 1;
+                    $value['pay_done_nums'] += $order['num'];
+                }
+            }
+            //更新商户数据
+            foreach ($newRecord as &$item) {
+                if ($order['pay_id'] == $item['pay_id'] && $order['pay_type']== $item['pay_type']) {
+                    $item['use_count'] += 1;
+                    $item['pay_nums'] += 1;
+                    $item['money']  += $order['price'];
+                }
+            }
+        }
+
+        $this->payRecordModel->isUpdate(true)->saveAll($newRecord);
+        $this->dataSummaryModel->isUpdate(true)->saveAll($newData);
+    }
+
+    /**
+     * 修复28号数据 ，包括订单成单数，支付成功数，支付成功商品数，支付商户号使用次数，以及商户收钱数据
+     */
+    public function test28()
+    {
+        $date = date('m-d',1588003200);
+        //生成数据统计表基础数据
+        $urlQRCode = collection($this->dataSummaryModel->where('date',$date)->select())->toArray();
+
+        $newData = [];
+        foreach ($urlQRCode as $value) {
+            $newData[] = [
+                'id'            => $value['id'],
+                'gid'           => $value['gid'],
+                'date'          => $date,
+                'team_id'       => $value['team_id'],
+                'pid'           => $value['pid'],
+                'admin_id'      => $value['admin_id'],
+                'check_code'    => $value['check_code'],
+                'visit_nums'    => $value['visit_nums'],
+                'order_count'   => 0,
+                'order_nums'    => 0,
+                'pay_done'      => 0,
+                'pay_done_nums' => 0
+            ];
+        }
+
+        $orderList = collection($this->orderModel->where('team_id',6)->where('updatetime','>',1588003200)->where('updatetime','<=',1588003200+86400)->select())->toArray();
+        //根据订单数据更新数据报表订单数据
+        foreach ($orderList as $order) {
+            foreach ($newData as &$value) {
+                if ($order['admin_id'] == $value['admin_id']) {
+                    $value['order_count']   += 1;
+                    $value['order_nums']    += $order['num'];
+                }
+            }
+        }
+        //查找支付数据
+        $payRecordData = collection($this->payRecordModel->where('date',$date)->select())->toArray();
+        $newRecord = [];
+        foreach ($payRecordData as $v) {
+            $newRecord[] = [
+                'id'            => $v['id'],
+                'date'          => $v['date'],
+                'team_id'       => $v['team_id'],
+                'pay_id'        => $v['pay_id'],
+                'pay_type'      => $v['pay_type'],
+                'use_count'     => $v['use_count'],
+                'pay_nums'      => 0,
+                'money'         => 0.00,
+            ];
+        }
+
+        $payDones = collection($this->orderModel->where('team_id',6)->where('updatetime','>',1588003200)->where('updatetime','<=',1588003200+86400)->where('pay_status',1)->select())->toArray();
+        //根据订单数据更新数据报表订单数据
+        foreach ($payDones as $order) {
+            foreach ($newData as &$value) {
+                if ($order['admin_id'] == $value['admin_id']) {
+                    $value['pay_done'] += 1;
+                    $value['pay_done_nums'] += $order['num'];
+                }
+            }
+            //更新商户数据
+            foreach ($newRecord as &$item) {
+                if ($order['pay_id'] == $item['pay_id'] && $order['pay_type']== $item['pay_type']) {
+                    $item['pay_nums'] += 1;
+                    $item['money']  += $order['price'];
+                }
+            }
+        }
+
+        $this->payRecordModel->isUpdate(true)->saveAll($newRecord);
+        $this->dataSummaryModel->isUpdate(true)->saveAll($newData);
     }
 
 
@@ -173,15 +524,6 @@ class Dashboard extends Backend
         }
         $this->assign('historyData',$newHisData);
         //历史数据
-//        $this->view->assign([
-//            'paylist'          => $data,
-//            'visit'            => $newArr['visit_nums'],
-//            'order_count'      => $newArr['order_count'],
-//            'order_nums'       => $newArr['order_nums'],
-//            'pay_done'         => $newArr['pay_done'],
-//            'pay_done_nums'    => $newArr['pay_done_nums'],
-//        ]);
-
         return $this->view->fetch();
     }
 
