@@ -30,9 +30,9 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {field: 'production_id', title: __('Production_id')},
                         {field: 'team_id', title: __('Team_id'),operate: false,visible:false},
                         {field: 'admin_id', title: __('Admin_id'),operate: false},
-                        {field: 'url', title: __('Url'), formatter: Table.api.formatter.url},
-                        {field: 'check_code', title: __('Check_code')},
-                        {field: 'count', title: __('Count')},
+                        {field: 'url', title: __('Url'), formatter: Table.api.formatter.url,operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
+                        {field: 'check_code', title: __('Check_code'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
+                        {field: 'count', title: __('Count'),operate: 'RANGE'},
                         {field: 'createtime', title: __('Createtime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
                         {field: 'updatetime', title: __('Updatetime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime,visible: false},
                         {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate, formatter: Table.api.formatter.operate}

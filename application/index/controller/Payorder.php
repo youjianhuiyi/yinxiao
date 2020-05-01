@@ -103,6 +103,8 @@ class PayOrder extends Frontend
             ->find()['check_code'];
         $payInfo = Cache::get($orderInfo['order_ip'].'-'.$checkCode.'-xpay_config');
         //由于下单逻辑和支付逻辑有冲突，这里需要生一个临时订单号，用于支付使用。与当前订单不一样，但需要建议绑定关系。
+        //由于网络问题，用户从openid跳转到这边进行下单的时候，可能会出现页面白屏，造成用户可能手动刷新页面。相当于会重新请求下单接口。
+        //这样子就会千万下单接口重复返回两次下单接口请求数据，第二次的会提示订单已重复。造成支付失败拉取不了收银台。这里使用缓存进行区分是第一次请求下单接口还是第二次请求下单接口
         if (!Cache::has('x-'.$params['sn'])) {
             $url = time().'.'.Cache::get('luck_domain');
             $data = [
@@ -133,47 +135,94 @@ class PayOrder extends Frontend
 
             //发起POST请求，获取订单信息
             $result = $this->curlPostJson($urlParams, 'http://openapi.xiangqianpos.com/gateway');
-            //缓存请求数据，避免重复请求
-            Cache::set('x-'.$params['sn'],$result,600);
-        } else {
-            $result = Cache::get('x-'.$params['sn']);
-        }
 
-        /**********************************下单完成处理的逻辑*************************************************/
-        //商户统计
-        $this->doPaySummary($payInfo['id'],1,['type'=>'use_count','nums'=>1]);
-        //接收请求下单接口回来的数据
-        $newData = json_decode($result,true);
-        Cache::set('xpay-nobody',$newData,240);
-        //计算下单接口返回过来数据的签名
-        $newParams1 = $this->XpaySignParams($newData,$payInfo['mch_key']);
-        //构建跳转收银台所需要的参数
-        $jsonData = [
-            'casher_id' => $newData['body']['casher_id'],
-            'mch_code'  => $payInfo['mch_code'],
-            'third_no'  => $params['sn'],
-            'sign'      => ''
-        ];
-        //
-        $cashSign = $this->XpaySignParams($jsonData,$payInfo['mch_key']);
-        //构建跳转的参数
-        $queryString = 'mch_code='.$payInfo['mch_code'].'&sign='.$cashSign.'&casher_id='.$newData['body']['casher_id'].'&third_no='.$params['sn'];
+            /**
+             * 此处非常重要
+             * 缓存请求数据，避免重复请求，核心缓存功能，请求第一次下单成功后缓存好下单接口返回的数据。
+             * 默认情况，一次性请求成功，直接走此方法就完成了收银台的拉取操作。以及支付等功能，
+             * 如果说用户网络问题与手机卡，千万跳转支付时比较慢，其实是已经下单成功，只是没跳转收银台，这个时候，用户如果使用手机刷新页面功能，则会进行缓存请求
+             */
+            Cache::set('x-'.$params['sn'],$result,1800);
 
-        // 验证下单接口的签名，如果签名没问题，返回JSON数据跳转收银台，如果有问题则不跳转
-        if ($newParams1 == $newData['sign']) {
-            //表示验签不成功，直接返回
-            //构建json数据
-            $url = 'https://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString;
-            header('Location:'.$url);
-        } else {
-            //表示请求订单验签失败
-            echo <<< EOF
+            /**********************************下单完成处理的逻辑*************************************************/
+            //商户统计
+            $this->doPaySummary($payInfo['id'],1,['type'=>'use_count','nums'=>1]);
+            //接收请求下单接口回来的数据
+            $newData = json_decode($result,true);
+            Cache::set('xpay-nobody',$newData,240);
+            //计算下单接口返回过来数据的签名
+            $newParams1 = $this->XpaySignParams($newData,$payInfo['mch_key']);
+            //构建跳转收银台所需要的参数
+            $jsonData = [
+                'casher_id' => $newData['body']['casher_id'],
+                'mch_code'  => $payInfo['mch_code'],
+                'third_no'  => $params['sn'],
+                'sign'      => ''
+            ];
+            //
+            $cashSign = $this->XpaySignParams($jsonData,$payInfo['mch_key']);
+            //构建跳转的参数
+            $queryString = 'mch_code='.$payInfo['mch_code'].'&sign='.$cashSign.'&casher_id='.$newData['body']['casher_id'].'&third_no='.$params['sn'];
+
+            // 验证下单接口的签名，如果签名没问题，返回JSON数据跳转收银台，如果有问题则不跳转
+            if ($newParams1 == $newData['sign']) {
+                //表示验签不成功，直接返回
+                //构建json数据
+                $url = 'https://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString;
+                header('Location:'.$url);
+            } else {
+                //表示请求订单验签失败
+                echo <<< EOF
             <script>
               alert("支付失败，请重新提交订单");
 </script>
 EOF;
-            die;
+                die;
+            }
+
+        } else {
+            /**
+             * 用户缓存请求核心流程，如果用户手机出现卡顿造成下单已经成功，但是因为没有跳转收银台。使用用户刷新页面造成二次请求。
+             * 二次请求前会查找是否有当前已经下过支付接口订单的数据缓存 ，如果有，则直接走缓存拉取收银台，如果没有，访问失败
+             */
+
+            $result = Cache::get('x-'.$params['sn']);
+            //商户统计
+            $this->doPaySummary($payInfo['id'],1,['type'=>'use_count','nums'=>1]);
+            //接收请求下单接口回来的数据
+            $newData = json_decode($result,true);
+            Cache::set('xpay-nobody',$newData,240);
+            //计算下单接口返回过来数据的签名
+            $newParams1 = $this->XpaySignParams($newData,$payInfo['mch_key']);
+            //构建跳转收银台所需要的参数
+            $jsonData = [
+                'casher_id' => $newData['body']['casher_id'],
+                'mch_code'  => $payInfo['mch_code'],
+                'third_no'  => $params['sn'],
+                'sign'      => ''
+            ];
+            //
+            $cashSign = $this->XpaySignParams($jsonData,$payInfo['mch_key']);
+            //构建跳转的参数
+            $queryString = 'mch_code='.$payInfo['mch_code'].'&sign='.$cashSign.'&casher_id='.$newData['body']['casher_id'].'&third_no='.$params['sn'];
+
+            // 验证下单接口的签名，如果签名没问题，返回JSON数据跳转收银台，如果有问题则不跳转
+            if ($newParams1 == $newData['sign']) {
+                //表示验签不成功，直接返回
+                //构建json数据
+                $url = 'https://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString;
+                header('Location:'.$url);
+            } else {
+                //表示请求订单验签失败
+                echo <<< EOF
+            <script>
+              alert("支付失败，请重新提交订单");
+</script>
+EOF;
+                die;
+            }
         }
+
     }
 
     /**

@@ -209,47 +209,52 @@
     </div>
     <!-- ./col -->
 </div>
+<div class="row">
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-aqua">
+            <div class="inner">
+                <h3>￥{$yesterdayData['pay_total']}</h3>
+                <p>昨天入账金额</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-cny"></i>
+            </div>
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-green">
+            <div class="inner">
+                <h3>计算中……</h3>
+                <p>点击转换率</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-area-chart"></i>
+            </div>
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-yellow">
+            <div class="inner">
+                <h3>计算中……</h3>
+                <p>入账转化率</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-users"></i>
+            </div>
+        </div>
+    </div>
+    <!-- ./col -->
+
+    <!-- ./col -->
+</div>
 
 <div id="myTabContent" class="tab-content">
     <div class="tab-pane fade active in" id="one">
-        <div class="row">
-            <div class="col-sm-3 col-xs-6">
-                <div class="sm-st clearfix">
-                    <span class="sm-st-icon st-red"><i class="fa fa-users"></i></span>
-                    <div class="sm-st-info">
-                        <span>{$historyData['visit']}</span>
-                        历史总访问量
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-3 col-xs-6">
-                <div class="sm-st clearfix">
-                    <span class="sm-st-icon st-violet"><i class="fa fa-book"></i></span>
-                    <div class="sm-st-info">
-                        <span>{$historyData['order_count']}</span>
-                        历史总订单量
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-3 col-xs-6">
-                <div class="sm-st clearfix">
-                    <span class="sm-st-icon st-blue"><i class="fa fa-shopping-bag"></i></span>
-                    <div class="sm-st-info">
-                        <span>{$historyData['pay_done']}</span>
-                        历史总成交订单量
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-3 col-xs-6">
-                <div class="sm-st clearfix">
-                    <span class="sm-st-icon st-green"><i class="fa fa-cny"></i></span>
-                    <div class="sm-st-info">
-                        <span>{$historyData['pay_done_nums']}</span>
-                        历史总成交商品量
-                    </div>
-                </div>
-            </div>
-        </div>
         <div class="row">
             <div class="col-lg-12 col-xs-12">
                 <!-- small box -->
@@ -263,94 +268,73 @@
                 <div id="echart" class="btn-refresh" style="height:400px;width:100%;"></div>
             </div>
         </div>
+    </div>
+</div>
 
-        <div class="row" style="margin-top:15px;">
-            <div class="col-lg-12">
-            </div>
-            <div class="col-xs-6 col-md-3">
-                <div class="panel bg-blue">
-                    <div class="panel-body">
-                        <div class="panel-title">
-                            <span class="label label-success pull-right">{:__('Real time')}</span>
-                            <h5>{:__('Category count')}</h5>
-                        </div>
-                        <div class="panel-content">
-                            <h1 class="no-margins">1234</h1>
-                            <div class="stat-percent font-bold text-gray"><i class="fa fa-commenting"></i> 1234</div>
-                            <small>{:__('Category count tips')}</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xs-6 col-md-3">
-                <div class="panel bg-aqua-gradient">
-                    <div class="panel-body">
-                        <div class="ibox-title">
-                            <span class="label label-info pull-right">{:__('Real time')}</span>
-                            <h5>{:__('Attachment count')}</h5>
-                        </div>
-                        <div class="ibox-content">
-                            <h1 class="no-margins">1043</h1>
-                            <div class="stat-percent font-bold text-gray"><i class="fa fa-modx"></i> 2592</div>
-                            <small>{:__('Attachment count tips')}</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <div class="col-xs-6 col-md-3">
-                <div class="panel bg-purple-gradient">
-                    <div class="panel-body">
-                        <div class="ibox-title">
-                            <span class="label label-primary pull-right">{:__('Real time')}</span>
-                            <h5>{:__('Article count')}</h5>
-                        </div>
-                        <div class="ibox-content">
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <h1 class="no-margins">1234</h1>
-                                    <div class="font-bold"><i class="fa fa-commenting"></i>
-                                        <small>{:__('Comment count')}</small>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <h1 class="no-margins">6754</h1>
-                                    <div class="font-bold"><i class="fa fa-heart"></i>
-                                        <small>{:__('Like count')}</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<div class="row">
+    <div class="col-sm-3 col-xs-6">
+        <div class="sm-st clearfix">
+            <span class="sm-st-icon st-red"><i class="fa fa-users"></i></span>
+            <div class="sm-st-info">
+                <span>{$historyData['visit']}</span>
+                历史总访问量
             </div>
-            <div class="col-xs-6 col-md-3">
-                <div class="panel bg-green-gradient">
-                    <div class="panel-body">
-                        <div class="ibox-title">
-                            <span class="label label-primary pull-right">{:__('Real time')}</span>
-                            <h5>{:__('News count')}</h5>
-                        </div>
-                        <div class="ibox-content">
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <h1 class="no-margins">5302</h1>
-                                    <div class="font-bold"><i class="fa fa-commenting"></i>
-                                        <small>{:__('Comment count')}</small>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <h1 class="no-margins">8205</h1>
-                                    <div class="font-bold"><i class="fa fa-user"></i>
-                                        <small>{:__('Like count')}</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        </div>
+    </div>
+    <div class="col-sm-3 col-xs-6">
+        <div class="sm-st clearfix">
+            <span class="sm-st-icon st-violet"><i class="fa fa-book"></i></span>
+            <div class="sm-st-info">
+                <span>{$historyData['order_count']}</span>
+                历史总订单量
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-3 col-xs-6">
+        <div class="sm-st clearfix">
+            <span class="sm-st-icon st-blue"><i class="fa fa-shopping-bag"></i></span>
+            <div class="sm-st-info">
+                <span>{$historyData['pay_done']}</span>
+                历史总成交订单量
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-3 col-xs-6">
+        <div class="sm-st clearfix">
+            <span class="sm-st-icon st-green"><i class="fa fa-cny"></i></span>
+            <div class="sm-st-info">
+                <span>{$historyData['pay_done_nums']}</span>
+                历史总成交商品量
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-3 col-xs-6">
+        <div class="sm-st clearfix">
+            <span class="sm-st-icon st-red"><i class="fa fa-cny"></i></span>
+            <div class="sm-st-info">
+                <span>￥{$historyData['pay_total']}</span>
+                历史总入账
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-3 col-xs-6">
+        <div class="sm-st clearfix">
+            <span class="sm-st-icon st-violet"><i class="fa fa-book"></i></span>
+            <div class="sm-st-info">
+                <span>计算中……</span>
+                历史总点击转换率
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-3 col-xs-6">
+        <div class="sm-st clearfix">
+            <span class="sm-st-icon st-blue"><i class="fa fa-shopping-bag"></i></span>
+            <div class="sm-st-info">
+                <span>计算中……</span>
+                历史总入账转化率
             </div>
         </div>
     </div>

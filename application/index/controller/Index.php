@@ -232,7 +232,7 @@ class Index extends Frontend
         if (!Cache::has($visitIp)) {
             Cache::set($visitIp,$visitIp,$this->getDiscountTime());
             $this->urlModel->where(['admin_id'=>$params['aid'],'check_code'=>$params['check_code']])->setInc('count');
-            $this->visitModel->save($urlData);
+            $this->visitModel->isUpdate(false)->save($urlData);
             //进行数据统计
             $this->doDataSummary($params['check_code'],['type'=>'visit','nums'=>1]);
         } else {

@@ -529,16 +529,17 @@ class Frontend extends Controller
         $isExistsData = $this->dataSummaryModel->where('date',$date)->find();
         if ($isExistsData) {
             //表示已经存在，则直接进行相应数据的更新操作。增加一次访问记录。
+            $where = ['check_code'=>$checkCode,'date'=>$date];
             if ($data['type'] == 'visit') {
-                $result = $this->dataSummaryModel->where('check_code',$checkCode)->setInc('visit_nums');
+                $result = $this->dataSummaryModel->where($where)->setInc('visit_nums',$data['nums']);
             } elseif ($data['type'] == 'order_count') {
-                $result = $this->dataSummaryModel->where('check_code',$checkCode)->setInc('order_count');
+                $result = $this->dataSummaryModel->where($where)->setInc('order_count',$data['nums']);
             } elseif ($data['type'] == 'order_nums') {
-                $result = $this->dataSummaryModel->where('check_code',$checkCode)->setInc('order_nums',$data['nums']);
+                $result = $this->dataSummaryModel->where($where)->setInc('order_nums',$data['nums']);
             } elseif ($data['type'] == 'pay_done') {
-                $result = $this->dataSummaryModel->where('check_code',$checkCode)->setInc('pay_done');
+                $result = $this->dataSummaryModel->where($where)->setInc('pay_done',$data['nums']);
             } elseif ($data['type'] == 'pay_nums') {
-                $result = $this->dataSummaryModel->where('check_code',$checkCode)->setInc('pay_done_nums',$data['nums']);
+                $result = $this->dataSummaryModel->where($where)->setInc('pay_done_nums',$data['nums']);
             } else {
                 $result = false;
             }
@@ -586,7 +587,7 @@ class Frontend extends Controller
         $isExistsData = $this->payRecordMode->where('date',$date)->find();
         if ($isExistsData) {
             //表示已经存在，则直接进行相应数据的更新操作。增加一次访问记录。
-            $where = ['pay_id'=>$payId,'pay_type'=>$payType];
+            $where = ['pay_id'=>$payId,'pay_type'=>$payType,'date',$date];
             if ($data['type'] == 'use_count') {
                 $result = $this->payRecordMode->where($where)->setInc('use_count');
             } elseif ($data['type'] == 'pay_nums') {
@@ -611,7 +612,6 @@ class Frontend extends Controller
                     'team_id'       => $value['team_id'],
                     'pay_id'        => $value['id'],
                     'pay_type'      => 1,
-//                    'check_code'    => $value['check_code'],
                     'use_count'     => 0,
                     'pay_nums'      => 0,
                     'money'         => 0.00,
@@ -624,7 +624,6 @@ class Frontend extends Controller
                     'team_id'       => $value['team_id'],
                     'pay_id'        => $value['id'],
                     'pay_type'      => 2,
-//                    'check_code'    => $value['check_code'],
                     'use_count'     => 0,
                     'pay_nums'      => 0,
                     'money'         => 0.00,
@@ -637,7 +636,6 @@ class Frontend extends Controller
                     'team_id'       => $value['team_id'],
                     'pay_id'        => $value['id'],
                     'pay_type'      => 0,
-//                    'check_code'    => $value['check_code'],
                     'use_count'     => 0,
                     'pay_nums'      => 0,
                     'money'         => 0.00,

@@ -34,8 +34,8 @@ class Dashboard extends Backend
     protected $payModel = null;
     protected $xpayModel = null;
     protected $rypayModel = null;
-    protected $noNeedLogin = ['test28','test27','test26'];
-    protected $noNeedRight = ['test28','test27','test26'];
+    protected $noNeedLogin = ['test28','test27','test26','test25'];
+    protected $noNeedRight = ['test28','test27','test26','test25'];
 
     public function _initialize()
     {
@@ -466,6 +466,7 @@ class Dashboard extends Backend
      */
     public function index()
     {
+        //获取当天的日期
         $date = date('m-d',time());
         //获取当天所有用户的报表
         $dataSummary = collection($this->dataSummaryModel->where('date',$date)->select())->toArray();
@@ -477,19 +478,24 @@ class Dashboard extends Backend
             'pay_done'      => 0,
             'pay_done_nums' => 0
         ];
-        foreach ($dataSummary as $value) {
-            $data['visit']            += $value['visit_nums'];
-            $data['order_count']      += $value['order_count'];
-            $data['order_nums']       += $value['order_nums'];
-            $data['pay_done']         += $value['pay_done'];
-            $data['pay_done_nums']    += $value['pay_done_nums'];
+        foreach ($dataSummary as $v1) {
+            $data['visit']            += $v1['visit_nums'];
+            $data['order_count']      += $v1['order_count'];
+            $data['order_nums']       += $v1['order_nums'];
+            $data['pay_done']         += $v1['pay_done'];
+            $data['pay_done_nums']    += $v1['pay_done_nums'];
         }
-        //渲染当前实时变量
-        $this->assignconfig('data',$data);
 
         //昨天数据汇总
         $yesterDayTime = $this->getYesterDayTime();
-        $yseterDayData = collection($this->dataSummaryModel->where('createtime','>',$yesterDayTime[0])->where('createtime','<',$yesterDayTime[1])->select())->toArray();
+        $yesterDate = date('m-d',$yesterDayTime[1]);
+        $yesterDayPayData = collection($this->payRecordModel->where('date',$yesterDate)->select())->toArray();
+        $yesterPayTotal = 0.00;
+        foreach ($yesterDayPayData as $pay) {
+            $yesterPayTotal += (float)$pay['money'];
+        }
+
+        $yseterDayData = collection($this->dataSummaryModel->where('date',$yesterDate)->select())->toArray();
         $newYesData = [
             'visit'         => 0,
             'order_count'   => 0,
@@ -497,17 +503,23 @@ class Dashboard extends Backend
             'pay_done'      => 0,
             'pay_done_nums' => 0
         ];
-        foreach ($yseterDayData as $value) {
-            $newYesData['visit']            += $value['visit_nums'];
-            $newYesData['order_count']      += $value['order_count'];
-            $newYesData['order_nums']       += $value['order_nums'];
-            $newYesData['pay_done']         += $value['pay_done'];
-            $newYesData['pay_done_nums']    += $value['pay_done_nums'];
+        foreach ($yseterDayData as $v2) {
+            $newYesData['visit']            += $v2['visit_nums'];
+            $newYesData['order_count']      += $v2['order_count'];
+            $newYesData['order_nums']       += $v2['order_nums'];
+            $newYesData['pay_done']         += $v2['pay_done'];
+            $newYesData['pay_done_nums']    += $v2['pay_done_nums'];
         }
-        //渲染模板变量
-        $this->assign('yesterdayData',$newYesData);
+        //增加入账总金额
+        $newYesData['pay_total'] = $yesterPayTotal;
         //渲染历史数据汇总
         $historyData = collection($this->dataSummaryModel->select())->toArray();
+        $historyPayData = collection($this->payRecordModel->select())->toArray();
+        $hisPayTotal = 0.00;
+        foreach ($historyPayData as $historyDatum) {
+            $hisPayTotal += $historyDatum['money'];
+        }
+
         $newHisData = [
             'visit'         =>  0,
             'order_count'   =>  0,
@@ -515,13 +527,19 @@ class Dashboard extends Backend
             'pay_done'      =>  0,
             'pay_done_nums' =>  0
         ];
-        foreach ($historyData as $value) {
-            $newHisData['visit']        += $value['visit_nums'];
-            $newHisData['order_count']  += $value['order_count'];
-            $newHisData['order_nums']   += $value['order_nums'];
-            $newHisData['pay_done']     += $value['pay_done'];
-            $newHisData['pay_done_nums'] += $value['pay_done_nums'];
+        foreach ($historyData as $v3) {
+            $newHisData['visit']        += $v3['visit_nums'];
+            $newHisData['order_count']  += $v3['order_count'];
+            $newHisData['order_nums']   += $v3['order_nums'];
+            $newHisData['pay_done']     += $v3['pay_done'];
+            $newHisData['pay_done_nums'] += $v3['pay_done_nums'];
         }
+        //将入账金额写入历史变量
+        $newHisData['pay_total'] = $hisPayTotal;
+        //渲染当前实时变量
+        $this->assignconfig('data',$data);
+        //渲染模板变量
+        $this->assign('yesterdayData',$newYesData);
         $this->assign('historyData',$newHisData);
         //历史数据
         return $this->view->fetch();
