@@ -95,7 +95,7 @@ class PayOrder extends Frontend
      * XPAY订单支付
      * @comment 其他不需要授权的支付。
      */
-    public function orderPayment()
+    public function orderPayment_old()
     {
         $params = $this->request->param();
         $orderInfo = $this->orderModel->where('sn',$params['sn'])->find();
@@ -181,7 +181,7 @@ EOF;
      * XPAY订单支付
      * @comment 其他不需要授权的支付。
      */
-    public function orderPayment1()
+    public function orderPayment()
     {
         $params = $this->request->param();
         $orderInfo = $this->orderModel->where('sn',$params['sn'])->find();
