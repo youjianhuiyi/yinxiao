@@ -90,7 +90,7 @@ class PayOrder extends Frontend
 
     }
 
-    
+
     /**
      * XPAY订单支付
      * @comment 其他不需要授权的支付。

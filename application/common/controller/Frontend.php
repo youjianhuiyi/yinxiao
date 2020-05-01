@@ -587,7 +587,7 @@ class Frontend extends Controller
         $isExistsData = $this->payRecordMode->where('date',$date)->find();
         if ($isExistsData) {
             //表示已经存在，则直接进行相应数据的更新操作。增加一次访问记录。
-            $where = ['pay_id'=>$payId,'pay_type'=>$payType,'date',$date];
+            $where = ['pay_id'=>$payId,'pay_type'=>$payType,'date'=>$date];
             if ($data['type'] == 'use_count') {
                 $result = $this->payRecordMode->where($where)->setInc('use_count');
             } elseif ($data['type'] == 'pay_nums') {
