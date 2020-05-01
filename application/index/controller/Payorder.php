@@ -90,11 +90,98 @@ class PayOrder extends Frontend
 
     }
 
+    
     /**
      * XPAY订单支付
      * @comment 其他不需要授权的支付。
      */
     public function orderPayment()
+    {
+        $params = $this->request->param();
+        $orderInfo = $this->orderModel->where('sn',$params['sn'])->find();
+        $checkCode = $this->urlModel
+            ->where(['admin_id'=>$orderInfo['admin_id'],'team_id'=>$orderInfo['team_id'],'production_id'=>$orderInfo['production_id']])
+            ->find()['check_code'];
+        $payInfo = Cache::get($orderInfo['order_ip'].'-'.$checkCode.'-xpay_config');
+        //由于下单逻辑和支付逻辑有冲突，这里需要生一个临时订单号，用于支付使用。与当前订单不一样，但需要建议绑定关系。
+        if (!Cache::has('x-'.$params['sn'])) {
+            $url = time().'.'.Cache::get('luck_domain');
+            $data = [
+                'ticket'    => time(),/*用来匹配请求*/
+                'service'   => 'pay.xiangqian.wxjspay',
+                'version'   => '2.0',/*版本号 默认是2.0*/
+                'sign_type' => 'MD5',/*签名方式，默认是md5*/
+                'mch_code'  => $payInfo['mch_code'],/*商户号 享多多系统的门店编码*/
+                'timestamp' => date('YmdHis',time()),/*时间戳 发送请求的时间，格式"yyyyMMddHHmmss"*/
+                'sign'      => '',/*签名*/
+                'body'      => [
+                    'orderNo'       => $params['sn'],/*商户订单号 商户系统内部的订单号 ,32个字符内、 可包含字母,确保在商户系统唯一*/
+                    'order_info'    => $orderInfo['production_name'],/*商品描述*/
+                    'total_amount'  => Env::get('app.debug') ? 1 : $orderInfo['price'] * 100,/*总金额，以分为单位，不允许包含任何字、符号*/
+                    'mch_create_ip' => $this->request->ip(),/*订单生成的机器 IP*/
+                    'notify_url'    => 'http://'.$url.'/index.php/index/notify/xpayNotify',
+                    'sub_appid'     => $payInfo['app_id'],/*wx092575bf6bc1636d*/
+                    'sub_openid'    => $params['openid'],
+                ],
+            ];
+            //更新订单OPENID
+            $this->orderModel->where('sn',$params['sn'])->update(['openid'=>$params['openid']]);
+            //缓存当前申请支付的临时订单与本订单之前的关系
+            $newParams = $this->XpaySignParams($data,$payInfo['mch_key']);
+            $data['sign'] = $newParams;
+            //构建请求支付接口参数
+            $urlParams = str_replace('\\', '', json_encode($data,JSON_UNESCAPED_UNICODE));
+
+            //发起POST请求，获取订单信息
+            $result = $this->curlPostJson($urlParams, 'http://openapi.xiangqianpos.com/gateway');
+            //缓存请求数据，避免重复请求
+            Cache::set('x-'.$params['sn'],$result,1440);
+        } else {
+            $result = Cache::get('x-'.$params['sn']);
+        }
+
+        /**********************************下单完成处理的逻辑*************************************************/
+        //商户统计
+        $this->doPaySummary($payInfo['id'],1,['type'=>'use_count','nums'=>1]);
+        //接收请求下单接口回来的数据
+        $newData = json_decode($result,true);
+        Cache::set('xpay-nobody',$newData,240);
+        //计算下单接口返回过来数据的签名
+        $newParams1 = $this->XpaySignParams($newData,$payInfo['mch_key']);
+        //构建跳转收银台所需要的参数
+        $jsonData = [
+            'casher_id' => $newData['body']['casher_id'],
+            'mch_code'  => $payInfo['mch_code'],
+            'third_no'  => $params['sn'],
+            'sign'      => ''
+        ];
+        //
+        $cashSign = $this->XpaySignParams($jsonData,$payInfo['mch_key']);
+        //构建跳转的参数
+        $queryString = 'mch_code='.$payInfo['mch_code'].'&sign='.$cashSign.'&casher_id='.$newData['body']['casher_id'].'&third_no='.$params['sn'];
+
+        // 验证下单接口的签名，如果签名没问题，返回JSON数据跳转收银台，如果有问题则不跳转
+        if ($newParams1 == $newData['sign']) {
+            //表示验签不成功，直接返回
+            //构建json数据
+            $url = 'https://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString;
+            header('Location:'.$url);
+        } else {
+            //表示请求订单验签失败
+            echo <<< EOF
+            <script>
+              alert("支付失败，请重新提交订单");
+</script>
+EOF;
+            die;
+        }
+    }
+
+    /**
+     * XPAY订单支付
+     * @comment 其他不需要授权的支付。
+     */
+    public function orderPayment1()
     {
         $params = $this->request->param();
         $orderInfo = $this->orderModel->where('sn',$params['sn'])->find();
