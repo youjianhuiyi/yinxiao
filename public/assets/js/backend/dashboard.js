@@ -9,9 +9,9 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form', 'template', 'echarts'
             // 指定图表的配置项和数据
             var option = {
                 legend: {
-                    data: ['浏览数','订单数量','订单商品数量','支付成功订单','支付成功商品数量']
+                    data: ['入账金额','浏览数','订单数量','订单商品数量','支付成功订单','支付成功商品数量']
                 },
-                xAxis: {type: 'category',data:['浏览数','订单数量','订单商品数量','支付成功订单','支付成功商品数量']},
+                xAxis: {type: 'category',data:['入账金额','浏览数','订单数量','订单商品数量','支付成功订单','支付成功商品数量']},
                 yAxis: {type: 'value'},
                 grid: {},
                 tooltip: {
@@ -26,7 +26,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form', 'template', 'echarts'
                         "backgroundStyle": {
                             "color": "rgba(220, 220, 220, 0.8)"
                         },
-                        "data":[data.visit,data.order_count,data.order_nums,data.pay_done,data.pay_done_nums]
+                        "data":[data.pay_total,data.visit,data.order_count,data.order_nums,data.pay_done,data.pay_done_nums]
                     }
                 ]};
 
