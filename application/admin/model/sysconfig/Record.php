@@ -36,7 +36,7 @@ class Record extends Model
     {
         $xpay =  Xpay::column('pay_name','id');
         $rypay =  Rypay::column('pay_name','id');
-        $pay =  pay::column('pay_name','id');
+        $pay =  Pay::column('pay_name','id');
         return [$pay,$xpay,$rypay];
     }
 

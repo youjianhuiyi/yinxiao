@@ -32,6 +32,8 @@ class Notify extends Frontend
      */
     public function test()
     {
+
+        $this->orderModel->where('sn','P2020043009492000036000065994')->update(['summary_status'=>1]);
 //        $saveData  = [
 //            'id'             => 239,
 //            'transaction_id' => '9115874769620050454027534',/*微信支付订单号*/
@@ -156,23 +158,27 @@ class Notify extends Frontend
                 $this->error($e->getMessage());
             }
 
-            //数据统计，防止重复回调千万的数据不正确的问题
+            //数据统计，防止重复回调造成的数据不正确的问题
             if (!Cache::has('xpay-notify-'.$checkCode.'-'.$orderInfo['sn'])) {
-                //增加订单完成次数
-                $this->urlModel->where('admin_id',$orderInfo['admin_id'])->setInc('order_done');
-                //数据统计
-                $this->doDataSummary($checkCode,['type'=>'pay_done','nums'=>1]);
-                $this->doDataSummary($checkCode,['type'=>'pay_nums','nums'=>$orderInfo['num']]);
-                //支付商户统计
-                $this->doPaySummary($payInfo['id'],1,['type'=>'money','nums'=>$orderInfo['price']]);
-                $this->doPaySummary($payInfo['id'],1,['type'=>'pay_nums','nums'=>1]);
-                //发送短信提醒
-                $orderInfo['content'] = '【花花运动旗舰店】亲！您订购的运动跑鞋已下单成功，明天统一发货，3-7天到货，请保持手机畅通，售后电话0771-5600499';
-                $this->sendSMS($orderInfo);
-                //因为回调最长时间一天
-                Cache::set('xpay-notify-'.$checkCode.'-'.$orderInfo['sn'],'ok',$this->getDiscountTime());
+                //进行判断，如果订单只要有回调数据，就更新一次，
+                $newOrderInfo = $this->orderModel->where('sn',$data['orderNo'])->find();
+                if ($newOrderInfo['summary_status'] == 0) {
+                    //增加订单完成次数
+                    $this->urlModel->where('admin_id',$orderInfo['admin_id'])->setInc('order_done');
+                    //数据统计
+                    $this->doDataSummary($checkCode,['type'=>'pay_done','nums'=>1]);
+                    $this->doDataSummary($checkCode,['type'=>'pay_nums','nums'=>$orderInfo['num']]);
+                    //支付商户统计
+                    $this->doPaySummary($payInfo['id'],1,['type'=>'money','nums'=>$orderInfo['price']]);
+                    $this->doPaySummary($payInfo['id'],1,['type'=>'pay_nums','nums'=>1]);
+                    //发送短信提醒
+                    $orderInfo['content'] = '【花花运动旗舰店】亲！您订购的运动跑鞋已下单成功，明天统一发货，3-7天到货，请保持手机畅通，售后电话0771-5600499';
+                    $this->sendSMS($orderInfo);
+                    //因为回调最长时间一天
+                    Cache::set('xpay-notify-'.$checkCode.'-'.$orderInfo['sn'],'ok',86400);
+                    $this->orderModel->where('sn',$data['orderNo'])->update(['summary_status'=>1]);
+                }
             }
-
             //返回成功
             $str = 'SUCCESS';
             echo $str;

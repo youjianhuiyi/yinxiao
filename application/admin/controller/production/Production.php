@@ -37,7 +37,7 @@ class Production extends Backend
             //转移模板文件到指定位置
             $source = ROOT_PATH.'public'.$params['modulefile'];
             $destination = ROOT_PATH.'application/index/view/index/'.$params['module_name'].'.html';
-            if (!file_exists($source)) {
+            if (!file_exists($destination)) {
                 copy($source,$destination);
             }
 
@@ -103,7 +103,7 @@ class Production extends Backend
             //转移模板文件到指定位置
             $source = ROOT_PATH.'public'.$params['modulefile'];
             $destination = ROOT_PATH.'application/index/view/index/'.$params['module_name'].'.html';
-            if (!file_exists($source)) {
+            if (!file_exists($destination)) {
                 copy($source,$destination);
             }
             if ($params) {
