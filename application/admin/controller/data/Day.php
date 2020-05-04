@@ -247,10 +247,8 @@ class Day extends Backend
         $userInfo = $this->adminModel->get($params['ids']);
         $teamData = $this->teamModel->column('name','id');
         $adminName = $this->adminModel->column('nickname','id');
-//        dump($adminName);die;
         //查询数据
-        $data = collection($this->dataSummaryModel->where('admin_id',$params['ids'])->limit(7)->select())->toArray();
-//        dump($data);die;
+        $data = collection($this->dataSummaryModel->where('admin_id',$params['ids'])->order('date','desc')->select())->toArray();
         $string = "<table class='table text-center'><tr>";
         if ($userInfo['id'] == 1) {
             $string .= "<th>团队名称</th>";
