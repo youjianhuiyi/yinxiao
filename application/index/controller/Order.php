@@ -68,6 +68,7 @@ class Order extends Frontend
                 'sn'        => $sn,
                 'order_ip'  => $this->request->ip(),
                 'check_code'=> $params['check_code'],
+                'comment'   => isset($params['remarks']) ? $params['remarks'] : ''
             ];
 
             $result = false;
