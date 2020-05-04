@@ -154,10 +154,24 @@
     <div class="panel-body">
         <div id="myTabContent" class="tab-content">
             <div class="tab-pane fade active in" id="one">
+
                 <div class="row  table-responsive col-lg-8 col-md-8 col-xs-8 col-sm-8 table-bordered text-center col-lg-offset-2 col-md-offset-2 col-xs-offset-2 col-sm-offset-2
                         " style="margin-top:15px;">
                     <table class="table text-center">
 
+                        <tr>
+                            <form action="">
+                                <th colspan="2" class="text-center">
+                                    请选择日期
+                                </th>
+                                <th colspan="4" class="text-center">
+                                    {:Form::select('row[select]', ['0'=>'05-04', '1'=>'05-03'], '05-04', ['data-rule'=>'required'])}
+                                </th>
+                                <th colspan="2" class="text-center">
+                                   <button>查询</button>
+                                </th>
+                            </form>
+                        </tr>
                         <tr>
                             {if $user.id == 1}
                             <th colspan="8" class="text-center"><h4>{:date('Y-m-d',time())}:数据报表</h4></th>
@@ -176,6 +190,7 @@
                             <th>订单商品量</th>
                             <th>支付订单量</th>
                             <th>支付商品量</th>
+                            <th>历史数据</th>
                         </tr>
                         {foreach name="data" item="vo"}
                         <tr>
@@ -189,6 +204,9 @@
                             <td>{$vo.order_nums}</td>
                             <td>{$vo.pay_done}</td>
                             <td>{$vo.pay_done_nums}</td>
+                            <td>
+                                <input type="button" class="btn btn-success" onclick="search(this);" value="历史数据查询" ids="{$vo.admin_id}">
+                            </td>
                         </tr>
                         {/foreach}
                     </table>
@@ -198,3 +216,30 @@
         </div>
     </div>
 </div>
+<script>
+    function search(obj) {
+        // console.log(obj.attributes.ids.value)
+        var ids = obj.attributes.ids.value;
+        $.ajax({
+            url: "{:url('data/Day/searchPersonHistory')}",
+            data: {'ids':ids},
+            type: 'post',
+            dataType: 'json',
+            success: function (res) {
+                Layer.open({
+                    type: 1,//这就是定义窗口类型的属性
+                    title: '历史数据',
+                    shadeClose: true,
+                    shade: 0.3,
+                    offset: "20%",
+                    shadeClose : false,
+                    area: ["100%", "100%"],
+                    content: res
+                });
+            },
+            error: function (XMLHttpRequest, status) {
+                layer.alert('数据有误，请联系管理员');
+            }
+        })
+    }
+</script>

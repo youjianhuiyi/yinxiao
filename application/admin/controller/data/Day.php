@@ -143,7 +143,6 @@ class Day extends Backend
             }
 
         }
-//        dump($data);die;
         $this->assign('user',$this->adminInfo);/*当前用户信息*/
         $this->assign('teamData',$teamData);/*团队数据*/
         $this->assign('adminName',$adminName);/*业务员ID=>名称数据*/
@@ -151,6 +150,43 @@ class Day extends Backend
         return $this->view->fetch();
     }
 
+
+    /**
+     * ajax查询个人历史数据
+     */
+    public function searchPersonHistory()
+    {
+        $params = $this->request->param();
+        $userInfo = $this->adminModel->get($params['ids']);
+        $teamData = $this->teamModel->column('name','id');
+        $adminName = $this->adminModel->column('nickname','id');
+//        dump($adminName);die;
+        //查询数据
+        $data = collection($this->dataSummaryModel->where('admin_id',$params['ids'])->limit(7)->select())->toArray();
+//        dump($data);die;
+        $string = "<table class='table text-center'><tr>";
+        if ($userInfo['id'] == 1) {
+            $string .= "<th>团队名称</th>";
+        }
+        $string .= "<th>日期</th><th>组长</th><th>业务员</th><th>访问量</th><th>订单量</th><th>订单商品量</th><th>支付订单量</th><th>支付商品量</th></tr>";
+        foreach ($data as $item) {
+            $string .= "<tr>";
+            if ($userInfo['id'] == 1) {
+                $string .= "<td>".isset($teamData[$item['team_id']]) ? $teamData[$item['team_id']] : ''."</td>";
+            }
+            $string .= "<td>{$item['date']}</td>";
+            $string .= "<td>".(isset($adminName[$item['pid']]) ? $adminName[$item['pid']] : '')."</td>";
+            $string .= "<td>".(isset($adminName[$item['admin_id']]) ? $adminName[$item['admin_id']] : '')."</td>";
+            $string .= "<td>{$item['visit_nums']}</td>";
+            $string .= "<td>{$item['order_count']}</td>";
+            $string .= "<td>{$item['order_nums']}</td>";
+            $string .= "<td>{$item['pay_done']}</td>";
+            $string .= "<td>{$item['pay_done_nums']}</td>";
+            $string .= "</tr>";
+        }
+        $string .= "</table>";
+        return $string;
+    }
     /**
      * 获取用户关系。往
      * @return array
