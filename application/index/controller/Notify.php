@@ -162,7 +162,9 @@ class Notify extends Frontend
             if (!Cache::has('xpay-notify-'.$checkCode.'-'.$orderInfo['sn'])) {
                 //进行判断，如果订单只要有回调数据，就更新一次，
                 $newOrderInfo = $this->orderModel->where('sn',$data['orderNo'])->find();
-                if ($newOrderInfo['summary_status'] == 0) {
+                //判断订单是否是当天的
+                $date = date('m-d',time());
+                if ($newOrderInfo['summary_status'] == 0 && $date == date('m-d',$orderInfo['createtime'])) {
                     //增加订单完成次数
                     $this->urlModel->where('admin_id',$orderInfo['admin_id'])->setInc('order_done');
                     //数据统计
@@ -175,7 +177,7 @@ class Notify extends Frontend
                     $orderInfo['content'] = '【花花运动旗舰店】亲！您订购的运动跑鞋已下单成功，明天统一发货，3-7天到货，请保持手机畅通，售后电话0771-5600499';
                     $this->sendSMS($orderInfo);
                     //因为回调最长时间一天
-                    Cache::set('xpay-notify-'.$checkCode.'-'.$orderInfo['sn'],'ok',86400);
+                    Cache::set('xpay-notify-'.$checkCode.'-'.$orderInfo['sn'],'ok',86400*2);
                     $this->orderModel->where('sn',$data['orderNo'])->update(['summary_status'=>1]);
                 }
             }
