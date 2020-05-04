@@ -81,73 +81,160 @@ class Day extends Backend
      */
     public function index()
     {
-        //获取当前用户信息
         $userInfo = $this->adminInfo;
-        $date = date('m-d',time());
         $teamData = $this->teamModel->column('name','id');
         $adminName = $this->adminModel->column('nickname','id');
-        //先将所有数据按日期分类
-        $data = [];
-
-        if ($userInfo['id'] == 1) {
-            //表示是平台总管理员，可以查看所有记录
-            //获取当天时间 0点到23点59分59秒的订单数量。
-            //获取当天所有用户的报表
-            $dataSummary = collection($this->dataSummaryModel->where('date',$date)->select())->toArray();
-            foreach ($dataSummary as &$item) {
-                $name = $this->adminModel->get($item['admin_id'])['nickname'];
-                $item['name'] = $name;
-                $data[] = $item;
-            }
-
-        } elseif ($userInfo['pid'] == 0 && $userInfo['id'] != 1) {
-            //老板查看团队所有人员的数据
-            //获取团队下所有的用户数据
-            //获取当天所有用户的报表
-            $dataSummary = $this->dataSummaryModel
-                ->where('date',$date)
-                ->where('team_id',$this->adminInfo['team_id'])
-                ->select();
-            $dataSummary = collection($dataSummary)->toArray();
-            foreach ($dataSummary as &$item) {
-                $name = $this->adminModel->get($item['admin_id'])['nickname'];
-                $item['name'] = $name;
-                $data[] = $item;
-            }
-
-        } elseif ($userInfo['pid'] != 0 && $userInfo['level'] != 2) {
-            //组长查看自己及以下员工的数据
-            $userIds = $this->getUserLower();
-            $dataSummary = $this->dataSummaryModel
-                ->where('date',$date)
-                ->where('admin_id','in',$userIds)
-                ->select();
-            $dataSummary = collection($dataSummary)->toArray();
-            foreach ($dataSummary as &$item) {
-                $name = $this->adminModel->get($item['admin_id'])['nickname'];
-                $item['name'] = $name;
-                $data[] = $item;
-            }
-
-        } else {
-            //业务员只能查看自己的订单数据
-            $dataSummary = $this->dataSummaryModel
-                ->where('date',$date)
-                ->where('admin_id',$this->adminInfo['id'])
-                ->select();
-            $dataSummary = collection($dataSummary)->toArray();
-            foreach ($dataSummary as &$item) {
-                $name = $this->adminModel->get($item['admin_id'])['nickname'];
-                $item['name'] = $name;
-                $data[] = $item;
-            }
-
+        $selectData = array_unique(collection($this->dataSummaryModel->field('date')->order('date','desc')->column('date'))->toArray());
+        $newSelectData = [];
+        foreach ($selectData as $item) {
+            $newSelectData[$item] = $item;
         }
-        $this->assign('user',$this->adminInfo);/*当前用户信息*/
-        $this->assign('teamData',$teamData);/*团队数据*/
-        $this->assign('adminName',$adminName);/*业务员ID=>名称数据*/
-        $this->assign('data',$data);
-        return $this->view->fetch();
+
+        if ($this->request->isPost()) {
+            $params = $this->request->param();
+            //获取当前用户信息
+            $date = $params['row']['select'];
+            //先将所有数据按日期分类
+            $data = [];
+
+            if ($userInfo['id'] == 1) {
+                //表示是平台总管理员，可以查看所有记录
+                //获取当天时间 0点到23点59分59秒的订单数量。
+                //获取当天所有用户的报表
+                $dataSummary = collection($this->dataSummaryModel->where('date',$date)->select())->toArray();
+                foreach ($dataSummary as &$item) {
+                    $name = $this->adminModel->get($item['admin_id'])['nickname'];
+                    $item['name'] = $name;
+                    $data[] = $item;
+                }
+
+            } elseif ($userInfo['pid'] == 0 && $userInfo['id'] != 1) {
+                //老板查看团队所有人员的数据
+                //获取团队下所有的用户数据
+                //获取当天所有用户的报表
+                $dataSummary = $this->dataSummaryModel
+                    ->where('date',$date)
+                    ->where('team_id',$this->adminInfo['team_id'])
+                    ->select();
+                $dataSummary = collection($dataSummary)->toArray();
+                foreach ($dataSummary as &$item) {
+                    $name = $this->adminModel->get($item['admin_id'])['nickname'];
+                    $item['name'] = $name;
+                    $data[] = $item;
+                }
+
+            } elseif ($userInfo['pid'] != 0 && $userInfo['level'] != 2) {
+                //组长查看自己及以下员工的数据
+                $userIds = $this->getUserLower();
+                $dataSummary = $this->dataSummaryModel
+                    ->where('date',$date)
+                    ->where('admin_id','in',$userIds)
+                    ->select();
+                $dataSummary = collection($dataSummary)->toArray();
+                foreach ($dataSummary as &$item) {
+                    $name = $this->adminModel->get($item['admin_id'])['nickname'];
+                    $item['name'] = $name;
+                    $data[] = $item;
+                }
+
+            } else {
+                //业务员只能查看自己的订单数据
+                $dataSummary = $this->dataSummaryModel
+                    ->where('date',$date)
+                    ->where('admin_id',$this->adminInfo['id'])
+                    ->select();
+                $dataSummary = collection($dataSummary)->toArray();
+                foreach ($dataSummary as &$item) {
+                    $name = $this->adminModel->get($item['admin_id'])['nickname'];
+                    $item['name'] = $name;
+                    $data[] = $item;
+                }
+
+            }
+            $this->assign('user',$this->adminInfo);/*当前用户信息*/
+            $this->assign('teamData',$teamData);/*团队数据*/
+            $this->assign('adminName',$adminName);/*业务员ID=>名称数据*/
+            $this->assign('data',$data);
+            $this->assign('date',$params['row']['select']);
+            $this->assign('select_data',$newSelectData);/*查询数据*/
+            return $this->view->fetch();
+        } else {
+            //获取当前用户信息
+            $userInfo = $this->adminInfo;
+            $date = date('m-d',time());
+            $teamData = $this->teamModel->column('name','id');
+            $adminName = $this->adminModel->column('nickname','id');
+            $selectData = array_unique(collection($this->dataSummaryModel->field('date')->order('date','desc')->column('date'))->toArray());
+            $newSelectData = [];
+            foreach ($selectData as $item) {
+                $newSelectData[$item] = $item;
+            }
+            //先将所有数据按日期分类
+            $data = [];
+
+            if ($userInfo['id'] == 1) {
+                //表示是平台总管理员，可以查看所有记录
+                //获取当天时间 0点到23点59分59秒的订单数量。
+                //获取当天所有用户的报表
+                $dataSummary = collection($this->dataSummaryModel->where('date',$date)->select())->toArray();
+                foreach ($dataSummary as &$item) {
+                    $name = $this->adminModel->get($item['admin_id'])['nickname'];
+                    $item['name'] = $name;
+                    $data[] = $item;
+                }
+
+            } elseif ($userInfo['pid'] == 0 && $userInfo['id'] != 1) {
+                //老板查看团队所有人员的数据
+                //获取团队下所有的用户数据
+                //获取当天所有用户的报表
+                $dataSummary = $this->dataSummaryModel
+                    ->where('date',$date)
+                    ->where('team_id',$this->adminInfo['team_id'])
+                    ->select();
+                $dataSummary = collection($dataSummary)->toArray();
+                foreach ($dataSummary as &$item) {
+                    $name = $this->adminModel->get($item['admin_id'])['nickname'];
+                    $item['name'] = $name;
+                    $data[] = $item;
+                }
+
+            } elseif ($userInfo['pid'] != 0 && $userInfo['level'] != 2) {
+                //组长查看自己及以下员工的数据
+                $userIds = $this->getUserLower();
+                $dataSummary = $this->dataSummaryModel
+                    ->where('date',$date)
+                    ->where('admin_id','in',$userIds)
+                    ->select();
+                $dataSummary = collection($dataSummary)->toArray();
+                foreach ($dataSummary as &$item) {
+                    $name = $this->adminModel->get($item['admin_id'])['nickname'];
+                    $item['name'] = $name;
+                    $data[] = $item;
+                }
+
+            } else {
+                //业务员只能查看自己的订单数据
+                $dataSummary = $this->dataSummaryModel
+                    ->where('date',$date)
+                    ->where('admin_id',$this->adminInfo['id'])
+                    ->select();
+                $dataSummary = collection($dataSummary)->toArray();
+                foreach ($dataSummary as &$item) {
+                    $name = $this->adminModel->get($item['admin_id'])['nickname'];
+                    $item['name'] = $name;
+                    $data[] = $item;
+                }
+
+            }
+            $this->assign('user',$this->adminInfo);/*当前用户信息*/
+            $this->assign('teamData',$teamData);/*团队数据*/
+            $this->assign('adminName',$adminName);/*业务员ID=>名称数据*/
+            $this->assign('data',$data);
+            $this->assign('date',$date);
+            $this->assign('select_data',$newSelectData);/*查询数据*/
+            return $this->view->fetch();
+        }
+
     }
 
 

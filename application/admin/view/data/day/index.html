@@ -160,12 +160,10 @@
                     <table class="table text-center">
 
                         <tr>
-                            <form action="">
-                                <th colspan="2" class="text-center">
-                                    请选择日期
-                                </th>
+                            <form action="" method="post">
+                                <th colspan="2" class="text-center">请选择日期</th>
                                 <th colspan="4" class="text-center">
-                                    {:Form::select('row[select]', ['0'=>'05-04', '1'=>'05-03'], '05-04', ['data-rule'=>'required'])}
+                                    {:Form::select('row[select]', $select_data, 0, ['data-rule'=>'required'])}
                                 </th>
                                 <th colspan="2" class="text-center">
                                    <button>查询</button>
@@ -174,9 +172,9 @@
                         </tr>
                         <tr>
                             {if $user.id == 1}
-                            <th colspan="8" class="text-center"><h4>{:date('Y-m-d',time())}:数据报表</h4></th>
+                            <th colspan="8" class="text-center"><h4>{$date}:数据报表</h4></th>
                             {else}
-                            <th colspan="7" class="text-center"><h4>{:date('Y-m-d',time())}:数据报表</h4></th>
+                            <th colspan="7" class="text-center"><h4>{$date}:数据报表</h4></th>
                             {/if}
                         </tr>
                         <tr>
