@@ -490,8 +490,8 @@
 			</div>
 
 
-            <input type="hidden" name="aid" value="{$data.aid}"/>
-            <input type="hidden" name="tid" id="sid" value="{$data.tid}"/>
+            <input type="hidden" name="aid" id='aid' value="{$data.aid}"/>
+            <input type="hidden" name="tid" id="tid" value="{$data.tid}"/>
             <input type="hidden" name="pid" id="pid" value="{$data.pid}"/>
             <input type="hidden" name="gid" id="gid" value="{$data.gid}"/>
             <input type="hidden" name="pay_type" id="pay_type" value="{$data.pay_type}"/>
@@ -767,6 +767,9 @@
         var remarks = $('#remarks').val();
         var detailaddress = $('#detailaddress').text();
         var production_name = $('#production_name').val();
+        var tid = $('#tid').val();
+        var pid = $('#pid').val();
+        var showprice = $('#showprice').text();
 
         var address;
         if(province === city){
@@ -778,6 +781,8 @@
         var data = {
             "aid": aid,/*推广员ID*/
             "gid": gid,/*商品ID*/
+            "tid": tid,/*团队ID*/
+            "pid": pid,/*上级ID*/
             "pattern": color,/*属性*/
             "sex": style,/*款式*/
             "attr": size,/*尺寸*/
@@ -786,6 +791,7 @@
             "phone": mobile,
             "province": province,
             "city": city,
+            "price": showprice,
             "district": district,
             "production_name": production_name,
             "detailaddress": detailaddress,
