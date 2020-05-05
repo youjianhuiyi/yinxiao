@@ -33,7 +33,8 @@ class Notify extends Frontend
     public function test()
     {
 
-        $this->orderModel->where('sn','P2020043009492000036000065994')->update(['summary_status'=>1]);
+//        $this->orderModel->where('sn','P2020043009492000036000065994')->update(['summary_status'=>1]);
+//        dump(strlen('P2020043009492000036000065994'));
 //        $saveData  = [
 //            'id'             => 239,
 //            'transaction_id' => '9115874769620050454027534',/*微信支付订单号*/
@@ -164,7 +165,7 @@ class Notify extends Frontend
                 $newOrderInfo = $this->orderModel->where('sn',$data['orderNo'])->find();
                 //判断订单是否是当天的
                 $date = date('m-d',time());
-                if ($newOrderInfo['summary_status'] == 0 && $date == date('m-d',$orderInfo['createtime'])) {
+                if ($newOrderInfo['summary_status'] == 0 && $date == date('m-d',$orderInfo['createtime']) && strlen($data['orderNo']) == 29) {
                     //增加订单完成次数
                     $this->urlModel->where('admin_id',$orderInfo['admin_id'])->setInc('order_done');
                     //数据统计
