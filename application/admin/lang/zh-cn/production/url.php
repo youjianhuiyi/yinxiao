@@ -8,6 +8,7 @@ return [
     'Url'             => '推广链接',
     'Count'           => '访问次数',
     'Order_done'      => '成单数量',
+    'Is_use'          => '是否使用,0=否,1=是',
     'Is_forbidden'    => '是否被封,0=否,1=是',
     'Createtime'      => '增加时间',
     'Updatetime'      => '更新时间',

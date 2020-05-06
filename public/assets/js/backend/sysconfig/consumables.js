@@ -29,15 +29,8 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form','editable'], function 
                         {field: 'id', title: __('Id'),operate:false},
                         {field: 'domain_url', title: __('Domain_url')},
                         {field: 'team_id', title: __('Team_id'),operate:false,visible:false},
-                        {field: 'team_name', title: __('Team_name')},
-                        {field: 'is_rand', title: __('Is_rand'),searchList: {"1": "固定", "0": "随机"},editable: {
-                                type: 'select',
-                                // pk: id,
-                                source: [
-                                    {value: 0, text: '随机'},
-                                    {value: 1, text: '固定'},
-                                ]
-                            }},
+                        {field: 'team_name', title: __('Team_name'),operate: false,visible: false},
+                        {field: 'is_inuse', title:"使用状态",searchList: {"1": "正在使用", "0": "未使用"}},
                         {field: 'count', title: __('Count')},
                         {field: 'is_forbidden', title: __('Is_forbidden'),searchList: {"1": "已封", "0": "正常"},formatter:function (value,row,index) {
                                 if (value ===0){return '正常';}

@@ -24,16 +24,17 @@ class Autocheckdomain extends Controller
 
     public function test()
     {
-        echo <<<EOF
-    <script>
-    window.onload=test;
-        function test() {
-           for (var i= 0;i<=10;i++) {
-               alert(i);
-           }
-        }
-</script>
-EOF;
+//        echo <<<EOF
+//    <script>
+//    window.onload=test;
+//        function test() {
+//           for (var i= 0;i<=10;i++) {
+//               alert(i);
+//           }
+//        }
+//</script>
+//EOF;
+//        $this->consumablesModel->where('domain_url','gaopingzx.cn')->update(['is_inuse'=>1]);
     }
 
     /**
@@ -41,7 +42,7 @@ EOF;
      */
     public function index()
     {
-        $data = collection($this->consumablesModel->where(['is_forbidden'=>0,'deletetime'=>null])->select())->toArray();
+        $data = collection($this->consumablesModel->where(['is_forbidden'=>0,'is_inuse'=>1])->select())->toArray();
         $this->assign('data',$data);
         return $this->view->fetch();
     }
@@ -54,14 +55,14 @@ EOF;
         //$checkid  为传过来的正在检测的id
         $checkId = $this->request->param('check_id');
         //查出所有域名
-        $allConsumables = collection($this->consumablesModel->where(['is_forbidden'=>0,'deletetime'=>null])->select())->toArray();
+        $allConsumables = collection($this->consumablesModel->where(['is_forbidden'=>0,'is_inuse'=>1])->select())->toArray();
         $sort = [
             'direction' => 'SORT_ASC',
             'field' => 'id',
         ];
         $arrSort = [];
-        foreach($allConsumables AS $uniqid => $row){
-            foreach($row AS $key=>$value){
+        foreach($allConsumables as $uniqid => $row){
+            foreach($row as $key=>$value){
                 $arrSort[$key][$uniqid] = $value;
             }
         }
@@ -90,11 +91,10 @@ EOF;
         }
         //获取检测的域名
         $checkDomainList = $this->getRandDomain($min,$checkId,$maxCheckId);
-
-        $checkRES = $this->checkApi($checkDomainList["domain_url"]);
+        $checkRES = file_get_contents('http://1009.5zhuangbi.com/index.php/Home/Auto/CAPI/domain/'.$checkDomainList['domain_url']);
         $result = json_decode($checkRES,true);
         //根据结果采取不同的措施
-        if ($result["code"] == 1) { //域名被封了.
+        if ($result["code"] == '1') { //域名被封了.
             $re = $this->consumablesModel->where('id',$checkDomainList['id'])->update(['is_forbidden' => 1]);
             Cache::rm('luck_domain');
             if ($re) {
@@ -138,7 +138,7 @@ EOF;
         }else{
             $cid = $n;   //没有超出反问,就按照传过来的参数检测.
         }
-        $domain = $this->consumablesModel->where('id',$cid)->find()->toArray();
+        $domain = $this->consumablesModel->where('id',$cid)->find();
         //判断当前域名的状态，如果查询不到或者已经被封，则跳到下一条域名进行检测
         if (empty($domain) || $domain["is_forbidden"] == 1) {
             $next = $cid + 1;
@@ -174,7 +174,7 @@ EOF;
         //要求结果为字符串且输出到屏幕上
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
         //post 提交方式
-        curl_setopt($ch, CURLOPT_POST, TRUE);
+        curl_setopt($ch, CURLOPT_POST, false);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $str);
         $data = curl_exec($ch);
         //返回结果

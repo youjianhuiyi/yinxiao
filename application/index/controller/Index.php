@@ -362,12 +362,13 @@ class Index extends Frontend
         //对参数进行验证
         if ($str === $params['code']) {
             //表示验证成功，获取炮灰域名准备落地
-            $consumables = $this->consumablesModel->where(['is_forbidden'=>0])->column('domain_url');
+            $consumables = $this->consumablesModel->order('id','desc')->where(['is_forbidden'=>0])->column('domain_url');
             //获取落地域名，一个个的消耗。
             if (!Cache::has('luck_domain')) {
                 //表示不存在
                 if (count($consumables) >= 1) {
                     $luckDomain = array_pop($consumables);
+                    $this->consumablesModel->where('domain_url',$luckDomain)->update(['is_inuse'=>1]);
                     Cache::set('luck_domain',$luckDomain,0);
                     //TODO::更改域名为正在使用状态
                 } else {

@@ -5,6 +5,7 @@ return [
     'Team_id'      => '团队ID',
     'Team_name'    => '团队名称',
     'Is_rand'      => '是否随机',
+    'Is_inuse'     => '是否使用',
     'Count'        => '使用次数',
     'Is_forbidden' => '是否被封',
     'Createtime'   => '增加时间',
