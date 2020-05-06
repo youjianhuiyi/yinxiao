@@ -353,7 +353,6 @@ class Summary extends Backend
             ->where('createtime','<',$dateTime[1])
             ->select();
         $orderData = collection($orderData)->toArray();
-//        dump($orderData);die;
         //整理订单数据
         $newOrderData = [];
         foreach ($orderData as $value) {
@@ -396,33 +395,14 @@ class Summary extends Backend
             }
         }
 
-        $result = $this->model->isUpdate(false)->saveAll($newResOrderData);
-        if ($result) {
-            echo 'OK';
-            die();
-        } else {
-            echo 'failure';
-            die();
-        }
-    }
-
-    public function salesChart()
-    {
-        $dateTime = $this->getBeginEndTime();
-        $data = $this->model
-            ->where('createtime','>',$dateTime[0])
-            ->where('createtime','<',$dateTime[1])
-            ->select();
-        $data = collection($data)->toArray();
-        $newData = [
-          'key' => ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-            'dataset1'=>[0, 10, 5, 2, 20, 30, 45],
-            'dataset2'=>[0, 10, 5, 2, 20, 30, 45],
-            'dataset3'=>[0, 10, 5, 2, 20, 30, 45],
-            'dataset4'=>[0, 10, 5, 2, 20, 30, 45],
-            'dataset5'=>[0, 10, 5, 2, 20, 30, 45]
-        ];
-        return $newData;
+//        $result = $this->model->isUpdate(false)->saveAll($newResOrderData);
+//        if ($result) {
+//            echo 'OK';
+//            die();
+//        } else {
+//            echo 'failure';
+//            die();
+//        }
     }
 
     /**
@@ -453,7 +433,6 @@ class Summary extends Backend
                 $dateData[$key]['pay_done_nums'] += $v['pay_done_nums'];
             }
         }
-//        dump($dateData);die;
 
         //构建图标需要的数值
         $newArr = [];
@@ -465,19 +444,6 @@ class Summary extends Backend
             $newArr['pay_done_nums'][$key] =  $value['pay_done_nums'];
         }
 
-
-//        dump($newArr);die;
-//        $sevenTime = Date::unixtime('day', -7);
-//        $payList = $createList = [];
-//        for ($i = 0; $i < 7; $i++)
-//        {
-//            $day = date("Y-m-d", $sevenTime + ($i * 86400));
-//            $createList[$day] = mt_rand(20, 200);
-//            $payList[$day] = mt_rand(1, mt_rand(1, $createList[$day]));
-//        }
-//
-//        dump($createList);
-//        dump($payList);die;
         $this->view->assign([
             'paylist'          => $dateData,
             'createlist'       => $dateData,
