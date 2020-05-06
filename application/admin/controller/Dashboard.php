@@ -438,9 +438,11 @@ class Dashboard extends Backend
 
     /**
      * @description:根据数据
-     * @internal
-     * @param {dataArr:需要分组的数据；keyStr:分组依据}
+     * @param $dataArr array    需要分组的数据
+     * @param $keyStr   string  分组依据
+     * @param $userIds  array    业务员ID
      * @return array
+     * @internal
      */
     protected function dataGroup($dataArr, $keyStr,$userIds)
     {
@@ -461,10 +463,99 @@ class Dashboard extends Backend
         return $newArr;
     }
 
+
+    /**
+     * 根据时间戳划分订单数据
+     * @param $data array 需要区分的数据
+     * @param $visitData array 访问记录
+     * @return array
+     */
+    protected function doDataGroupByTime($data,$visitData)
+    {
+        $tmp = [
+            'visit'         => 0,
+            'order_count'   => 0,
+            'order_nums'    => 0,
+            'pay_done'      => 0,
+            'pay_done_nums' => 0,
+            'pay_total'     => 0.00
+        ];
+
+        foreach ($data as $value) {
+            //表示属于一天的数据量。
+            $tmp['order_count']         += 1;
+            $tmp['order_nums']          += (int)$value['num'];
+            if ($value['pay_status'] == 1) {
+                $tmp['pay_done']        += 1;
+                $tmp['pay_done_nums']   += (int)$value['num'];
+                $tmp['pay_total']       += (float)$value['price'];
+            }
+        }
+
+        foreach ($visitData as $v1) {
+            $tmp['visit'] += 1;
+        }
+
+        return $tmp;
+
+    }
+
+
     /**
      * 查看
      */
     public function index()
+    {
+        if ($this->adminInfo['id'] == 1) {
+            //获取当天的日期
+            $dateTime = $this->getBeginEndTime();
+            //获取当天所有用户的报表
+            $visitData = collection($this->visitModel->where('createtime','>=',$dateTime[0])->where('createtime','<=',$dateTime[1])->select())->toArray();
+            //先将所有数据按日期分类
+            $orderData = collection($this->orderModel->where('createtime','>=',$dateTime[0])->where('createtime','<=',$dateTime[1])->select())->toArray();
+            //昨天数据汇总
+            $yesterDayTime = $this->getYesterDayTime();
+            //获取当天所有用户的报表
+            $yesVisitData = collection($this->visitModel->where('createtime','>=',$yesterDayTime[0])->where('createtime','<=',$yesterDayTime[1])->select())->toArray();
+            //先将所有数据按日期分类
+            $yesOrderData = collection($this->orderModel->where('createtime','>=',$yesterDayTime[0])->where('createtime','<=',$yesterDayTime[1])->select())->toArray();
+            //渲染历史数据汇总
+            $historyVisitData = collection($this->visitModel->select())->toArray();
+            $historyOrderData = collection($this->orderModel->select())->toArray();
+        } else {
+            //获取当天的日期
+            $dateTime = $this->getBeginEndTime();
+            //获取当天所有用户的报表
+            $visitData = collection($this->visitModel->where('createtime','>=',$dateTime[0])->where('team_id',$this->adminInfo['team_id'])->where('createtime','<=',$dateTime[1])->select())->toArray();
+            //先将所有数据按日期分类
+            $orderData = collection($this->orderModel->where('createtime','>=',$dateTime[0])->where('team_id',$this->adminInfo['team_id'])->where('createtime','<=',$dateTime[1])->select())->toArray();
+            //昨天数据汇总
+            $yesterDayTime = $this->getYesterDayTime();
+            //获取当天所有用户的报表
+            $yesVisitData = collection($this->visitModel->where('createtime','>=',$yesterDayTime[0])->where('team_id',$this->adminInfo['team_id'])->where('createtime','<=',$yesterDayTime[1])->select())->toArray();
+            //先将所有数据按日期分类
+            $yesOrderData = collection($this->orderModel->where('createtime','>=',$yesterDayTime[0])->where('team_id',$this->adminInfo['team_id'])->where('createtime','<=',$yesterDayTime[1])->select())->toArray();
+            //渲染历史数据汇总
+            $historyVisitData = collection($this->visitModel->where('team_id',$this->adminInfo['team_id'])->select())->toArray();
+            $historyOrderData = collection($this->orderModel->where('team_id',$this->adminInfo['team_id'])->select())->toArray();
+        }
+        $newData = $this->doDataGroupByTime($orderData,$visitData);
+        $newYesData = $this->doDataGroupByTime($yesOrderData,$yesVisitData);
+        $newHisData = $this->doDataGroupByTime($historyOrderData,$historyVisitData);
+        //渲染当前实时变量
+        $this->assignconfig('data',$newData);
+        //渲染模板变量
+        $this->assign('yesterdayData',$newYesData);
+        $this->assign('historyData',$newHisData);
+        //历史数据
+        return $this->view->fetch();
+    }
+
+
+    /**
+     * 查看
+     */
+    public function index0()
     {
         //获取当天的日期
         $date = date('m-d',time());
@@ -491,6 +582,8 @@ class Dashboard extends Backend
             $data['pay_done_nums']    += $v1['pay_done_nums'];
         }
         $data['pay_total'] = $todayPayTotal;
+
+
         //昨天数据汇总
         $yesterDayTime = $this->getYesterDayTime();
         $yesterDate = date('m-d',$yesterDayTime[1]);
@@ -550,12 +643,14 @@ class Dashboard extends Backend
         return $this->view->fetch();
     }
 
+
+
     /**
      * 获取用户关系。往
      * @return array
      * @internal
      */
-    public function getUserLower()
+    protected function getUserLower()
     {
         if ($this->adminInfo['id'] == 1) {
             $data = $this->adminModel->field(['id','pid','nickname'])->order('id desc')->select();
