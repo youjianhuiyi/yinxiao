@@ -218,9 +218,7 @@
                                 function couphide() {
                                     document.getElementById("coupon_model").style.display = "none";
                                     localStorage.setItem("coupon2", "exists");
-                                    layer.open({
-                                        title: '提示',content: '恭喜您抢到名额'
-                                    });
+                                    layer.open({content: '恭喜您抢到名额！',btn: '确定'});
                                 }
                             </script>
 
