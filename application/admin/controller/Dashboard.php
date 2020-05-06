@@ -14,6 +14,7 @@ use app\admin\model\sysconfig\Pay as PayModel;
 use app\admin\model\sysconfig\Xpay as XPayModel;
 use app\admin\model\sysconfig\Rypay as RyPayModel;
 use fast\Tree;
+use think\Cache;
 
 /**
  * 数据报表
@@ -506,38 +507,62 @@ class Dashboard extends Backend
      */
     public function index()
     {
+        $orderField = ['team_id','admin_id','num','price','pay_status','createtime'];
+        $visitField = ['team_id','admin_id','count','createtime'];
         if ($this->adminInfo['id'] == 1) {
             //获取当天的日期
             $dateTime = $this->getBeginEndTime();
             //获取当天所有用户的报表
-            $visitData = collection($this->visitModel->where('createtime','>=',$dateTime[0])->where('createtime','<=',$dateTime[1])->select())->toArray();
+            $visitData = collection($this->visitModel->field($visitField)->where('createtime','>=',$dateTime[0])->where('createtime','<=',$dateTime[1])->select())->toArray();
             //先将所有数据按日期分类
-            $orderData = collection($this->orderModel->where('createtime','>=',$dateTime[0])->where('createtime','<=',$dateTime[1])->select())->toArray();
+            $orderData = collection($this->orderModel->field($orderField)->where('createtime','>=',$dateTime[0])->where('createtime','<=',$dateTime[1])->select())->toArray();
             //昨天数据汇总
             $yesterDayTime = $this->getYesterDayTime();
             //获取当天所有用户的报表
-            $yesVisitData = collection($this->visitModel->where('createtime','>=',$yesterDayTime[0])->where('createtime','<=',$yesterDayTime[1])->select())->toArray();
+            $yesVisitData = collection($this->visitModel->field($visitField)->where('createtime','>=',$yesterDayTime[0])->where('createtime','<=',$yesterDayTime[1])->select())->toArray();
             //先将所有数据按日期分类
-            $yesOrderData = collection($this->orderModel->where('createtime','>=',$yesterDayTime[0])->where('createtime','<=',$yesterDayTime[1])->select())->toArray();
+            $yesOrderData = collection($this->orderModel->field($orderField)->where('createtime','>=',$yesterDayTime[0])->where('createtime','<=',$yesterDayTime[1])->select())->toArray();
             //渲染历史数据汇总
-            $historyVisitData = collection($this->visitModel->select())->toArray();
-            $historyOrderData = collection($this->orderModel->select())->toArray();
+            if (!Cache::has('all-history-visit-data')) {
+                $historyVisitData = collection($this->visitModel->field($visitField)->select())->toArray();
+                Cache::set('all-history-visit-data',$historyVisitData);
+            } else {
+                $historyVisitData = Cache::get('all-history-visit-data');
+            }
+            
+            if (!Cache::has('all-history-order-data')) {
+                $historyOrderData = collection($this->orderModel->field($orderField)->select())->toArray();
+                Cache::set('all-history-order-data',$historyOrderData);
+            } else {
+                $historyOrderData = Cache::get('all-history-order-data');
+            }
+
         } else {
             //获取当天的日期
             $dateTime = $this->getBeginEndTime();
             //获取当天所有用户的报表
-            $visitData = collection($this->visitModel->where('createtime','>=',$dateTime[0])->where('team_id',$this->adminInfo['team_id'])->where('createtime','<=',$dateTime[1])->select())->toArray();
+            $visitData = collection($this->visitModel->field($visitField)->where('createtime','>=',$dateTime[0])->where('team_id',$this->adminInfo['team_id'])->where('createtime','<=',$dateTime[1])->select())->toArray();
             //先将所有数据按日期分类
-            $orderData = collection($this->orderModel->where('createtime','>=',$dateTime[0])->where('team_id',$this->adminInfo['team_id'])->where('createtime','<=',$dateTime[1])->select())->toArray();
+            $orderData = collection($this->orderModel->field($orderField)->where('createtime','>=',$dateTime[0])->where('team_id',$this->adminInfo['team_id'])->where('createtime','<=',$dateTime[1])->select())->toArray();
             //昨天数据汇总
             $yesterDayTime = $this->getYesterDayTime();
             //获取当天所有用户的报表
-            $yesVisitData = collection($this->visitModel->where('createtime','>=',$yesterDayTime[0])->where('team_id',$this->adminInfo['team_id'])->where('createtime','<=',$yesterDayTime[1])->select())->toArray();
+            $yesVisitData = collection($this->visitModel->field($visitField)->where('createtime','>=',$yesterDayTime[0])->where('team_id',$this->adminInfo['team_id'])->where('createtime','<=',$yesterDayTime[1])->select())->toArray();
             //先将所有数据按日期分类
-            $yesOrderData = collection($this->orderModel->where('createtime','>=',$yesterDayTime[0])->where('team_id',$this->adminInfo['team_id'])->where('createtime','<=',$yesterDayTime[1])->select())->toArray();
+            $yesOrderData = collection($this->orderModel->field($orderField)->where('createtime','>=',$yesterDayTime[0])->where('team_id',$this->adminInfo['team_id'])->where('createtime','<=',$yesterDayTime[1])->select())->toArray();
             //渲染历史数据汇总
-            $historyVisitData = collection($this->visitModel->where('team_id',$this->adminInfo['team_id'])->select())->toArray();
-            $historyOrderData = collection($this->orderModel->where('team_id',$this->adminInfo['team_id'])->select())->toArray();
+            if (!Cache::has('all-history-visit-data')) {
+                $historyVisitData = collection($this->visitModel->field($visitField)->where('team_id',$this->adminInfo['team_id'])->select())->toArray();
+                Cache::set('all-history-visit-data',$historyVisitData);
+            } else {
+                $historyVisitData = Cache::get('all-history-visit-data');
+            }
+            if (!Cache::has('all-history-order-data')) {
+                $historyOrderData = collection($this->orderModel->field($orderField)->where('team_id',$this->adminInfo['team_id'])->select())->toArray();
+                Cache::set('all-history-order-data',$historyOrderData);
+            } else {
+                $historyOrderData = Cache::get('all-history-order-data');
+            }
         }
         $newData = $this->doDataGroupByTime($orderData,$visitData);
         $newYesData = $this->doDataGroupByTime($yesOrderData,$yesVisitData);
