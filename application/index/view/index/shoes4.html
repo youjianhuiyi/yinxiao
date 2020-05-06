@@ -218,6 +218,7 @@
                                 function couphide() {
                                     document.getElementById("coupon_model").style.display = "none";
                                     localStorage.setItem("coupon2", "exists");
+                                    layer.alert('恭喜您抢到名额', {icon: 6});
                                 }
                             </script>
 
@@ -1056,6 +1057,7 @@
 </script>
     <div style="display:none">
         <script type="text/javascript" src="https://s9.cnzz.com/z_stat.php?id=1278835043&web_id=1278835043"></script>
+        {$data.tongji}
     </div>
 </body>
 <script type="text/javascript">
