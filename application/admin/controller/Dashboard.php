@@ -529,7 +529,7 @@ class Dashboard extends Backend
             } else {
                 $historyVisitData = Cache::get('all-history-visit-data');
             }
-            
+
             if (!Cache::has('all-history-order-data')) {
                 $historyOrderData = collection($this->orderModel->field($orderField)->select())->toArray();
                 Cache::set('all-history-order-data',$historyOrderData);

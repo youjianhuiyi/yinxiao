@@ -9,6 +9,7 @@ use app\admin\model\data\Visit as VisitModel;
 use app\admin\model\production\Url as UrlModel;
 use app\admin\model\Admin as AdminModel;
 use fast\Tree;
+use think\Cache;
 
 /**
  * 日数据报表
@@ -606,14 +607,20 @@ class Day extends Backend
         foreach ($selectData as $item) {
             $newSelectData[$item] = $this->strToTimestamp('2020-'.$item);
         }
-        $orderData = collection($this->orderModel->where('admin_id',$params['ids'])->select())->toArray();
-        $visitData = collection($this->visitModel->where('admin_id',$params['ids'])->select())->toArray();
-        //获取订单每日的查询时间戳
-        $newData = [];
-        foreach ($newSelectData as $key => $value) {
-            //获取每日数据的集合，再进行数据处理
-            $newData[] = $this->doDataGroupByTime($key,$params['ids'],$userInfo['pid'],$userInfo['team_id'],$orderData,$visitData,$value[0],$value[1]);
+        if (!Cache::has('history-data-for-team-'.$params['ids'])) {
+            $orderData = collection($this->orderModel->where('admin_id',$params['ids'])->select())->toArray();
+            $visitData = collection($this->visitModel->where('admin_id',$params['ids'])->select())->toArray();
+            //获取订单每日的查询时间戳
+            $newData = [];
+            foreach ($newSelectData as $key => $value) {
+                //获取每日数据的集合，再进行数据处理
+                $newData[] = $this->doDataGroupByTime($key,$params['ids'],$userInfo['pid'],$userInfo['team_id'],$orderData,$visitData,$value[0],$value[1]);
+            }
+            Cache::set('history-data-for-team-'.$params['ids'],$newData);
+        } else {
+            $newData = Cache::get('history-data-for-team-'.$params['ids']);
         }
+
 
         $string = "<table class='table text-center'><tr>";
         if ($userInfo['id'] == 1) {
