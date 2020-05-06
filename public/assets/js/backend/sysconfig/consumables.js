@@ -30,7 +30,10 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form','editable'], function 
                         {field: 'domain_url', title: __('Domain_url')},
                         {field: 'team_id', title: __('Team_id'),operate:false,visible:false},
                         {field: 'team_name', title: __('Team_name'),operate: false,visible: false},
-                        {field: 'is_inuse', title:"使用状态",searchList: {"1": "正在使用", "0": "未使用"}},
+                        {field: 'is_inuse', title:"使用状态",searchList: {"1": "正在使用", "0": "未使用"},formatter:function (value,row,index) {
+                            if (value ===0){return '未使用';}
+                            if (value ===1){return '正在使用';}
+                        }},
                         {field: 'count', title: __('Count')},
                         {field: 'is_forbidden', title: __('Is_forbidden'),searchList: {"1": "已封", "0": "正常"},formatter:function (value,row,index) {
                                 if (value ===0){return '正常';}
