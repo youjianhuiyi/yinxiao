@@ -3,6 +3,7 @@ namespace app\index\Controller;
 
 use app\admin\model\order\Order as OrderModel;
 use app\admin\model\team\Team as TeamModel;
+use app\admin\model\data\Analysis as AnalysisModel;
 use app\common\controller\Frontend;
 use think\Cache;
 use think\Db;
@@ -14,12 +15,14 @@ class Order extends Frontend
 {
     protected $orderModel = null;
     protected $teamModel = null;
+    protected $analysisModel = null;
 
     public function _initialize()
     {
         parent::_initialize();
         $this->orderModel = new OrderModel();
         $this->teamModel = new TeamModel();
+        $this->analysisModel = new AnalysisModel();
     }
 
 
@@ -95,6 +98,33 @@ class Order extends Frontend
                     $this->doDataSummary($params['check_code'],['type'=>'order_count','nums'=>1]);
                     $this->doDataSummary($params['check_code'],['type'=>'order_nums','nums'=>$data['num']]);
                     Cache::set('xpay-order-'.$params['check_code'].$sn,$sn,600);
+                    //写入具体数据详情到数据报表详情表
+                    $analysisData = [
+                        [
+                            'team_id'   => $this->adminModel->get($params['aid'])->team_id,
+                            'pid'       => $this->adminModel->get($params['aid'])->pid,
+                            'admin_id'  => $params['aid'],
+                            'gid'       => $params['gid'],
+                            'date'      => date('m-d',time()),
+                            'check_code'=> $params['check_code'],
+                            'order_sn'  => $sn,
+                            'type'      => 0,
+                            'count'     => 1,
+                            'data'      => json_encode($data)
+                        ],[
+                            'team_id'   => $this->adminModel->get($params['aid'])->team_id,
+                            'pid'       => $this->adminModel->get($params['aid'])->pid,
+                            'admin_id'  => $params['aid'],
+                            'gid'       => $params['gid'],
+                            'date'      => date('m-d',time()),
+                            'check_code'=> $params['check_code'],
+                            'order_sn'  => $sn,
+                            'type'      => 1,
+                            'count'     => 1,
+                            'data'      => json_encode($data)
+                        ]
+                    ];
+                    $this->analysisModel->isUpdate(false)->saveAll($analysisData);
                 }
                 Cache::set($sn,$data);
                 return ['status'=>0,'msg'=>'提交订单成功','order_id'=>$orderId,'sn'=>$sn];

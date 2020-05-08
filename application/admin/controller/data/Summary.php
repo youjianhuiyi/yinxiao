@@ -105,6 +105,7 @@ class Summary extends Backend
 
     /**
      * 查看
+     * @comment 读取统计报表得到的数据，暂时有问题。先停止使用
      */
     public function index1()
     {

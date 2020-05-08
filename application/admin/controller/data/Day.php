@@ -113,7 +113,6 @@ class Day extends Backend
         }
         return $tmp;
     }
-
     /**
      * @return array
      */
@@ -377,7 +376,6 @@ class Day extends Backend
         return $this->view->fetch();
     }
 
-
     /**
      * 根据时间戳划分订单数据
      * @param $date string  日期格式 05-05
@@ -590,7 +588,6 @@ class Day extends Backend
         }
 
     }
-
 
     /**
      * ajax查询个人历史数据

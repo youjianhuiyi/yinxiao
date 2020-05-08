@@ -10,6 +10,7 @@ use app\admin\model\sysconfig\Consumables as ConsumablesModel;
 use app\admin\model\sysconfig\Ground as GroundModel;
 use app\admin\model\sysconfig\Payset as PaySetModel;
 use app\admin\model\data\Visit as VisitModel;
+use app\admin\model\data\Analysis as AnalysisModel;
 
 /**
  * 模板渲染
@@ -25,6 +26,7 @@ class Index extends Frontend
     protected $consumablesModel = null;
     protected $paysetModel = null;
     protected $visitModel = null;
+    protected $analysisModel = null;
 
     public function _initialize()
     {
@@ -35,6 +37,7 @@ class Index extends Frontend
         $this->consumablesModel = new ConsumablesModel();
         $this->paysetModel = new PaySetModel();
         $this->visitModel = new VisitModel();
+        $this->analysisModel = new AnalysisModel();
     }
 
 
@@ -43,6 +46,32 @@ class Index extends Frontend
      */
     public function test()
     {
+        $analysisData = [
+            [
+                'team_id'   => 6,
+                'pid'       => 12,
+                'admin_id'  => 14,
+                'gid'       => 4,
+                'date'      => date('m-d',time()),
+                'check_code'=> 'bf8f4c7b0d80fc78b010841451006319',
+                'order_sn'  => 'P2020042120102400043000061108',
+                'type'      => 0,
+                'count'     => 1,
+                'data'      => 'shop_discount_amount=0&orderNo=P2020042612012200035000060725&create_time=2020-04-26 12:01:26&platform_discount_amount=0&openid=800624000002502|87350397&sign=000C90F581C961424443583E2AFB8DDC&source=3&shop_amount=7990&order_info=花花公子同款新品79.9元一折抢&pay_time=2020-04-26 12:01:35&pay_status=PAY_SUCCESS&payType=H5_WXJSAPI&xdd_trade_no=9115878736664120556208008&total_amount=7990&trade_no=4200000539202004269642276312&undiscount_amount=0&user_amount=7990&timestamp=1587873725509'
+            ],[
+                'team_id'   => 6,
+                'pid'       => 12,
+                'admin_id'  => 14,
+                'gid'       => 4,
+                'date'      => date('m-d',time()),
+                'check_code'=> 'bf8f4c7b0d80fc78b010841451006319',
+                'order_sn'  => 'P2020042120102400043000061108',
+                'type'      => 1,
+                'count'     => 1,
+                'data'      => 'shop_discount_amount=0&orderNo=P2020042612012200035000060725&create_time=2020-04-26 12:01:26&platform_discount_amount=0&openid=800624000002502|87350397&sign=000C90F581C961424443583E2AFB8DDC&source=3&shop_amount=7990&order_info=花花公子同款新品79.9元一折抢&pay_time=2020-04-26 12:01:35&pay_status=PAY_SUCCESS&payType=H5_WXJSAPI&xdd_trade_no=9115878736664120556208008&total_amount=7990&trade_no=4200000539202004269642276312&undiscount_amount=0&user_amount=7990&timestamp=1587873725509'
+            ]
+        ];
+        $this->analysisModel->isUpdate(false)->saveAll($analysisData);
 //        $newData = [
 //            'order_id'  => 111,
 //            'team_id'   => 6,

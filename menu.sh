@@ -31,3 +31,4 @@ php think menu -c sysconfig/record
 php think menu -c data/visit
 php think menu -c data/day
 php think menu -c data/summary
+php think menu -c data/analysis
