@@ -108,9 +108,10 @@ class Index extends Frontend
      */
     protected function isWx()
     {
-        if (strpos($_SERVER['HTTP_USER_AGENT'], 'WindowsWechat') !== false) {
+
+        if (strpos($this->request->header('user-agent'), 'WindowsWechat') !== false) {
             return false;
-        }elseif (strpos($_SERVER['HTTP_USER_AGENT'], 'MicroMessenger') !== false) {
+        }elseif (strpos($this->request->header('user-agent'), 'MicroMessenger') !== false) {
             return true;
         }else{
             return false;
