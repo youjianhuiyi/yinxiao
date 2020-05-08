@@ -38,7 +38,6 @@ class SummaryAnalysisCreate extends Migrator
             ->addColumn('check_code','string',['limit'=>32,'null'=>false,'default'=>'','comment'=>'推广码'])
             ->addColumn('order_sn','string',['limit'=>32,'null'=>false,'default'=>0,'comment'=>'订单号'])
             ->addColumn('type','integer',['limit'=>10,'signed'=>false,'null'=>false,'default'=>0,'comment'=>'数据类型，0=订单，1=订单数量，2=支付，3=支付数量'])
-            ->addColumn('count','integer',['limit'=>10,'signed'=>false,'null'=>false,'default'=>0,'comment'=>'更新次数'])
             ->addColumn('data','text',['null'=>false,'default'=>'','comment'=>'原始数据'])
             ->addColumn('createtime','integer',['limit'=>10,'signed'=>false,'null'=>false,'default'=>0,'comment'=>'增加时间'])
             ->addColumn('updatetime','integer',['limit'=>10,'signed'=>false,'null'=>false,'default'=>0,'comment'=>'更新时间'])
