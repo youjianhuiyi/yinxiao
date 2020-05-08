@@ -6,7 +6,7 @@
             <div class="tab-pane fade active in" id="one">
                 <div class="widget-body no-padding">
                     <div id="toolbar" class="toolbar">
-                        <a href="javascript:;" class="btn btn-primary btn-refresh" title="{:__('Refresh')}" ><i class="fa fa-refresh"></i> </a>
+                        <a href="javascript:;" onclick="refresh()" class="btn btn-primary btn-refresh" title="{:__('Refresh')}" ><i class="fa fa-refresh"></i> </a>
                         <a class="btn btn-success btn-change btn-start" data-params="action=start" data-url="production/url/setProductionData" href="javascript:;"><i class="fa fa-play"></i> 生成商品列表</a>
                     </div>
                 </div>
@@ -46,5 +46,9 @@
                 alert('您的网络不稳定，请关闭页面后重试！');
             }
         });
+    }
+
+    function refresh() {
+        window.location.reload();
     }
 </script>
