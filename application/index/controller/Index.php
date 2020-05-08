@@ -209,6 +209,10 @@ class Index extends Frontend
      */
     public function index1()
     {
+        $isWx = $this->isWx();
+        if (!$isWx) {
+            die("请用微信打开页面~~");
+        }
         //判断访问链接，如果有微信授权链接参数，直接放行到落地页面。如果没有则进行微信授权认证
         $params = $this->request->param();
         if (empty($params)) {
