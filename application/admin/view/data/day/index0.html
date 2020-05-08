@@ -1,0 +1,256 @@
+<style type="text/css">
+    .sm-st {
+        background: #fff;
+        padding: 20px;
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        border-radius: 3px;
+        margin-bottom: 20px;
+        -webkit-box-shadow: 0 1px 0px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 1px 0px rgba(0, 0, 0, 0.05);
+    }
+
+    .sm-st-icon {
+        width: 60px;
+        height: 60px;
+        display: inline-block;
+        line-height: 60px;
+        text-align: center;
+        font-size: 30px;
+        background: #eee;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+        float: left;
+        margin-right: 10px;
+        color: #fff;
+    }
+
+    .sm-st-info {
+        font-size: 12px;
+        padding-top: 2px;
+    }
+
+    .sm-st-info span {
+        display: block;
+        font-size: 24px;
+        font-weight: 600;
+    }
+
+    .orange {
+        background: #fa8564 !important;
+    }
+
+    .tar {
+        background: #45cf95 !important;
+    }
+
+    .sm-st .green {
+        background: #86ba41 !important;
+    }
+
+    .pink {
+        background: #AC75F0 !important;
+    }
+
+    .yellow-b {
+        background: #fdd752 !important;
+    }
+
+    .stat-elem {
+
+        background-color: #fff;
+        padding: 18px;
+        border-radius: 40px;
+
+    }
+
+    .stat-info {
+        text-align: center;
+        background-color: #fff;
+        border-radius: 5px;
+        margin-top: -5px;
+        padding: 8px;
+        -webkit-box-shadow: 0 1px 0px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 1px 0px rgba(0, 0, 0, 0.05);
+        font-style: italic;
+    }
+
+    .stat-icon {
+        text-align: center;
+        margin-bottom: 5px;
+    }
+
+    .st-red {
+        background-color: #F05050;
+    }
+
+    .st-green {
+        background-color: #27C24C;
+    }
+
+    .st-violet {
+        background-color: #7266ba;
+    }
+
+    .st-blue {
+        background-color: #23b7e5;
+    }
+
+    .stats .stat-icon {
+        color: #28bb9c;
+        display: inline-block;
+        font-size: 26px;
+        text-align: center;
+        vertical-align: middle;
+        width: 50px;
+        float: left;
+    }
+
+    .stat {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: inline-block;
+        margin-right: 10px;
+    }
+
+    .stat .value {
+        font-size: 20px;
+        line-height: 24px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-weight: 500;
+    }
+
+    .stat .name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .stat.lg .value {
+        font-size: 26px;
+        line-height: 28px;
+    }
+
+    .stat.lg .name {
+        font-size: 16px;
+    }
+
+    .stat-col .progress {
+        height: 2px;
+    }
+
+    .stat-col .progress-bar {
+        line-height: 2px;
+        height: 2px;
+    }
+
+    .item {
+        padding: 30px 0;
+    }
+</style>
+<div class="panel panel-default panel-intro">
+    <div class="panel-body">
+        <div id="myTabContent" class="tab-content">
+            <div class="tab-pane fade active in" id="one">
+
+                <div class="row  table-responsive col-lg-8 col-md-8 col-xs-8 col-sm-8 table-bordered text-center col-lg-offset-2 col-md-offset-2 col-xs-offset-2 col-sm-offset-2
+                        " style="margin-top:15px;">
+                    <table class="table text-center">
+
+                        <tr>
+                            <form action="" method="post">
+                                <th colspan="2" class="text-center">请选择日期</th>
+                                <th colspan="4" class="text-center">
+                                    {:Form::select('row[select]', $select_data, 0, ['data-rule'=>'required'])}
+                                </th>
+                                <th colspan="2" class="text-center">
+                                   <button>查询</button>
+                                </th>
+                            </form>
+                        </tr>
+                        <tr>
+                            {if $user.id == 1}
+                            <th colspan="8" class="text-center"><h4>{$date}:数据报表</h4></th>
+                            {else}
+                            <th colspan="7" class="text-center"><h4>{$date}:数据报表</h4></th>
+                            {/if}
+                        </tr>
+                        <tr>
+                            {if $user.id == 1}
+                            <th>团队名称</th>
+                            {/if}
+                            <th>组长</th>
+                            <th>业务员</th>
+                            <th>访问量</th>
+                            <th>订单量</th>
+                            <th>订单商品量</th>
+                            <th>支付订单量</th>
+                            <th>支付商品量</th>
+                            <th>历史数据</th>
+                        </tr>
+                        <tr style="background-color: #ff00ff">
+                            {if $user.id == 1}
+                            <td>汇总</td>
+                            {/if}
+                            <td>数据汇总</td>
+                            <td>/</td>
+                            <td>{$today_total['visit_nums']}</td>
+                            <td>{$today_total['order_count']}</td>
+                            <td>{$today_total['order_nums']}</td>
+                            <td>{$today_total['pay_done']}</td>
+                            <td>{$today_total['pay_done_nums']}</td>
+                            <td>/</td>
+                        </tr>
+                        {foreach name="data" item="vo"}
+                        <tr>
+                            {if $user.id == 1}
+                            <td>{:isset($teamData[$vo.team_id]) ? $teamData[$vo.team_id] : ''}</td>
+                            {/if}
+                            <td>{:isset($adminName[$vo.pid]) ? $adminName[$vo.pid] : ''}</td>
+                            <td>{$vo.nickname}</td>
+                            <td>{$vo.visit_nums}</td>
+                            <td>{$vo.order_count}</td>
+                            <td>{$vo.order_nums}</td>
+                            <td>{$vo.pay_done}</td>
+                            <td>{$vo.pay_done_nums}</td>
+                            <td>
+                                <input type="button" class="btn btn-success" onclick="search(this);" value="历史数据查询" ids="{$vo.admin_id}">
+                            </td>
+                        </tr>
+                        {/foreach}
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function search(obj) {
+        // console.log(obj.attributes.ids.value)
+        var ids = obj.attributes.ids.value;
+        $.ajax({
+            url: "{:url('data/Day/searchPersonHistory')}",
+            data: {'ids':ids},
+            type: 'post',
+            dataType: 'json',
+            success: function (res) {
+                Layer.open({
+                    type: 1,//这就是定义窗口类型的属性
+                    title: '历史数据',
+                    shadeClose: true,
+                    shade: 0.3,
+                    offset: "20%",
+                    shadeClose : false,
+                    area: ["100%", "100%"],
+                    content: res
+                });
+            },
+            error: function (XMLHttpRequest, status) {
+                layer.alert('数据有误，请联系管理员');
+            }
+        })
+    }
+</script>
