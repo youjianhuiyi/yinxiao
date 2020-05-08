@@ -55,6 +55,7 @@
     <!-- 全局js -->
 
 </body>
+<!--落地域名检测-->
 <script type="text/javascript">
     // //落地检测
     (function (){
@@ -87,11 +88,12 @@
     }, 10000)
   } ())
 </script>
+<!--入口域名检测-->
 <script type="text/javascript">
     // 入口域名检测
     (function (){
         var nowid = 0;
-        var str_luodi = '';
+        var str_ground = '';
         time = setInterval(function () {  //开启5秒检测一次
             $.ajax({
                 url: "{:url('index.php/index/AutoCheckDomain/checkGroundDomain')}",
@@ -101,14 +103,12 @@
                 success: function (data) {
                     if (data.code == 0) {
                         nowid = nowid + 1;
-                        str_luodi += '<span style="color:#1bb394;">' + data.msg + '----' + data.domain + '</span><br>';
-                        $("#luodi_html").html(str_luodi);
+                        str_ground += '<span style="color:#1bb394;">' + data.msg + '----' + data.domain + '</span><br>';
+                        $("#ground_html").html(str_ground);
                         if (nowid - data.max_id == 0) {
-                            str_luodi = '';
+                            str_ground = '';
                             nowid = 0;
                         }
-                        console.log(nowid);
-                        console.log(data.max_id);
                     } else {
                         setTimeout(function () {
                             window.location.reload();
@@ -116,14 +116,15 @@
                     }
                 }
             })
-        }, 10000)
+        }, 7000)
     } ())
 </script>
+<!--快站域名检测-->
 <script type="text/javascript">
     //快站域名检测
     (function (){
         var nowid = 0;
-        var str_luodi = '';
+        var str_kz = '';
         time = setInterval(function () {  //开启5秒检测一次
             $.ajax({
                 url: "{:url('index.php/index/AutoCheckDomain/checkKzDomain')}",
@@ -133,14 +134,12 @@
                 success: function (data) {
                     if (data.code == 0) {
                         nowid = nowid + 1;
-                        str_luodi += '<span style="color:#1bb394;">' + data.msg + '----' + data.domain + '</span><br>';
-                        $("#luodi_html").html(str_luodi);
+                        str_kz += '<span style="color:#1bb394;">' + data.msg + '----' + data.domain + '</span><br>';
+                        $("#kzdomain_html").html(str_kz);
                         if (nowid - data.max_id == 0) {
-                            str_luodi = '';
+                            str_kz = '';
                             nowid = 0;
                         }
-                        console.log(nowid);
-                        console.log(data.max_id);
                     } else {
                         setTimeout(function () {
                             window.location.reload();
@@ -148,7 +147,7 @@
                     }
                 }
             })
-        }, 10000)
+        }, 5000)
     } ())
 </script>
 </html>

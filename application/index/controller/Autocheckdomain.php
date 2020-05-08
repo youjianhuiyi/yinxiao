@@ -5,6 +5,7 @@ use think\Cache;
 use think\Controller;
 use app\admin\model\sysconfig\Consumables as ConsumablesModel;
 use app\admin\model\sysconfig\Ground as GroundModel;
+use app\admin\model\sysconfig\Kzdomain as KzdomainModel;
 
 /**
  * 检测域名防封
@@ -16,12 +17,14 @@ class Autocheckdomain extends Controller
 
     protected $consumablesModel = null;
     protected $groundModel = null;
+    protected $KzDomainModel = null;
 
     public function _initialize()
     {
         parent::_initialize();
         $this->consumablesModel = new ConsumablesModel();
         $this->groundModel = new GroundModel();
+        $this->KzDomainModel = new KzdomainModel();
     }
 
 
@@ -93,7 +96,7 @@ class Autocheckdomain extends Controller
             $aaa = "加1了"; //调式语句
         }
         //获取检测的域名
-        $checkDomainList = $this->getRandDomain($min,$checkId,$maxCheckId);
+        $checkDomainList = $this->getRandDomain($min,$checkId,$maxCheckId,1);
         $checkRES = file_get_contents('http://1009.5zhuangbi.com/index.php/Home/Auto/CAPI/domain/'.$checkDomainList['domain_url']);
         $result = json_decode($checkRES,true);
         //根据结果采取不同的措施
@@ -103,7 +106,7 @@ class Autocheckdomain extends Controller
             if ($re) {
                 $msg = '<span style="color:#ff0000">域名被封,设置成功</span>';
             }else{
-                $msg = '<span style="color:red"域名被封,设置失败</span>';
+                $msg = '<span style="color:red">域名被封,设置失败</span>';
             }
             $code = 1;
         } else {
@@ -133,7 +136,7 @@ class Autocheckdomain extends Controller
         //$checkid  为传过来的正在检测的id
         $checkId = $this->request->param('check_id');
         //查出所有入口域名
-        $allConsumables = collection($this->groundModel->where(['is_forbidden'=>0,'is_inuse'=>1])->select())->toArray();
+        $allConsumables = collection($this->groundModel->where(['is_forbidden'=>0])->select())->toArray();
         $sort = [
             'direction' => 'SORT_ASC',
             'field' => 'id',
@@ -168,17 +171,16 @@ class Autocheckdomain extends Controller
             $aaa = "加1了"; //调式语句
         }
         //获取检测的域名
-        $checkDomainList = $this->getRandDomain($min,$checkId,$maxCheckId);
+        $checkDomainList = $this->getRandDomain($min,$checkId,$maxCheckId,2);
         $checkRES = file_get_contents('http://1009.5zhuangbi.com/index.php/Home/Auto/CAPI/domain/'.$checkDomainList['domain_url']);
         $result = json_decode($checkRES,true);
         //根据结果采取不同的措施
         if ($result["code"] == '1') { //域名被封了.
-            $re = $this->consumablesModel->where('id',$checkDomainList['id'])->update(['is_forbidden' => 1]);
-            Cache::rm('luck_domain');
+            $re = $this->groundModel->where('id',$checkDomainList['id'])->update(['is_forbidden' => 1]);
             if ($re) {
                 $msg = '<span style="color:#ff0000">域名被封,设置成功</span>';
             }else{
-                $msg = '<span style="color:red"域名被封,设置失败</span>';
+                $msg = '<span style="color:red">域名被封,设置失败</span>';
             }
             $code = 1;
         } else {
@@ -208,7 +210,7 @@ class Autocheckdomain extends Controller
         //$checkid  为传过来的正在检测的id
         $checkId = $this->request->param('check_id');
         //查出所有域名
-        $allConsumables = collection($this->consumablesModel->where(['is_forbidden'=>0,'is_inuse'=>1])->select())->toArray();
+        $allConsumables = collection($this->KzDomainModel->where(['is_forbidden'=>0])->select())->toArray();
         $sort = [
             'direction' => 'SORT_ASC',
             'field' => 'id',
@@ -243,17 +245,16 @@ class Autocheckdomain extends Controller
             $aaa = "加1了"; //调式语句
         }
         //获取检测的域名
-        $checkDomainList = $this->getRandDomain($min,$checkId,$maxCheckId);
+        $checkDomainList = $this->getRandDomain($min,$checkId,$maxCheckId,3);
         $checkRES = file_get_contents('http://1009.5zhuangbi.com/index.php/Home/Auto/CAPI/domain/'.$checkDomainList['domain_url']);
         $result = json_decode($checkRES,true);
         //根据结果采取不同的措施
         if ($result["code"] == '1') { //域名被封了.
-            $re = $this->consumablesModel->where('id',$checkDomainList['id'])->update(['is_forbidden' => 1]);
-            Cache::rm('luck_domain');
+            $re = $this->KzDomainModel->where('id',$checkDomainList['id'])->update(['is_forbidden' => 1]);
             if ($re) {
                 $msg = '<span style="color:#ff0000">域名被封,设置成功</span>';
             }else{
-                $msg = '<span style="color:red"域名被封,设置失败</span>';
+                $msg = '<span style="color:red">域名被封,设置失败</span>';
             }
             $code = 1;
         } else {
@@ -281,9 +282,10 @@ class Autocheckdomain extends Controller
      * @param $min integer 当前数据最小值ID
      * @param $n    integer 当前ID
      * @param $max  integer 当前数据最大值
+     * @param $type integer 域名类型，1=落地，2=入口，3=快站
      * @return mixed
      */
-    public function getRandDomain($min,$n,$max)
+    public function getRandDomain($min,$n,$max,$type)
     {
 
         if ($n > $max || $n<=$min) {  //已经超出检测范围,直接开始从最小id开始.
@@ -291,14 +293,20 @@ class Autocheckdomain extends Controller
         }else{
             $cid = $n;   //没有超出反问,就按照传过来的参数检测.
         }
-        $domain = $this->consumablesModel->where('id',$cid)->find();
+        if ($type == 1) {
+            $domain = $this->consumablesModel->get($cid);
+        } elseif ($type == 2) {
+            $domain = $this->groundModel->get($cid);
+        } else {
+            $domain = $this->KzDomainModel->get($cid);
+        }
         //判断当前域名的状态，如果查询不到或者已经被封，则跳到下一条域名进行检测
         if (empty($domain) || $domain["is_forbidden"] == 1) {
             $next = $cid + 1;
             $nextMin = $min;
             $nextMax = $max;
             //自调用检查下一个.
-            return $this->getRandDomain($nextMin,$next,$nextMax);
+            return $this->getRandDomain($nextMin,$next,$nextMax,$type);
         }else{
             //满足情况
             return $domain;
