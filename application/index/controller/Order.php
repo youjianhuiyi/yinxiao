@@ -51,6 +51,10 @@ class Order extends Frontend
             $params = $this->request->param();
             //TODO::测试流程先不判断订单是否有效，后面再做这块的检验
             $sn = $this->orderSn($params);
+            $pattern = isset($params['pattern']) ? $params['pattern'] : '';
+            $sex = isset($params['sex']) ? $params['sex'] : '';
+            $attr = isset($params['attr']) ? $params['attr'] : '';
+            $goodsInfo = '款式='.$pattern.';性别='.$sex.';属性='.$attr;
             //构建订单数据
             $data = [
                 'admin_id'  => $params['aid'],
@@ -64,7 +68,7 @@ class Order extends Frontend
                 'team_name' => $this->teamModel->get($this->adminModel->get($params['aid'])->team_id)->name,
                 'production_id'     => $params['gid'],
                 'production_name'   => $params['production_name'],
-                'goods_info'=> '款式='.$params['pattern'].';性别='.$params['sex'].';属性='.$params['attr'],
+                'goods_info'=> $goodsInfo,
                 'price'     => $params['price']*$params['number'],
                 'pay_id'    => $params['pay_id'],
                 'pay_type'  => $params['pay_type'],

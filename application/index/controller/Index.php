@@ -101,6 +101,22 @@ class Index extends Frontend
 
     }
 
+
+    /**
+     * 落地检测是否是微信打开
+     * @return bool
+     */
+    protected function isWx()
+    {
+        if (strpos($_SERVER['HTTP_USER_AGENT'], 'WindowsWechat') !== false) {
+            return false;
+        }elseif (strpos($_SERVER['HTTP_USER_AGENT'], 'MicroMessenger') !== false) {
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     /**
      * 微信支付落地页面
      * @return string
