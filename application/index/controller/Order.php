@@ -101,6 +101,7 @@ class Order extends Frontend
                     //写入具体数据详情到数据报表详情表
                     $analysisData = [
                         [
+                            /*订单量记录*/
                             'team_id'   => $this->adminModel->get($params['aid'])->team_id,
                             'pid'       => $this->adminModel->get($params['aid'])->pid,
                             'admin_id'  => $params['aid'],
@@ -109,9 +110,10 @@ class Order extends Frontend
                             'check_code'=> $params['check_code'],
                             'order_sn'  => $sn,
                             'type'      => 0,
-                            'count'     => 1,
+                            'num'       => 1,
                             'data'      => json_encode($data)
                         ],[
+                            /*订单商品记录*/
                             'team_id'   => $this->adminModel->get($params['aid'])->team_id,
                             'pid'       => $this->adminModel->get($params['aid'])->pid,
                             'admin_id'  => $params['aid'],
@@ -120,7 +122,7 @@ class Order extends Frontend
                             'check_code'=> $params['check_code'],
                             'order_sn'  => $sn,
                             'type'      => 1,
-                            'count'     => 1,
+                            'num'       => $params['number'],
                             'data'      => json_encode($data)
                         ]
                     ];
