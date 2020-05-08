@@ -227,7 +227,11 @@
         <!-- small box -->
         <div class="small-box bg-green">
             <div class="inner">
+                {if $yesterdayData['visit'] == 0}
+                <h3>0</h3>
+                {else}
                 <h3>{:round($yesterdayData['order_count']/$yesterdayData['visit'],2)*100}%</h3>
+                {/if}
                 <p>点击转换率</p>
             </div>
             <div class="icon">
@@ -240,7 +244,11 @@
         <!-- small box -->
         <div class="small-box bg-yellow">
             <div class="inner">
+                {if $yesterdayData['order_count'] == 0}
+                <h3>0</h3>
+                {else}
                 <h3>{:round($yesterdayData['pay_done']/$yesterdayData['order_count'],2)*100}%</h3>
+                {/if}
                 <p>入账转化率</p>
             </div>
             <div class="icon">
@@ -324,7 +332,11 @@
         <div class="sm-st clearfix">
             <span class="sm-st-icon st-violet"><i class="fa fa-book"></i></span>
             <div class="sm-st-info">
-                <span>{:round($historyData['order_count']/$historyData['visit'],2)*100} %</span>
+                {if $historyData['visit'] == 0}
+                <span>0</span>
+                {else}
+                <span>{:round($historyData['order_count']/$historyData['visit'],2)*100}%</span>
+                {/if}
                 历史总点击转换率
             </div>
         </div>
@@ -333,7 +345,11 @@
         <div class="sm-st clearfix">
             <span class="sm-st-icon st-blue"><i class="fa fa-shopping-bag"></i></span>
             <div class="sm-st-info">
-                <span>{:round($historyData['pay_done']/$historyData['order_count'],2)*100} %</span>
+                {if $historyData['order_count'] == 0}
+                <span>0</span>
+                {else}
+                <span>{:round($historyData['pay_done']/$historyData['order_count'],2)*100}%</span>
+                {/if}
                 历史总入账转化率
             </div>
         </div>
