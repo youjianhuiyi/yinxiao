@@ -54,7 +54,18 @@ class Order extends Frontend
             $pattern = isset($params['pattern']) ? $params['pattern'] : '';
             $sex = isset($params['sex']) ? $params['sex'] : '';
             $attr = isset($params['attr']) ? $params['attr'] : '';
-            $goodsInfo = '款式='.$pattern.';性别='.$sex.';属性='.$attr;
+            $goodsInfo = '';
+            if (!$pattern) {
+                $goodsInfo .= '款式='.$pattern.';';
+            }
+            if (!$sex) {
+                $goodsInfo .= '性别='.$sex.';';
+            }
+
+            if (!$attr) {
+                $goodsInfo .= '属性='.$attr.';';
+            }
+            
             //构建订单数据
             $data = [
                 'admin_id'  => $params['aid'],
