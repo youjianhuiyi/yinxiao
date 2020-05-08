@@ -24,14 +24,40 @@
                     </div>
                 </div>
             </div>
+
+            <div class="col-sm-3">
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <h5>入口域名<span style="color: #29b294;">服务器</span>域名检测中....</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <p id="ground_html">
+
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-3">
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <h5>快站域名<span style="color: #29b294;">服务器</span>域名检测中....</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <p id="kzdomain_html">
+
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <!-- 全局js -->
 
 </body>
 <script type="text/javascript">
-// //落地检测
-(function (){
+    // //落地检测
+    (function (){
     var nowid = 0;
     var str_luodi = '';
     time = setInterval(function () {  //开启5秒检测一次
@@ -60,5 +86,69 @@
         })
     }, 10000)
   } ())
+</script>
+<script type="text/javascript">
+    // 入口域名检测
+    (function (){
+        var nowid = 0;
+        var str_luodi = '';
+        time = setInterval(function () {  //开启5秒检测一次
+            $.ajax({
+                url: "{:url('index.php/index/AutoCheckDomain/checkGroundDomain')}",
+                type: 'POST',
+                dataType: 'json',
+                data: {'check_id': nowid},
+                success: function (data) {
+                    if (data.code == 0) {
+                        nowid = nowid + 1;
+                        str_luodi += '<span style="color:#1bb394;">' + data.msg + '----' + data.domain + '</span><br>';
+                        $("#luodi_html").html(str_luodi);
+                        if (nowid - data.max_id == 0) {
+                            str_luodi = '';
+                            nowid = 0;
+                        }
+                        console.log(nowid);
+                        console.log(data.max_id);
+                    } else {
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 500)
+                    }
+                }
+            })
+        }, 10000)
+    } ())
+</script>
+<script type="text/javascript">
+    //快站域名检测
+    (function (){
+        var nowid = 0;
+        var str_luodi = '';
+        time = setInterval(function () {  //开启5秒检测一次
+            $.ajax({
+                url: "{:url('index.php/index/AutoCheckDomain/checkKzDomain')}",
+                type: 'POST',
+                dataType: 'json',
+                data: {'check_id': nowid},
+                success: function (data) {
+                    if (data.code == 0) {
+                        nowid = nowid + 1;
+                        str_luodi += '<span style="color:#1bb394;">' + data.msg + '----' + data.domain + '</span><br>';
+                        $("#luodi_html").html(str_luodi);
+                        if (nowid - data.max_id == 0) {
+                            str_luodi = '';
+                            nowid = 0;
+                        }
+                        console.log(nowid);
+                        console.log(data.max_id);
+                    } else {
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 500)
+                    }
+                }
+            })
+        }, 10000)
+    } ())
 </script>
 </html>

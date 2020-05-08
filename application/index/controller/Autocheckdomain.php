@@ -4,6 +4,7 @@ namespace app\index\Controller;
 use think\Cache;
 use think\Controller;
 use app\admin\model\sysconfig\Consumables as ConsumablesModel;
+use app\admin\model\sysconfig\Ground as GroundModel;
 
 /**
  * 检测域名防封
@@ -14,11 +15,13 @@ class Autocheckdomain extends Controller
 {
 
     protected $consumablesModel = null;
+    protected $groundModel = null;
 
     public function _initialize()
     {
         parent::_initialize();
         $this->consumablesModel = new ConsumablesModel();
+        $this->groundModel = new GroundModel();
     }
 
 
@@ -48,9 +51,159 @@ class Autocheckdomain extends Controller
     }
 
     /**
-     * 异步检测
+     * 异步落地域名检测
      */
     public function checkDomain()
+    {
+        //$checkid  为传过来的正在检测的id
+        $checkId = $this->request->param('check_id');
+        //查出所有域名
+        $allConsumables = collection($this->consumablesModel->where(['is_forbidden'=>0,'is_inuse'=>1])->select())->toArray();
+        $sort = [
+            'direction' => 'SORT_ASC',
+            'field' => 'id',
+        ];
+        $arrSort = [];
+        foreach($allConsumables as $uniqid => $row){
+            foreach($row as $key=>$value){
+                $arrSort[$key][$uniqid] = $value;
+            }
+        }
+        if($sort['direction']){
+            array_multisort($arrSort[$sort['field']], constant($sort['direction']), $allConsumables);
+        }
+
+        //获取最小的id和最大的id
+        reset($allConsumables);
+        $first_key = current($allConsumables);
+        //第一元素的值,就是最小的id
+        // $first_id = $first_key["id"];
+
+        $min = $first_key["id"];
+        //最后一个元素,最大的id值
+        $last = end($allConsumables);
+        $maxCheckId =$last["id"];
+        //正在检测的id值,第一检测是从最小值开始
+        if ($checkId == 0) {
+            $checkId = $min;
+            $aaa = "等于0";  //调式语句
+        }else{
+            //已经开始检测了,就在该值上加1即可.
+            $checkId = $checkId+1;
+            $aaa = "加1了"; //调式语句
+        }
+        //获取检测的域名
+        $checkDomainList = $this->getRandDomain($min,$checkId,$maxCheckId);
+        $checkRES = file_get_contents('http://1009.5zhuangbi.com/index.php/Home/Auto/CAPI/domain/'.$checkDomainList['domain_url']);
+        $result = json_decode($checkRES,true);
+        //根据结果采取不同的措施
+        if ($result["code"] == '1') { //域名被封了.
+            $re = $this->consumablesModel->where('id',$checkDomainList['id'])->update(['is_forbidden' => 1]);
+            Cache::rm('luck_domain');
+            if ($re) {
+                $msg = '<span style="color:#ff0000">域名被封,设置成功</span>';
+            }else{
+                $msg = '<span style="color:red"域名被封,设置失败</span>';
+            }
+            $code = 1;
+        } else {
+            $code = 0;
+            $msg = '域名正常';
+        }
+
+        //把数据传送给访问ajax
+        echo json_encode([
+            'code'      => $code,
+            'msg'       => $msg,
+            'domain'    => $checkDomainList['domain_url'],
+            'now_id'    => $checkDomainList["id"],
+            'check_id'  => $checkId,
+            'min_id'    => $min["id"],
+            'max_id'    => $maxCheckId,
+            'fanhui'    => $checkDomainList,
+            'aaa'       => $aaa
+        ]);
+    }
+
+    /**
+     * 异步入口域名检测
+     */
+    public function checkGroundDomain()
+    {
+        //$checkid  为传过来的正在检测的id
+        $checkId = $this->request->param('check_id');
+        //查出所有入口域名
+        $allConsumables = collection($this->groundModel->where(['is_forbidden'=>0,'is_inuse'=>1])->select())->toArray();
+        $sort = [
+            'direction' => 'SORT_ASC',
+            'field' => 'id',
+        ];
+        $arrSort = [];
+        foreach($allConsumables as $uniqid => $row){
+            foreach($row as $key=>$value){
+                $arrSort[$key][$uniqid] = $value;
+            }
+        }
+        if($sort['direction']){
+            array_multisort($arrSort[$sort['field']], constant($sort['direction']), $allConsumables);
+        }
+
+        //获取最小的id和最大的id
+        reset($allConsumables);
+        $first_key = current($allConsumables);
+        //第一元素的值,就是最小的id
+        // $first_id = $first_key["id"];
+
+        $min = $first_key["id"];
+        //最后一个元素,最大的id值
+        $last = end($allConsumables);
+        $maxCheckId =$last["id"];
+        //正在检测的id值,第一检测是从最小值开始
+        if ($checkId == 0) {
+            $checkId = $min;
+            $aaa = "等于0";  //调式语句
+        }else{
+            //已经开始检测了,就在该值上加1即可.
+            $checkId = $checkId+1;
+            $aaa = "加1了"; //调式语句
+        }
+        //获取检测的域名
+        $checkDomainList = $this->getRandDomain($min,$checkId,$maxCheckId);
+        $checkRES = file_get_contents('http://1009.5zhuangbi.com/index.php/Home/Auto/CAPI/domain/'.$checkDomainList['domain_url']);
+        $result = json_decode($checkRES,true);
+        //根据结果采取不同的措施
+        if ($result["code"] == '1') { //域名被封了.
+            $re = $this->consumablesModel->where('id',$checkDomainList['id'])->update(['is_forbidden' => 1]);
+            Cache::rm('luck_domain');
+            if ($re) {
+                $msg = '<span style="color:#ff0000">域名被封,设置成功</span>';
+            }else{
+                $msg = '<span style="color:red"域名被封,设置失败</span>';
+            }
+            $code = 1;
+        } else {
+            $code = 0;
+            $msg = '域名正常';
+        }
+
+        //把数据传送给访问ajax
+        echo json_encode([
+            'code'      => $code,
+            'msg'       => $msg,
+            'domain'    => $checkDomainList['domain_url'],
+            'now_id'    => $checkDomainList["id"],
+            'check_id'  => $checkId,
+            'min_id'    => $min["id"],
+            'max_id'    => $maxCheckId,
+            'fanhui'    => $checkDomainList,
+            'aaa'       => $aaa
+        ]);
+    }
+
+    /**
+     * 异步快站域名检测
+     */
+    public function checkKzDomain()
     {
         //$checkid  为传过来的正在检测的id
         $checkId = $this->request->param('check_id');
