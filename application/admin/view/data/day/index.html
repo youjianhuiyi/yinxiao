@@ -177,6 +177,7 @@
                             <th colspan="7" class="text-center"><h4>{$date}:数据报表</h4></th>
                             {/if}
                         </tr>
+                        {if $user.pid == 0}
                         <tr>
                             {if $user.id == 1}
                             <th>团队名称</th>
@@ -190,6 +191,7 @@
                             <th>支付商品量</th>
                             <th>历史数据</th>
                         </tr>
+                        {/if}
                         <tr style="background-color: #ff00ff">
                             {if $user.id == 1}
                             <td>汇总</td>

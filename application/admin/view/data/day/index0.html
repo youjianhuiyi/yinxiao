@@ -190,6 +190,7 @@
                             <th>支付商品量</th>
                             <th>历史数据</th>
                         </tr>
+                        {if $user.pid == 0}
                         <tr style="background-color: #ff00ff">
                             {if $user.id == 1}
                             <td>汇总</td>
@@ -203,13 +204,14 @@
                             <td>{$today_total['pay_done_nums']}</td>
                             <td>/</td>
                         </tr>
+                        {/if}
                         {foreach name="data" item="vo"}
                         <tr>
                             {if $user.id == 1}
                             <td>{:isset($teamData[$vo.team_id]) ? $teamData[$vo.team_id] : ''}</td>
                             {/if}
                             <td>{:isset($adminName[$vo.pid]) ? $adminName[$vo.pid] : ''}</td>
-                            <td>{$vo.nickname}</td>
+                            <td>{$vo.name}</td>
                             <td>{$vo.visit_nums}</td>
                             <td>{$vo.order_count}</td>
                             <td>{$vo.order_nums}</td>

@@ -441,14 +441,13 @@ class Day extends Backend
         foreach ($selectData as $item) {
             $newSelectData[$item] = $item;
         }
+        //先将所有数据按日期分类
+        $data = [];
 
         if ($this->request->isPost()) {
             $params = $this->request->param();
             //获取当前用户信息
             $date = $params['row']['select'];
-            //先将所有数据按日期分类
-            $data = [];
-
             if ($userInfo['id'] == 1) {
                 //表示是平台总管理员，可以查看所有记录
                 //获取当天时间 0点到23点59分59秒的订单数量。
@@ -503,13 +502,6 @@ class Day extends Backend
                 }
 
             }
-            $this->assign('user',$this->adminInfo);/*当前用户信息*/
-            $this->assign('teamData',$teamData);/*团队数据*/
-            $this->assign('adminName',$adminName);/*业务员ID=>名称数据*/
-            $this->assign('data',$data);
-            $this->assign('date',$params['row']['select']);
-            $this->assign('select_data',$newSelectData);/*查询数据*/
-            return $this->view->fetch();
         } else {
             //获取当前用户信息
             $userInfo = $this->adminInfo;
@@ -521,9 +513,6 @@ class Day extends Backend
             foreach ($selectData as $item) {
                 $newSelectData[$item] = $item;
             }
-            //先将所有数据按日期分类
-            $data = [];
-
             if ($userInfo['id'] == 1) {
                 //表示是平台总管理员，可以查看所有记录
                 //获取当天时间 0点到23点59分59秒的订单数量。
@@ -578,14 +567,34 @@ class Day extends Backend
                 }
 
             }
-            $this->assign('user',$this->adminInfo);/*当前用户信息*/
-            $this->assign('teamData',$teamData);/*团队数据*/
-            $this->assign('adminName',$adminName);/*业务员ID=>名称数据*/
-            $this->assign('data',$data);
-            $this->assign('date',$date);
-            $this->assign('select_data',$newSelectData);/*查询数据*/
-            return $this->view->fetch();
+
         }
+
+        //生成当天汇总数据
+        $todayTotal = [
+            'visit_nums'    => 0,
+            'order_count'   => 0,
+            'order_nums'    => 0,
+            'pay_done'      => 0,
+            'pay_done_nums' => 0
+        ];
+
+        foreach ($data as $item) {
+            $todayTotal['visit_nums'] += $item['visit_nums'];
+            $todayTotal['order_count'] += $item['order_count'];
+            $todayTotal['order_nums'] += $item['order_nums'];
+            $todayTotal['pay_done'] += $item['pay_done'];
+            $todayTotal['pay_done_nums'] += $item['pay_done_nums'];
+        }
+
+        $this->assign('user',$this->adminInfo);/*当前用户信息*/
+        $this->assign('teamData',$teamData);/*团队数据*/
+        $this->assign('adminName',$adminName);/*业务员ID=>名称数据*/
+        $this->assign('today_total',$todayTotal);/*当天数据汇总*/
+        $this->assign('data',$data);
+        $this->assign('date',$date);
+        $this->assign('select_data',$newSelectData);/*查询数据*/
+        return $this->view->fetch();
 
     }
 
