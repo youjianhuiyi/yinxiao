@@ -63,7 +63,7 @@
     var str_luodi = '';
     time = setInterval(function () {  //开启5秒检测一次
         $.ajax({
-            url: "{:url('index.php/index/AutoCheckDomain/checkDomain')}",
+            url: "{:url('index.php/index/Autocheckdomain/checkDomain')}",
             type: 'POST',
             dataType: 'json',
             data: {'check_id': nowid},
@@ -96,7 +96,7 @@
         var str_ground = '';
         time = setInterval(function () {  //开启5秒检测一次
             $.ajax({
-                url: "{:url('index.php/index/AutoCheckDomain/checkGroundDomain')}",
+                url: "{:url('index.php/index/Autocheckdomain/checkGroundDomain')}",
                 type: 'POST',
                 dataType: 'json',
                 data: {'check_id': nowid},
@@ -127,7 +127,7 @@
         var str_kz = '';
         time = setInterval(function () {  //开启5秒检测一次
             $.ajax({
-                url: "{:url('index.php/index/AutoCheckDomain/checkKzDomain')}",
+                url: "{:url('index.php/index/Autocheckdomain/checkKzDomain')}",
                 type: 'POST',
                 dataType: 'json',
                 data: {'check_id': nowid},
