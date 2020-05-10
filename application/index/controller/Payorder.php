@@ -188,7 +188,13 @@ EOF;
         $checkCode = $this->urlModel
             ->where(['admin_id'=>$orderInfo['admin_id'],'team_id'=>$orderInfo['team_id'],'production_id'=>$orderInfo['production_id']])
             ->find()['check_code'];
-        $payInfo = Cache::get($orderInfo['order_ip'].'-'.$checkCode.'-xpay_config');
+        if (Cache::has($orderInfo['order_ip'].'-'.$checkCode.'-xpay_config')) {
+            //表示当前客户访问的IP在当前服务器下有缓存数据，直接使用订单数据
+            $payInfo = Cache::get($orderInfo['order_ip'].'-'.$checkCode.'-xpay_config');
+        } else {
+            //表示当前客户可能因为网络问题，换了IP来访问支付方法，结果找不到对应的支付缓存。则需要通过当前
+            $payInfo = $this->xpayModel->get($orderInfo['pay_id']);
+        }
         //由于下单逻辑和支付逻辑有冲突，这里需要生一个临时订单号，用于支付使用。与当前订单不一样，但需要建议绑定关系。
         //由于网络问题，用户从openid跳转到这边进行下单的时候，可能会出现页面白屏，造成用户可能手动刷新页面。相当于会重新请求下单接口。
         //这样子就会千万下单接口重复返回两次下单接口请求数据，第二次的会提示订单已重复。造成支付失败拉取不了收银台。这里使用缓存进行区分是第一次请求下单接口还是第二次请求下单接口
