@@ -198,7 +198,7 @@
                             {/if}
                             <td>数据汇总</td>
                             <td>/</td>
-                            <td>{$today_total['visit_nums']}</td>
+                            <td>{:ceil($today_total['visit_nums']*0.8)}</td>
                             <td>{$today_total['order_count']}</td>
                             <td>{$today_total['order_nums']}</td>
                             <td>{$today_total['pay_done']}</td>
@@ -212,7 +212,7 @@
                             {/if}
                             <td>{:isset($adminName[$vo.pid]) ? $adminName[$vo.pid] : ''}</td>
                             <td>{$vo.nickname}</td>
-                            <td>{$vo.visit_nums}</td>
+                            <td>{:ceil($vo.visit_nums*0.8)}</td>
                             <td>{$vo.order_count}</td>
                             <td>{$vo.order_nums}</td>
                             <td>{$vo.pay_done}</td>

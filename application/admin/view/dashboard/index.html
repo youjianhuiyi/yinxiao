@@ -160,7 +160,7 @@
         <!-- small box -->
         <div class="small-box bg-aqua">
             <div class="inner">
-                <h3>{$yesterdayData['visit']}</h3>
+                <h3>{:ceil($yesterdayData['visit']*0.8)}</h3>
                 <p>昨天总访问量</p>
             </div>
             <div class="icon">
@@ -230,7 +230,7 @@
                 {if $yesterdayData['visit'] == 0}
                 <h3>0</h3>
                 {else}
-                <h3>{:round($yesterdayData['order_count']/$yesterdayData['visit'],2)*100}%</h3>
+                <h3>{:round($yesterdayData['order_count']/ceil($yesterdayData['visit']*0.8),2)*100}%</h3>
                 {/if}
                 <p>点击转换率</p>
             </div>
@@ -285,7 +285,7 @@
         <div class="sm-st clearfix">
             <span class="sm-st-icon st-red"><i class="fa fa-users"></i></span>
             <div class="sm-st-info">
-                <span>{$historyData['visit']}</span>
+                <span>{:ceil($historyData['visit']*0.8)}</span>
                 历史总访问量
             </div>
         </div>
@@ -335,7 +335,7 @@
                 {if $historyData['visit'] == 0}
                 <span>0</span>
                 {else}
-                <span>{:round($historyData['order_count']/$historyData['visit'],2)*100}%</span>
+                <span>{:round($historyData['order_count']/ceil($historyData['visit']*0.8),2)*100}%</span>
                 {/if}
                 历史总点击转换率
             </div>
