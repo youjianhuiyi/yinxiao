@@ -188,6 +188,8 @@
                             <th>订单商品量</th>
                             <th>支付订单量</th>
                             <th>支付商品量</th>
+                            <th>点击转化率</th>
+                            <th>支付成功率</th>
                             <th>历史数据</th>
                         </tr>
                         {if $user.pid == 0}
@@ -202,6 +204,16 @@
                             <td>{$today_total['order_nums']}</td>
                             <td>{$today_total['pay_done']}</td>
                             <td>{$today_total['pay_done_nums']}</td>
+                            {if $today_total['visit_nums'] == 0}
+                            <td>0</td>
+                            {else}
+                            <td>{:round($today_total['order_count']/$today_total['visit_nums'],2)*100}%</td>
+                            {/if}
+                            {if $today_total['order_count'] == 0}
+                            <td>0</td>
+                            {else}
+                            <td>{:round($today_total['pay_done']/$today_total['order_count'],2)*100}%</td>
+                            {/if}
                             <td>/</td>
                         </tr>
                         {/if}
@@ -217,6 +229,16 @@
                             <td>{$vo.order_nums}</td>
                             <td>{$vo.pay_done}</td>
                             <td>{$vo.pay_done_nums}</td>
+                            {if $vo['visit_nums'] == 0}
+                            <td>0</td>
+                            {else}
+                            <td>{:round($vo['order_count']/$vo['visit_nums'],2)*100}%</td>
+                            {/if}
+                            {if $vo['order_count'] == 0}
+                            <td>0</td>
+                            {else}
+                            <td>{:round($vo['pay_done']/$vo['order_count'],2)*100}%</td>
+                            {/if}
                             <td>
                                 <input type="button" class="btn btn-success" onclick="search(this);" value="历史数据查询" ids="{$vo.admin_id}">
                             </td>

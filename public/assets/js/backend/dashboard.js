@@ -26,7 +26,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form', 'template', 'echarts'
                         "backgroundStyle": {
                             "color": "rgba(220, 220, 220, 0.8)"
                         },
-                        "data":[data.pay_total,data.visit,data.order_count,data.order_nums,data.pay_done,data.pay_done_nums]
+                        "data":[data.pay_total,data.visit*0.9,data.order_count,data.order_nums,data.pay_done,data.pay_done_nums]
                     }
                 ]};
 
