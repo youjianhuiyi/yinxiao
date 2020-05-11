@@ -108,7 +108,6 @@ class Index extends Frontend
      */
     protected function isWx()
     {
-
         if (strpos($this->request->header('user-agent'), 'WindowsWechat') !== false) {
             return false;
         }elseif (strpos($this->request->header('user-agent'), 'MicroMessenger') !== false) {
@@ -223,6 +222,13 @@ class Index extends Frontend
         if (!$this->verifyCheckCode($params)) {
             //表示验证失败，链接被篡改
             die("请不要使用非法手段更改链接");
+        }
+
+        //判断访问链接是否属于正常状态
+        $where = ['admin_id'=>$params['aid'],'team_id'=>$params['tid'],'production_id'=>$params['gid'],'check_code'=>$params['check_code']];
+        $urlQrStatus = $this->urlModel->where($where)->find();
+        if ($urlQrStatus['is_forbidden'] == 1) {
+            die("<h1>活动已经结束</h1>");
         }
 
         $userInfo = $this->adminModel->get($params['aid']);

@@ -43,6 +43,7 @@ class Url extends Backend
         $this->groundModel = new GroundModel();
         $this->consumablesModel = new ConsumablesModel();
         $this->kzModel = new KzDomainModel();
+        $this->setProductionData();
 
     }
 
@@ -120,7 +121,7 @@ class Url extends Backend
     /**
      * 生成产品数据
      */
-    public function setProductionData()
+    protected function setProductionData()
     {
         $uid = $this->adminInfo['id'];
         //查找出当前团队所选择的产品模板数据
@@ -187,13 +188,13 @@ class Url extends Backend
                 Db::rollback();
                 $this->error($e->getMessage());
             }
-            if ($result !== false) {
-                $this->success();
-            } else {
-                $this->error(__('No rows were inserted'));
-            }
+//            if ($result !== false) {
+//                $this->success();
+//            } else {
+//                $this->error(__('No rows were inserted'));
+//            }
         }
-        $this->success('没有启用的文案可以生成链接！！');
+//        $this->success('没有启用的文案可以生成链接！！');
     }
 
     /**
@@ -314,6 +315,42 @@ class Url extends Backend
         $urlData['app-debug'] = false;
         $urlData['is_use'] = true;
         return $urlData;
+    }
+
+    /**
+     * 关闭二维码
+     * @param null $ids
+     * @return bool
+     */
+    public function forbidden($ids = null)
+    {
+        $data = [
+            'id'    => $ids,
+            'is_forbidden'  => 1
+        ];
+        $result = $this->model->isUpdate(true)->save($data);
+        if ($result) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 开启二维码
+     * @param null $ids
+     * @return bool
+     */
+    public function open($ids = null)
+    {
+        $data = [
+            'id'    => $ids,
+            'is_forbidden'  => 0
+        ];
+        $result = $this->model->isUpdate(true)->save($data);
+        if ($result) {
+            return true;
+        }
+        return false;
     }
 
     /**
