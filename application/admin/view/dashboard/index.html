@@ -1,8 +1,3 @@
-<style>
-    .tab-content > .chart {
-        padding: 10px;
-    }
-</style>
 <style type="text/css">
     .sm-st {
         background: #fff;
@@ -155,10 +150,126 @@
         padding: 30px 0;
     }
 </style>
+<div class="row" style="text-align: center">
+    <div style="border-bottom: 2px solid #000000;"></div>
+    <h3 style="margin-bottom: 17px;">《今天实时数据》</h3>
+</div>
+<!--今天的数据-->
 <div class="row">
     <div class="col-lg-3 col-xs-6">
         <!-- small box -->
-        <div class="small-box bg-aqua">
+        <div class="small-box bg-red">
+            <div class="inner">
+                <h3>{:ceil($yesterdayData['visit']*0.9)}</h3>
+                <p>今天总访问量</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-shopping-cart"></i>
+            </div>
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-red">
+            <div class="inner">
+                <h3>{$yesterdayData['order_count']}</h3>
+                <p>今天总订单量</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-area-chart"></i>
+            </div>
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-red">
+            <div class="inner">
+                <h3>{$yesterdayData['pay_done']}</h3>
+                <p>今天总支付量</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-users"></i>
+            </div>
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-red">
+            <div class="inner">
+                <h3>{$yesterdayData['pay_done_nums']}</h3>
+                <p>今天总商品成交量</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-user"></i>
+            </div>
+        </div>
+    </div>
+    <!-- ./col -->
+</div>
+<div class="row">
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-red">
+            <div class="inner">
+                <h3>￥{$yesterdayData['pay_total']}</h3>
+                <p>今天入账金额</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-cny"></i>
+            </div>
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-red">
+            <div class="inner">
+                {if $yesterdayData['visit'] == 0}
+                <h3>0</h3>
+                {else}
+                <h3>{:round($yesterdayData['order_count']/ceil($yesterdayData['visit']*0.9),2)*100}%</h3>
+                {/if}
+                <p>今天点击转换率</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-area-chart"></i>
+            </div>
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-red">
+            <div class="inner">
+                {if $yesterdayData['order_count'] == 0}
+                <h3>0</h3>
+                {else}
+                <h3>{:round($yesterdayData['pay_done']/$yesterdayData['order_count'],2)*100}%</h3>
+                {/if}
+                <p>今天入账转化率</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-users"></i>
+            </div>
+        </div>
+    </div>
+    <!-- ./col -->
+
+    <!-- ./col -->
+</div>
+
+<div class="row"   style="text-align: center">
+    <div style="border-bottom: 2px solid #000000;"></div>
+    <h3 style="margin-bottom: 17px;">《昨天数据》</h3>
+</div>
+<!--昨天的数据-->
+<div class="row">
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-green">
             <div class="inner">
                 <h3>{:ceil($yesterdayData['visit']*0.9)}</h3>
                 <p>昨天总访问量</p>
@@ -184,7 +295,7 @@
     <!-- ./col -->
     <div class="col-lg-3 col-xs-6">
         <!-- small box -->
-        <div class="small-box bg-yellow">
+        <div class="small-box bg-green">
             <div class="inner">
                 <h3>{$yesterdayData['pay_done']}</h3>
                 <p>昨天总支付量</p>
@@ -197,7 +308,7 @@
     <!-- ./col -->
     <div class="col-lg-3 col-xs-6">
         <!-- small box -->
-        <div class="small-box bg-red">
+        <div class="small-box bg-green">
             <div class="inner">
                 <h3>{$yesterdayData['pay_done_nums']}</h3>
                 <p>昨天总商品成交量</p>
@@ -212,7 +323,7 @@
 <div class="row">
     <div class="col-lg-3 col-xs-6">
         <!-- small box -->
-        <div class="small-box bg-aqua">
+        <div class="small-box bg-green">
             <div class="inner">
                 <h3>￥{$yesterdayData['pay_total']}</h3>
                 <p>昨天入账金额</p>
@@ -232,7 +343,7 @@
                 {else}
                 <h3>{:round($yesterdayData['order_count']/ceil($yesterdayData['visit']*0.9),2)*100}%</h3>
                 {/if}
-                <p>点击转换率</p>
+                <p>昨天点击转换率</p>
             </div>
             <div class="icon">
                 <i class="fa fa-area-chart"></i>
@@ -242,14 +353,14 @@
     <!-- ./col -->
     <div class="col-lg-3 col-xs-6">
         <!-- small box -->
-        <div class="small-box bg-yellow">
+        <div class="small-box bg-green">
             <div class="inner">
                 {if $yesterdayData['order_count'] == 0}
                 <h3>0</h3>
                 {else}
                 <h3>{:round($yesterdayData['pay_done']/$yesterdayData['order_count'],2)*100}%</h3>
                 {/if}
-                <p>入账转化率</p>
+                <p>昨天入账转化率</p>
             </div>
             <div class="icon">
                 <i class="fa fa-users"></i>
@@ -261,97 +372,111 @@
     <!-- ./col -->
 </div>
 
-<div id="myTabContent" class="tab-content">
-    <div class="tab-pane fade active in" id="one">
-        <div class="row">
-            <div class="col-lg-12 col-xs-12">
-                <!-- small box -->
-                <div class="inner">
-                    <p><h1  class="text-center">今天实时数据</h1></p>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-12">
-                <div id="echart" class="btn-refresh" style="height:400px;width:100%;"></div>
-            </div>
-        </div>
-    </div>
+<div class="row"  style="text-align: center">
+    <div style="border-bottom: 2px solid #000000;"></div>
+    <h3 style="margin-bottom: 17px">《历史数据》</h3>
 </div>
-
-
+<!--历史的数据-->
 <div class="row">
-    <div class="col-sm-3 col-xs-6">
-        <div class="sm-st clearfix">
-            <span class="sm-st-icon st-red"><i class="fa fa-users"></i></span>
-            <div class="sm-st-info">
-                <span>{:ceil($historyData['visit']*0.9)}</span>
-                历史总访问量
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-yellow">
+            <div class="inner">
+                <h3>{:ceil($historyData['visit']*0.9)}</h3>
+                <p>历史总访问量</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-shopping-cart"></i>
             </div>
         </div>
     </div>
-    <div class="col-sm-3 col-xs-6">
-        <div class="sm-st clearfix">
-            <span class="sm-st-icon st-violet"><i class="fa fa-book"></i></span>
-            <div class="sm-st-info">
-                <span>{$historyData['order_count']}</span>
-                历史总订单量
+    <!-- ./col -->
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-yellow">
+            <div class="inner">
+                <h3>{$historyData['order_count']}</h3>
+                <p>历史总订单量</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-area-chart"></i>
             </div>
         </div>
     </div>
-    <div class="col-sm-3 col-xs-6">
-        <div class="sm-st clearfix">
-            <span class="sm-st-icon st-blue"><i class="fa fa-shopping-bag"></i></span>
-            <div class="sm-st-info">
-                <span>{$historyData['pay_done']}</span>
-                历史总成交订单量
+    <!-- ./col -->
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-yellow">
+            <div class="inner">
+                <h3>{$historyData['pay_done']}</h3>
+                <p>历史总支付量</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-users"></i>
             </div>
         </div>
     </div>
-    <div class="col-sm-3 col-xs-6">
-        <div class="sm-st clearfix">
-            <span class="sm-st-icon st-green"><i class="fa fa-cny"></i></span>
-            <div class="sm-st-info">
-                <span>{$historyData['pay_done_nums']}</span>
-                历史总成交商品量
+    <!-- ./col -->
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-yellow">
+            <div class="inner">
+                <h3>{$historyData['pay_done_nums']}</h3>
+                <p>历史总商品成交量</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-user"></i>
             </div>
         </div>
     </div>
+    <!-- ./col -->
 </div>
 <div class="row">
-    <div class="col-sm-3 col-xs-6">
-        <div class="sm-st clearfix">
-            <span class="sm-st-icon st-red"><i class="fa fa-cny"></i></span>
-            <div class="sm-st-info">
-                <span>￥{$historyData['pay_total']}</span>
-                历史总入账
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-yellow">
+            <div class="inner">
+                <h3>￥{$historyData['pay_total']}</h3>
+                <p>历史入账金额</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-cny"></i>
             </div>
         </div>
     </div>
-    <div class="col-sm-3 col-xs-6">
-        <div class="sm-st clearfix">
-            <span class="sm-st-icon st-violet"><i class="fa fa-book"></i></span>
-            <div class="sm-st-info">
+    <!-- ./col -->
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-yellow">
+            <div class="inner">
                 {if $historyData['visit'] == 0}
-                <span>0</span>
+                <h3>0</h3>
                 {else}
-                <span>{:round($historyData['order_count']/ceil($historyData['visit']*0.9),2)*100}%</span>
+                <h3>{:round($historyData['order_count']/ceil($historyData['visit']*0.9),2)*100}%</h3>
                 {/if}
-                历史总点击转换率
+                <p>历史总点击转换率</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-users"></i>
             </div>
         </div>
     </div>
-    <div class="col-sm-3 col-xs-6">
-        <div class="sm-st clearfix">
-            <span class="sm-st-icon st-blue"><i class="fa fa-shopping-bag"></i></span>
-            <div class="sm-st-info">
+    <!-- ./col -->
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-yellow">
+            <div class="inner">
                 {if $historyData['order_count'] == 0}
-                <span>0</span>
+                <h3>0</h3>
                 {else}
-                <span>{:round($historyData['pay_done']/$historyData['order_count'],2)*100}%</span>
+                <h3>{:round($historyData['pay_done']/$historyData['order_count'],2)*100}%</h3>
                 {/if}
-                历史总入账转化率
+                <p>历史总入账转化率</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-area-chart"></i>
             </div>
         </div>
     </div>
+
 </div>
