@@ -43,7 +43,7 @@ class Url extends Backend
         $this->groundModel = new GroundModel();
         $this->consumablesModel = new ConsumablesModel();
         $this->kzModel = new KzDomainModel();
-        $this->setProductionData();
+//        $this->setProductionData();
 
     }
 
@@ -173,7 +173,7 @@ class Url extends Backend
         //不能删除现有数据，因为里面有访问数据以及成单数据
         //TODO::这里没做限制，如果用户不断点击，会重复写入数据库,可以选择真实删除，目前使用的是软删除
         if ($params) {
-            $result = false;
+//            $result = false;
             Db::startTrans();
             try {
                 $result = $this->model->allowField(true)->saveAll($params);
@@ -340,7 +340,7 @@ class Url extends Backend
      * @param null $ids
      * @return bool
      */
-    public function open($ids = null)
+    public function openUrl($ids = null)
     {
         $data = [
             'id'    => $ids,

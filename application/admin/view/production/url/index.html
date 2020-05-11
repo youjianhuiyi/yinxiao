@@ -23,7 +23,7 @@
                             {if $vo.is_forbidden == 0}
                             <button class="btn btn-xl btn-danger" onclick='forbidden("{$vo['id']}")'>禁止访问</button>
                             {else}
-                            <button class="btn btn-xl btn-info" onclick='open("{$vo['id']}")'>开启访问</button>
+                            <button class="btn btn-xl btn-info" onclick='openUrl("{$vo['id']}")'>开启访问</button>
                             {/if}
                         </div>
                     </div>
@@ -34,6 +34,25 @@
         </div>
     </div>
 </div>
+<script type="text/javascript">
+    function openUrl(id){
+        $.ajax({
+            type : "POST",
+            url : "{:url('production/url/openUrl')}",
+            data : {'ids':id},
+            dataType : "json",
+            success : function(result) {
+                if (result) {
+                    window.location.reload();
+                }else{
+                    alert('入口域名用完了');
+                }
+            },error:function(){
+                alert('您的网络不稳定，请关闭页面后重试！');
+            }
+        });
+    }
+</script>
 <script type="text/javascript">
     function regetqr(id){
         $.ajax({
@@ -57,24 +76,6 @@
         $.ajax({
             type : "POST",
             url : "{:url('production/url/forbidden')}",
-            data : {'ids':id},
-            dataType : "json",
-            success : function(result) {
-                if (result) {
-                    window.location.reload();
-                }else{
-                    alert('入口域名用完了');
-                }
-            },error:function(){
-                alert('您的网络不稳定，请关闭页面后重试！');
-            }
-        });
-    }
-
-    function open(id){
-        $.ajax({
-            type : "POST",
-            url : "{:url('production/url/open')}",
             data : {'ids':id},
             dataType : "json",
             success : function(result) {
