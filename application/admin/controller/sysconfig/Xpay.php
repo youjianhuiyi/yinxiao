@@ -10,6 +10,7 @@ use think\exception\PDOException;
 use think\exception\ValidateException;
 use app\admin\model\team\Team as TeamModel;
 use app\admin\model\order\Order as OrderModel;
+use app\admin\model\order\OrderTest as OrderTestModel;
 use app\admin\model\sysconfig\Xpay as XpayModel;
 use app\admin\model\Admin as AdminModel;
 use app\admin\model\sysconfig\Payset as PaySetModel;
@@ -36,6 +37,7 @@ class Xpay extends Backend
     protected $payRecordMode = null;
     protected $paysetModel = null;
     protected $urlModel = null;
+    protected $orderTestModel = null;
 
     public function _initialize()
     {
@@ -44,6 +46,7 @@ class Xpay extends Backend
         $this->teamModel = new TeamModel();
         $this->adminModel = new AdminModel();
         $this->orderModel = new OrderModel();
+        $this->orderTestModel = new OrderTestModel();
         $this->payRecordMode = new PayRecordModel();
         $this->paysetModel = new PaySetModel();
         $this->urlModel = new UrlModel();
@@ -352,7 +355,7 @@ class Xpay extends Backend
             'order_ip'  => $this->request->ip(),
         ];
 
-        $this->orderModel->isUpdate(false)->save($data);
+        $this->orderTestModel->isUpdate(false)->save($data);
 
         //开始进行支付操作。先判断是否已经下过订单
         if (!Cache::has('x-'.$params['sn'])) {
@@ -369,7 +372,7 @@ class Xpay extends Backend
                     'order_info' => 'test',/*商品描述*/
                     'total_amount' => 1,/*总金额，以分为单位，不允许包含任何字、符号*/
                     'mch_create_ip' => $this->request->ip(),/*订单生成的机器 IP*/
-                    'notify_url' => 'http://back.dehub.com.cn/index.php/index/notify/xpayNotify',
+                    'notify_url' => 'http://back.dehub.com.cn/index.php/index/notify/xpayTestNotify',
                     'sub_appid' => 'wx092575bf6bc1636d',/*wx092575bf6bc1636d*/
                     'sub_openid' => $params['openid'],
                 ],

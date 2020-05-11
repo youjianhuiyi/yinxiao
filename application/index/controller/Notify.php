@@ -3,6 +3,7 @@ namespace app\index\controller;
 
 use app\admin\model\data\Analysis as AnalysisModel;
 use app\admin\model\order\Order as OrderModel;
+use app\admin\model\order\OrderTest as OrderTestModel;
 use app\common\controller\Frontend;
 use think\Cache;
 use think\Db;
@@ -18,6 +19,7 @@ use app\admin\model\production\Url as UrlModel;
 class Notify extends Frontend
 {
     protected $orderModel = null;
+    protected $orderTestModel = null;
     protected $urlModel = null;
     protected $analysisModel = null;
 
@@ -25,6 +27,7 @@ class Notify extends Frontend
     {
         parent::_initialize();
         $this->orderModel = new OrderModel();
+        $this->orderTestModel = new OrderTestModel();
         $this->urlModel = new UrlModel();
         $this->analysisModel = new AnalysisModel();
     }
@@ -225,6 +228,64 @@ class Notify extends Frontend
         }
 
     }
+
+    /**
+     * 享钱支付测试商户回调，
+     * @comment 由于业务原因。暂时没有接通付款通道到回调环节
+     */
+    public function xpayTestNotify()
+    {
+        $returnData = urldecode(file_get_contents('php://input'));
+        $data = $this->do403Params($returnData);
+        //通过回调的信息反查订单相关信息
+        //通过临时订单查找真实订单号，
+        $orderInfo = $this->orderTestModel->where('sn',$data['orderNo'])->find();
+        $this->orderTestModel->where('sn',$data['orderNo'])->update(['notify_data'=>$returnData]);
+        //根据订单数据提取支付信息
+        $checkCode = $this->urlModel->where(['admin_id'=>$orderInfo['admin_id'],'team_id'=>$orderInfo['team_id'],'production_id'=>$orderInfo['production_id']])->find()['check_code'];
+        $payInfo = Cache::get($orderInfo['order_ip'].'-'.$checkCode.'-xpay_config');
+        // 先回调验签
+        $newSign = $this->XpaySignParams($data,$payInfo['mch_key']);
+
+        if ($data['sign'] === $newSign) {
+            //表示验签成功
+            $saveData  = [
+                'id'             => $orderInfo['id'],
+                'transaction_id' => $data['trade_no'],/*微信支付订单号*/
+                'pay_type'       => 1,/*支付类型，0=微信，1=享钱*/
+                'pay_status'     => 1,/*支付状态，已经完成支付*/
+                'pay_id'         => $payInfo['id'],/*使用的支付id，支付链接在产生支付的时候进行写入*/
+                'xdd_trade_no'   => $data['xdd_trade_no'],/*使用的支付id，支付链接在产生支付的时候进行写入*/
+            ];
+            //更新数据
+            Db::startTrans();
+            try {
+                $this->orderModel->isUpdate(true)->save($saveData);
+                Db::commit();
+            } catch (ValidateException $e) {
+                Db::rollback();
+                $this->error($e->getMessage());
+            } catch (PDOException $e) {
+                Db::rollback();
+                $this->error($e->getMessage());
+            } catch (\Exception $e) {
+                Db::rollback();
+                $this->error($e->getMessage());
+            }
+
+            //返回成功
+            $str = 'SUCCESS';
+            echo $str;
+            return ;
+        } else {
+            //返回失败
+            $str = 'FAIL';
+            echo $str;
+            return ;
+        }
+
+    }
+
 
     /**
      * 享钱支付手动补单
