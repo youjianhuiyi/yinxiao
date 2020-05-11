@@ -7,10 +7,7 @@ use traits\model\SoftDelete;
 
 class Select extends Model
 {
-
     use SoftDelete;
-
-    
 
     // 表名
     protected $name = 'production_select';
@@ -25,8 +22,20 @@ class Select extends Model
 
     // 追加属性
     protected $append = [
-
+        'url'
     ];
+
+    public function getUrl()
+    {
+        return Production::column('modulefile','id');
+    }
+
+    public function getUrlAttr($value, $data)
+    {
+        $value = $value ? $value : (isset($data['production_id']) ? $data['production_id'] : '');
+        $list = $this->getUrl();
+        return isset($list[$value]) ? $list[$value] : '';
+    }
     
 
     
