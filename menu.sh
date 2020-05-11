@@ -18,6 +18,7 @@ php think menu -c production/select
 php think menu -c production/url
 php think menu -c order/order
 php think menu -c order/ordertest
+php think menu -c order/export
 php think menu -c express/express
 php think menu -c express/sms
 php think menu -c sysconfig/pay
