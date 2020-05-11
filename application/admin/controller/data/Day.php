@@ -113,6 +113,7 @@ class Day extends Backend
         }
         return $tmp;
     }
+
     /**
      * @return array
      */
@@ -253,31 +254,68 @@ class Day extends Backend
         $userInfo = $this->adminInfo;
         $teamData = $this->teamModel->column('name','id');
         $adminName = $this->adminModel->column('nickname','id');
+        $row = [];
+        //构建下拉列表的日期数据
         $selectData = array_unique(collection($this->dataSummaryModel->field('date')->order('date','desc')->column('date'))->toArray());
         $newSelectData = [];
         foreach ($selectData as $item) {
             $newSelectData[$item] = $item;
         }
+        //构建组长列表数据。
+        if ($this->adminInfo['id'] == 1) {
+            $zzData = $this->adminModel->where(['level' => 1])->column('nickname','id');
+        } else {
+            $zzData = $this->adminModel->where(['team_id'=>$this->adminInfo['team_id'],'level' => 1])->column('nickname','id');
+        }
+        //构建员工数据
+        if ($this->adminInfo['id'] == 1) {
+            $ygData = $this->adminModel->column('nickname','id');
+        } else {
+            $ygData = $this->adminModel->where(['team_id'=>$this->adminInfo['team_id']])->column('nickname','id');
+        }
+        $zzData[0] = '请选择';
+        $ygData[0] = '请选择';
 
         if ($this->request->isPost()) {
             $params = $this->request->param();
             //获取当前用户信息
             $date = $params['row']['select'];
+            $zz = $params['row']['zz'];
+            $yg = $params['row']['yg'];
+            $zzIds = $this->getLowerUser($zz);
             //将05-05字符串转换为当前的时间戳
             $dateTime = $this->strToTimestamp('2020-'.$date);
-            if ($userInfo['id'] == 1) {
-                $data = $this->doSummary($dateTime,0);
-            } elseif ($userInfo['pid'] == 0 && $userInfo['id'] != 1) {
-                //老板查看团队所有人员的数据
-                $data = $this->doSummary($dateTime,1,$this->adminInfo['team_id']);
-            } elseif ($userInfo['pid'] != 0 && $userInfo['level'] != 2) {
-                //组长查看自己及以下员工的数据
-                $userIds = $this->getUserLower();
-                $data = $this->doSummary($dateTime,2,$userIds);
+            $row['select'] = $date;
+            if ($zz == 0 && $yg == 0) {
+                //表示当前只针对日期进行查询
+                if ($userInfo['id'] == 1) {
+                    $data = $this->doSummary($dateTime,0);
+                } elseif ($userInfo['pid'] == 0 && $userInfo['id'] != 1) {
+                    //老板查看团队所有人员的数据
+                    $data = $this->doSummary($dateTime,1,$this->adminInfo['team_id']);
+                } elseif ($userInfo['pid'] != 0 && $userInfo['level'] != 2) {
+                    //组长查看自己及以下员工的数据
+                    $userIds = $this->getUserLower();
+                    $data = $this->doSummary($dateTime,2,0,$userIds);
+                } else {
+                    //业务员只能查看自己的订单数据
+                    $data = $this->doSummary($dateTime,3,0,[],$this->adminInfo['id']);
+                }
+            } elseif ($zz != 0 && $yg == 0) {
+                //表示当前查询条件为日期和组
+                $data = $this->doSummary($dateTime,2,0,$zzIds);
+            } elseif ($zz == 0 && $yg != 0) {
+                //表示只查询某个业务员的报表
+                $data = $this->doSummary($dateTime,3,0,[],$yg);
             } else {
-                //业务员只能查看自己的订单数据
-                $data = $this->doSummary($dateTime,3,$this->adminInfo['id']);
+                //表示即查某个业务员又查对应组的报表
+                $data1 = $this->doSummary($dateTime,3,0,[],$yg);
+                $data2 = $this->doSummary($dateTime,2,0,$zzIds);
+                $data[0] = array_merge($data1[0],$data2[0]);
+                $data[1] = array_merge($data1[1],$data2[1]);
             }
+            $row['zz'] = $zz;
+            $row['yg'] = $yg;
             $orderData=$data[0];
             $newVisitSummary = $data[1];
         } else {
@@ -307,13 +345,14 @@ class Day extends Backend
             $newOrderData[$value['admin_id']][] = $value;
         }
 
-        $adminIds = array_keys($newOrderData);
-        //根据用户ID进行判断。
-        foreach ($userIds as $userId) {
-            if (!in_array($userId,$adminIds)) {
-                $newOrderData[$userId] = '';
-            }
-        }
+//        //判断是否有查询条件
+//        $adminIds = array_keys($newOrderData);
+//        //根据用户ID进行判断。
+//        foreach ($userIds as $userId) {
+//            if (!in_array($userId,$adminIds)) {
+//                $newOrderData[$userId] = '';
+//            }
+//        }
         $newResOrderData = [];
 
         foreach ($newOrderData as $key => $item) {
@@ -373,6 +412,9 @@ class Day extends Backend
         $this->assign('data',$newResOrderData);
         $this->assign('date',$date);
         $this->assign('select_data',$newSelectData);/*查询数据*/
+        $this->assign('zz_data',$zzData);/*组长数据*/
+        $this->assign('yg_data',$ygData);/*员工数据*/
+        $this->assign('row',$row);
         return $this->view->fetch();
     }
 
@@ -688,7 +730,7 @@ class Day extends Backend
     }
 
     /**
-     * 获取用户关系。往
+     * 获取用户关系
      * @return array
      * @internal
      */
@@ -722,6 +764,40 @@ class Day extends Backend
         }
         //把自己添加进去
         array_push($adminData, $this->adminInfo['id']);
+        return $adminData;
+    }
+
+
+    /**
+     * 获取用户关系。往
+     * @param $id
+     * @return array
+     * @internal
+     */
+    public function getLowerUser($id)
+    {
+        if ($this->adminInfo['id'] == 1) {
+            $data = $this->adminModel->field(['id', 'pid', 'nickname'])->order('id desc')->select();
+            $data = collection($data)->toArray();
+        } elseif ($this->adminInfo['pid'] == 0) {
+            $data = $this->adminModel->field(['id', 'pid', 'nickname'])->where('team_id', $this->adminInfo['team_id'])->order('id desc')->select();
+            $data = collection($data)->toArray();
+        } elseif ($this->adminInfo['pid'] != 0 && $this->adminInfo['level'] != 2) {
+            $data = $this->adminModel->field(['id', 'pid', 'nickname'])->where('team_id', $this->adminInfo['team_id'])->order('id desc')->select();
+            $data = collection($data)->toArray();
+        } else {
+            $data = $this->adminModel->field(['id', 'pid', 'nickname'])->find($this->adminInfo['id']);
+        }
+
+        $tree = Tree::instance();
+        $tree->init($data, 'pid');
+        $teamList = $tree->getTreeList($tree->getTreeArray($id), 'nickname');
+        $adminData = [];
+        foreach ($teamList as $k => $v) {
+            $adminData[] = $v['id'];
+        }
+        //把自己添加进去
+        array_push($adminData, (int)$id);
         return $adminData;
     }
 

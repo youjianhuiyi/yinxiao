@@ -149,6 +149,9 @@
     .item {
         padding: 30px 0;
     }
+    .table > tbody > tr > td {
+        vertical-align:middle;
+    }
 </style>
 <div class="panel panel-default panel-intro">
     <div class="panel-body">
@@ -159,22 +162,37 @@
                         " style="margin-top:15px;">
                     <table class="table text-center">
 
-                        <tr>
-                            <form action="" method="post">
-                                <th colspan="2" class="text-center">请选择日期</th>
-                                <th colspan="4" class="text-center">
-                                    {:Form::select('row[select]', $select_data, 0, ['data-rule'=>'required'])}
+                        <form action="" method="post">
+                            <tr>
+                                <th colspan="4" style="vertical-align:middle">请选择日期</th>
+                                <th colspan="6" style="vertical-align:middle">
+                                    {:Form::select('row[select]', $select_data, isset($row.select) ? $row.select : 0, ['data-rule'=>'required'])}
                                 </th>
-                                <th colspan="2" class="text-center">
-                                   <button>查询</button>
+                            </tr>
+                            <tr>
+                                <th colspan="4" style="vertical-align:middle">组长</th>
+                                <th colspan="6" style="vertical-align:middle">
+                                    {:Form::select('row[zz]', $zz_data, isset($row.zz) ? $row.zz : 0, ['data-rule'=>'required'])}
                                 </th>
-                            </form>
-                        </tr>
+                            </tr>
+                            <tr>
+                                <th colspan="4" style="vertical-align:middle">业务员</th>
+                                <th colspan="6" style="vertical-align:middle">
+                                    {:Form::select('row[yg]', $yg_data, isset($row.yg) ? $row.yg : 0, ['data-rule'=>'required'])}
+                                </th>
+                            </tr>
+                            <tr>
+                                <th colspan="10">
+                                    <button class="btn btn-sm btn-success">查询</button>
+                                    <button type="reset" class="btn btn-sm btn-info">重置</button>
+                                </th>
+                            </tr>
+                        </form>
                         <tr>
                             {if $user.id == 1}
-                            <th colspan="8" class="text-center"><h4>{$date}:数据报表</h4></th>
+                            <th colspan="10"><h4>{$date}:数据报表</h4></th>
                             {else}
-                            <th colspan="7" class="text-center"><h4>{$date}:数据报表</h4></th>
+                            <th colspan="10"><h4>{$date}:数据报表</h4></th>
                             {/if}
                         </tr>
                         {if $user.pid == 0}
