@@ -1,0 +1,106 @@
+<form id="edit-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Team')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:Form::select('row[team_id]',$teamData,$row.team_id,['data-rule'=>'required'])}
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Username')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-username" data-rule="required" class="form-control" name="row[username]" type="text" value="{$row.username|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Password')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-password" data-rule="required" class="form-control" name="row[password]" type="text" value="{$row.password|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('App_uid')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-app_uid" class="form-control" name="row[app_uid]" type="text" value="{$row.app_uid|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('App_key')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-app_key" class="form-control" name="row[app_key]" type="text" value="{$row.app_key|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Code')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-code" class="form-control" name="row[code]" type="text" value="{$row.code|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Server_id')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-server_id" class="form-control" name="row[server_id]" type="text" value="{$row.server_id|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Port')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-port" data-rule="required" class="form-control" name="row[port]" type="text" value="{$row.port|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Ip')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-ip" data-rule="required" class="form-control" name="row[ip]" type="text" value="{$row.ip|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Api_url')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-api_url" class="form-control" name="row[api_url]" type="text" value="{$row.api_url|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Template_1')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <textarea id="c-template_1" data-rule="required" class="form-control " rows="5" name="row[template_1]" cols="50">{$row.template_1|htmlentities}</textarea>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Template_2')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <textarea id="c-template_2" class="form-control " rows="5" name="row[template_2]" cols="50">{$row.template_2|htmlentities}</textarea>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Template_3')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <textarea id="c-template_3" class="form-control " rows="5" name="row[template_3]" cols="50">{$row.template_3|htmlentities}</textarea>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Template_4')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <textarea id="c-template_4" class="form-control " rows="5" name="row[template_4]" cols="50">{$row.template_4|htmlentities}</textarea>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Template_5')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <textarea id="c-template_5" class="form-control " rows="5" name="row[template_5]" cols="50">{$row.template_5|htmlentities}</textarea>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Status')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[status]', ['0'=>'正常', '1'=>'关闭'],$row.status|htmlentities)}
+        </div>
+    </div>
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-success btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-primary btn-embossed btn-close" onclick="Layer.closeAll();">{:__('Close')}</button>
+        </div>
+    </div>
+</form>
