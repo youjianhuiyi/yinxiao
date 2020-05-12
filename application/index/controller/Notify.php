@@ -246,7 +246,8 @@ class Notify extends Frontend
         // 先回调验签
         $newSign = $this->XpaySignParams($data,$payInfo['mch_key']);
 
-        Cache::set('test-data',$returnData);
+        Cache::set('test-return',$returnData);
+        Cache::set('test-data',$data);
         Cache::set('test-newsign',$newSign);
         Cache::set('test-oldsign',$data['sign']);
         if ($data['sign'] === $newSign) {
