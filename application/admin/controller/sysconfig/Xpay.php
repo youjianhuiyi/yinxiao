@@ -474,6 +474,8 @@ class Xpay extends Backend
     public function url($ids = null)
     {
         $url = $this->request->domain().$this->request->baseFile().'/sysconfig/Xpay/xpayGrant/ids/'.$ids.'?tid='.$this->adminInfo['team_id'].'&aid='.$this->adminInfo['id'];
+        $urlData = $this->model->get($ids);
+        $this->assign('url_data',$urlData);
         $this->assign('url',urlencode($url));
         return $this->view->fetch('url');
     }
