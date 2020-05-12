@@ -5,7 +5,7 @@ namespace app\admin\model\order;
 use think\Model;
 use traits\model\SoftDelete;
 
-class Ordertest extends Model
+class OrderTest extends Model
 {
 
     use SoftDelete;
