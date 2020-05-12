@@ -263,7 +263,7 @@ class Notify extends Frontend
             //更新数据
             Db::startTrans();
             try {
-                $this->orderModel->isUpdate(true)->save($saveData);
+                $this->orderTestModel->isUpdate(true)->save($saveData);
                 Db::commit();
             } catch (ValidateException $e) {
                 Db::rollback();
