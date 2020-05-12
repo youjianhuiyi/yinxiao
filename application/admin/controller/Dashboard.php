@@ -568,7 +568,7 @@ class Dashboard extends Backend
         $newYesData = $this->doDataGroupByTime($yesOrderData,$yesVisitData);
         $newHisData = $this->doDataGroupByTime($historyOrderData,$historyVisitData);
         //渲染当前实时变量
-        $this->assignconfig('data',$newData);
+        $this->assign('data',$newData);
         //渲染模板变量
         $this->assign('yesterdayData',$newYesData);
         $this->assign('historyData',$newHisData);
@@ -660,7 +660,7 @@ class Dashboard extends Backend
         //将入账金额写入历史变量
         $newHisData['pay_total'] = $hisPayTotal;
         //渲染当前实时变量
-        $this->assignconfig('data',$data);
+        $this->assign('data',$data);
         //渲染模板变量
         $this->assign('yesterdayData',$newYesData);
         $this->assign('historyData',$newHisData);

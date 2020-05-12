@@ -14,6 +14,7 @@ php think menu -c auth/rule
 #php think menu -c user/rule
 php think menu -c team/team
 php think menu -c production/production
+php think menu -c production/review
 php think menu -c production/select
 php think menu -c production/url
 php think menu -c order/order

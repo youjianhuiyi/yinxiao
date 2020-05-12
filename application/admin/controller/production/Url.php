@@ -24,6 +24,7 @@ use app\admin\model\sysconfig\Kzdomain as KzDomainModel;
 class Url extends Backend
 {
 
+    protected $noNeedRight = ['openUrl','forbidden'];
     /**
      * Url模型对象
      */
