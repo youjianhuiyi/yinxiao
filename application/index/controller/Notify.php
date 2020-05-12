@@ -242,8 +242,7 @@ class Notify extends Frontend
         $orderInfo = $this->orderTestModel->where('sn',$data['orderNo'])->find();
         $this->orderTestModel->where('sn',$data['orderNo'])->update(['notify_data'=>$returnData]);
         //根据订单数据提取支付信息
-        $checkCode = $this->urlModel->where(['admin_id'=>$orderInfo['admin_id'],'team_id'=>$orderInfo['team_id'],'production_id'=>$orderInfo['production_id']])->find()['check_code'];
-        $payInfo = Cache::get($orderInfo['order_ip'].'-'.$checkCode.'-xpay_config');
+        $payInfo = $this->xpayModel->get($orderInfo['pay_id']);
         // 先回调验签
         $newSign = $this->XpaySignParams($data,$payInfo['mch_key']);
 
