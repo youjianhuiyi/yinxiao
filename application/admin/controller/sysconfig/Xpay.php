@@ -337,7 +337,6 @@ class Xpay extends Backend
         //构建订单数据
         $data = [
             'admin_id'  => $params['aid'],
-            'admin_name'=> $this->adminModel->get($params['aid'])->nickname,
             'pid'       => $this->adminModel->get($params['aid'])->pid,
             'num'       => 1,
             'name'      => $goodsName,
