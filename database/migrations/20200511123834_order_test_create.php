@@ -38,7 +38,7 @@ class OrderTestCreate extends Migrator
             ->addColumn('production_id','integer',['limit'=>10,'signed'=>false,'null'=>false,'default'=>0,'comment'=>'商品ID'])
             ->addColumn('production_name','string',['limit'=>50,'null'=>false,'default'=>'','comment'=>'商品名称'])
             ->addColumn('date','string',['limit'=>10,'null'=>false,'default'=>'','comment'=>'日期'])
-            ->addColumn('name','string',['limit'=>20,'null'=>false,'default'=>'','comment'=>'收货人'])
+            ->addColumn('name','string',['limit'=>50,'null'=>false,'default'=>'','comment'=>'收货人'])
             ->addColumn('phone','string',['limit'=>20,'null'=>false,'default'=>'','comment'=>'手机号'])
             ->addColumn('price','decimal',['precision'=>10,'scale'=>2,'signed'=>false,'null'=>false,'default'=>0.00,'comment'=>'商品价格'])
             ->addColumn('num','integer',['limit'=>10,'signed'=>false,'null'=>false,'default'=>0,'comment'=>'订单商品数量'])
