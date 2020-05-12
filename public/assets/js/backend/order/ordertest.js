@@ -33,14 +33,14 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {field: 'transaction_id', title: __('Transaction_id'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
                         {field: 'team_id', title: __('Team_id'),operate:false,visible:false},
                         {field: 'team_name_text', title: __('Team_name'),operate:false,visible:false},
-                        {field: 'name', title: __('Name'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
-                        {field: 'phone', title: __('Phone'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
+                        {field: 'name', title: __('Name'),operate:false},
+                        {field: 'phone', title: __('Phone'),operate:false,visible: false},
                         {field: 'production_id', title: __('Production_id'),operate:false,visible:false},
-                        {field: 'production_name', title: __('Production_name'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
-                        {field: 'address', title: __('Address'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符',visible:false},
-                        {field: 'goods_info', title: __('Goods_info'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符',visible:false},
-                        {field: 'price', title: __('Price'),operate: 'LIKE %...%',placeholder: '模糊搜索，*表示任意字符'},
-                        {field: 'num', title: __('Num')},
+                        {field: 'production_name', title: __('Production_name'),operate:false},
+                        {field: 'address', title: __('Address'),operate: false,visible:false},
+                        {field: 'goods_info', title: __('Goods_info'),operate: false,visible:false},
+                        {field: 'price', title: __('Price'),operate: false},
+                        {field: 'num', title: __('Num'),operate: false},
                         {field: 'pay_id', title: __('pay_id'),operate:false,visible:false},
                         {field: 'order_ip', title: '下单IP',operate:false,visible:false},
                         {field: 'xdd_trade_no', title: '享钱单号',operate:false,visible:false},
@@ -53,7 +53,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                                 if (value ===0){return '未付款';}
                                 if (value ===1){return '已付款';}
                             }},
-                        {field: 'order_status', title: __('Order_status'),searchList: {
+                        {field: 'order_status', title: __('Order_status'),operate:false,searchList: {
                                 "0":"正在出库中",
                                 "1":"已发货",
                                 "2":"补货",
@@ -67,23 +67,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                                 if (value ===4){return '退货退款';}
                             }},
                         {field: 'createtime', title: __('Createtime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
-                        {field: 'updatetime', title: __('Updatetime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime,visible:false},
-                        {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate, formatter: Table.api.formatter.operate,
-                            buttons:[
-                                {
-                                    name: 'detail',
-                                    text: '订单详情',
-                                    title: '订单详情',
-                                    classname: 'btn btn-xs btn-primary btn-dialog',
-                                    icon: 'fa fa-list',
-                                    url: 'order/order/detail',
-                                    callback: function (data) {
-                                        Layer.alert("接收到回传数据：", {title: "回传数据"});
-                                    }
-                                }
-                            ]
-
-                        }
+                        {field: 'updatetime', title: __('Updatetime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime,visible:false}
                     ]
                 ]
             });

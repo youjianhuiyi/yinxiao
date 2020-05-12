@@ -409,7 +409,7 @@ class Index extends Frontend
         Cache::set('403-paypool',$payPool,120);
         //根据查询出来的数据，生成支付通道。获取指定的支付域名。
         $payInfo = $this->getPayChannel($payPool,$params['code']);
-        Cache::set('403-payinfo',$payInfo);
+        Cache::set('403-payinfo',$payInfo,600);
         if (false === $payInfo) {
             //表示没有支付
             die("支付通道无效，请联系老板！！！");
@@ -425,7 +425,7 @@ class Index extends Frontend
                 if (count($consumables) >= 1) {
                     $luckDomain = array_pop($consumables);
                     $this->consumablesModel->where('domain_url',$luckDomain)->update(['is_inuse'=>1]);
-                    Cache::set('luck_domain',$luckDomain,0);
+                    Cache::set('luck_domain',$luckDomain,1800);
                     //TODO::更改域名为正在使用状态
                 } else {
                     //表示没有炮灰域名了
