@@ -49,7 +49,7 @@ class OrderTestCreate extends Migrator
             ->addColumn('pay_id','integer',['limit'=>10,'signed'=>false,'null'=>false,'default'=>0,'comment'=>'支付通道ID'])
             ->addColumn('openid','string',['limit'=>120,'null'=>false,'default'=>'','comment'=>'openid'])
             ->addColumn('order_ip','string',['limit'=>128,'null'=>false,'default'=>'','comment'=>'下单IP'])
-            ->addColumn('notify_data','text',['null'=>false,'default'=>'','comment'=>'支付回调信息'])
+            ->addColumn('notify_data','text',['null'=>false,'comment'=>'支付回调信息'])
             ->addColumn('transaction_id','string',['limit'=>255,'null'=>false,'default'=>'','comment'=>'支付平台订单号'])
             ->addColumn('xdd_trade_no','string',['limit'=>255,'null'=>false,'default'=>'','comment'=>'享钱订单'])
             ->addColumn('pay_status','integer',['limit'=>MysqlAdapter::INT_TINY,'signed'=>false,'null'=>false,'default'=>0,'comment'=>'支付状态'])
