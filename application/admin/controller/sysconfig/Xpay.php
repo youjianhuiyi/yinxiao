@@ -324,7 +324,6 @@ class Xpay extends Backend
      */
     public function testPay()
     {
-
         $params = $this->request->param();
         $payInfo = $this->model->get($params['pay_id']);
         //缓存支付数据用于回调时使用
@@ -342,7 +341,7 @@ class Xpay extends Backend
             'name'      => $goodsName,
             'phone'     => '18888888888',
             'address'   => '测试地址',
-            'team_id'   => $teamData['id'],
+            'team_id'   => isset($teamData['id']) ? $teamData['id'] : 0,
             'production_id'     => 4,
             'production_name'   => '测试商品',
             'goods_info'=> '款式=xxx;性别=xxx;属性=xxx',
