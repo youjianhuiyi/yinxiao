@@ -343,7 +343,6 @@ class Xpay extends Backend
             'phone'     => '18888888888',
             'address'   => '测试地址',
             'team_id'   => $teamData['id'],
-            'team_name' => '测试订单数据',
             'production_id'     => 4,
             'production_name'   => '测试商品',
             'goods_info'=> '款式=xxx;性别=xxx;属性=xxx',
