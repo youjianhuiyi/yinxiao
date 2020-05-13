@@ -20,7 +20,7 @@ class Sms extends Backend
      */
     protected $model = null;
     protected $smsConfigModel = null;
-    protected $smsconfig = [];
+    protected $smsconfig = null;
     protected $sendSMSUrl = 'http://139.186.39.24:8081/user/send';
     protected $getSMSReport = 'http://139.186.39.24:8081/getReport';
     protected $getSMSGetReply = 'http://139.186.39.24:8081/getReply';
@@ -44,6 +44,7 @@ class Sms extends Backend
         $this->model = new \app\admin\model\express\Sms;
         $this->smsConfigModel = new SmsConfigModel();
         $this->smsconfig = $this->smsConfigModel->where('team_id',$this->adminInfo['team_id'])->find();
+        Cache::set('smsconfig',$this->smsconfig,300);
 
         $timeStamp = date('YmdHis',time());
 //        $str = $this->apiUid.'-'.$timeStamp.'-'."balance".'-'.$this->apiKey;
@@ -52,6 +53,7 @@ class Sms extends Backend
         $data ='account='.$this->smsconfig['username'].'&password='.$this->smsconfig['password'].'&sign='.$sign.'&timeStamp='.$timeStamp;
         //发送请求
         $result = $this->curlPostForm($data,$this->getSMSGetBalance);
+        Cache::set('sms-res',$result,300);
         $data = json_decode($result,true);
         $smsData = $this->model->order('createtime','desc')->limit(50)->select();
         $this->assign('data',$data);
