@@ -1,8 +1,8 @@
 #!/bin/bash
-host="oss-cn-hangzhou.aliyuncs.com"
-bucket="order-backup"
-Id="LTAI4G8Z9Ng91NPnu4sNMnmw"
-Key="zGXnq5sJIoBUary7oHDYq7y2wkuQV1"
+host=""
+bucket=""
+Id=""
+Key=""
 # 参数1，PUT：上传，GET：下载
 method="PUT"
 # 参数2，上传时为本地源文件路径，下载时为oss源文件路径
