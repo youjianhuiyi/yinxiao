@@ -273,7 +273,7 @@ class Day extends Backend
         }
         $zzData[0] = '请选择';
         $ygData[0] = '请选择';
-
+        $newArr = [];
         if ($this->request->isPost()) {
             $params = $this->request->param();
             //获取当前用户信息
@@ -284,12 +284,11 @@ class Day extends Backend
             //将05-05字符串转换为当前的时间戳
             $dateTime = $this->strToTimestamp('2020-'.$date);
             $row['select'] = $date;
-            $newArr = [];
             if ($zz == 0 && $yg == 0) {
                 //表示当前只针对日期进行查询
                 if ($userInfo['id'] == 1) {
                     $data = $this->doSummary($dateTime,0);
-                    $newArr = $data;
+                    $newArr[] = $data;
                 } elseif ($userInfo['pid'] == 0 && $userInfo['id'] != 1) {
                     //老板查看团队所有人员的数据
                     $data = $this->doSummary($dateTime,1,$this->adminInfo['team_id']);
@@ -384,7 +383,7 @@ class Day extends Backend
                 $data = $this->doSummary($dateTime,3,0,[],$userInfo['id']);
                 foreach ($data as $datum) {
                     if ($userInfo['id'] == $datum['admin_id']) {
-                        $newArr = $datum;
+                        $newArr[] = $datum;
                     }
                 }
             }

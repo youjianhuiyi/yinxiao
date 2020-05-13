@@ -5,6 +5,7 @@ namespace app\admin\controller\express;
 use app\admin\library\Auth;
 use app\admin\model\order\Order as OrderModel;
 use app\admin\model\express\Sms as SmsModel;
+use app\admin\model\sysconfig\Smsconfig as SmsConfigModel;
 use app\common\controller\Backend;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Reader\Csv;
@@ -30,6 +31,7 @@ class Express extends Backend
     protected $model = null;
     protected $smsModel = null;
     protected $orderModel = null;
+    protected $smsConfigModel = null;
 
     public function _initialize()
     {
@@ -37,6 +39,7 @@ class Express extends Backend
         $this->model = new \app\admin\model\express\Express;
         $this->smsModel = new SmsModel();
         $this->orderModel = new OrderModel();
+        $this->smsConfigModel = new SmsConfigModel();
     }
 
     /**
@@ -390,7 +393,7 @@ class Express extends Backend
      */
     public function sendSMS()
     {
-        $smsData = config('site.sms_api_0');
+        $smsData = $this->smsConfigModel->where('team_id',$this->adminInfo['team_id'])->find();
         //查找当前导入的数据里面有没有发送短信成功
         $expressData = collection($this->model->where('is_send',0)->select())->toArray();
         //进行发送短信
@@ -398,12 +401,19 @@ class Express extends Backend
         foreach ($expressData as $value) {
             $orderInfo = $this->orderModel->get($value['order_id']);
             //拼接短信内容模板
-            $content = '【花花运动旗舰店】尊敬的客户'.$orderInfo['name'].'，您购买的商品已发货，快递单号：'.$value['express_no'].',快递公司：'.$value['express_com'];
+            $content = '';
+            $template = explode('${code}',$smsData['template_2']);
+            if (count($template) == 4) {
+                //表示有3个参数需要填写
+                $content = $template[0].$orderInfo['name'].$value['express_no'].$orderInfo['express_no'].$template[2].$value['express_com'];
+            } elseif (count($template == 3)) {
+                //表示有2个参数需要填写
+                $content = $template[0].$orderInfo['express_no'].$template[2].$value['express_com'];
+            }
             // 构建发送短信内容
             $data ='account='.$smsData['account'].'&password='.$smsData['password'].'&mobiles='.$value['phone'].'&content='.urlencode($content);
             //发送请求
             $result = $this->curlPostForm($data,$smsData['send_url']);
-//            $result = '{"data":{"count":1,"infoArray":[{"smsId":705064331251728384,"mobile":"13517683440","count":1,"status":"SUCCESS"}]},"resCode":"0000","resMsg":"成功"}';
             Cache::set('send-sms',$result,300);
             $res = json_decode($result,true);
             if ($res['resCode'] == '0000') {

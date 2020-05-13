@@ -1,6 +1,7 @@
 <?php
 namespace app\index\controller;
 
+use app\admin\model\sysconfig\Smsconfig as SmsConfigModel;
 use app\common\controller\Frontend;
 use think\Cache;
 use think\Env;
@@ -20,6 +21,7 @@ class PayOrder extends Frontend
     protected $orderModel = null;
     protected $xpayModel = null;
     protected $urlModel = null;
+    protected $smsConfigModel = null;
 
     public function _initialize()
     {
@@ -27,6 +29,7 @@ class PayOrder extends Frontend
         $this->orderModel = new OrderModel();
         $this->xpayModel = new XpayModel();
         $this->urlModel = new UrlModel();
+        $this->smsConfigModel = new SmsConfigModel();
     }
 
     /**

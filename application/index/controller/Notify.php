@@ -180,7 +180,6 @@ class Notify extends Frontend
                     $this->doPaySummary($payInfo['id'],1,['type'=>'money','nums'=>$orderInfo['price']]);
                     $this->doPaySummary($payInfo['id'],1,['type'=>'pay_nums','nums'=>1]);
                     //发送短信提醒
-                    $orderInfo['content'] = '【花花运动旗舰店】亲！您订购的运动跑鞋已下单成功，明天统一发货，3-7天到货，请保持手机畅通，售后电话0771-5600499';
                     $this->sendSMS($orderInfo);
                     //因为回调最长时间一天
                     Cache::set('xpay-notify-'.$checkCode.'-'.$orderInfo['sn'],'ok',86400*2);

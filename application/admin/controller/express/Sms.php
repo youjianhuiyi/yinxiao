@@ -2,9 +2,9 @@
 
 namespace app\admin\controller\express;
 
-use app\admin\controller\general\Config;
 use app\common\controller\Backend;
 use think\Cache;
+use app\admin\model\sysconfig\Smsconfig as SmsConfigModel;
 
 /**
  * 短信发送管理
@@ -19,6 +19,8 @@ class Sms extends Backend
      * @var \app\admin\model\express\Sms
      */
     protected $model = null;
+    protected $smsConfigModel = null;
+    protected $smsconfig = [];
     protected $sendSMSUrl = 'http://139.186.39.24:8081/user/send';
     protected $getSMSReport = 'http://139.186.39.24:8081/getReport';
     protected $getSMSGetReply = 'http://139.186.39.24:8081/getReply';
@@ -40,11 +42,14 @@ class Sms extends Backend
     {
         parent::_initialize();
         $this->model = new \app\admin\model\express\Sms;
+        $this->smsConfigModel = new SmsConfigModel();
+        $this->smsconfig = $this->smsConfigModel->where('team_id',$this->adminInfo['team_id'])->find();
 
         $timeStamp = date('YmdHis',time());
-        $str = $this->apiUid.'-'.$timeStamp.'-'."balance".'-'.$this->apiKey;
+//        $str = $this->apiUid.'-'.$timeStamp.'-'."balance".'-'.$this->apiKey;
+        $str = $this->smsconfig['app_uid'].'-'.$timeStamp.'-'."balance".'-'.$this->smsconfig['app_key'];
         $sign = strtoupper(md5($str));
-        $data ='account='.$this->account.'&password='.$this->password.'&sign='.$sign.'&timeStamp='.$timeStamp;
+        $data ='account='.$this->smsconfig['username'].'&password='.$this->smsconfig['password'].'&sign='.$sign.'&timeStamp='.$timeStamp;
         //发送请求
         $result = $this->curlPostForm($data,$this->getSMSGetBalance);
         $data = json_decode($result,true);
@@ -61,12 +66,17 @@ class Sms extends Backend
      */
     public function sendSMS($params)
     {
-        $data ='account='.$this->account.'&password='.$this->password.'&mobiles='.$params['phone'].'&content='.urlencode($params['content']);
+//        $data ='account='.$this->account.'&password='.$this->password.'&mobiles='.$params['phone'].'&content='.urlencode($params['content']);
+        $template = $this->smsconfig['teamplate_2'];
+        //短信模板替换。
+        $arr = explode('${code}',$template);
+
+        $data ='account='.$this->smsconfig['username'].'&password='.$this->smsconfig['password'].'&mobiles='.$params['phone'].'&content='.urlencode($template);
         //发送请求
         $result = $this->curlPostForm($data,$this->sendSMSUrl);
         Cache::set('send-sms',$result,300);
         $data = json_decode($result,true);
-        if ($data['resCode'] == '000') {
+        if ($data['resCode'] == '0000') {
             //表示发送成功
             $newData = [
                 'order_id'  => $params['id'],
