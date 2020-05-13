@@ -541,7 +541,7 @@ class Dashboard extends Backend
             if ($this->adminInfo['pid'] == 0) {
                 //获取当天的日期
                 $dateTime = $this->getBeginEndTime();
-                $where = ['team_id',$this->adminInfo['team_id']];
+                $where = ['team_id'=>$this->adminInfo['team_id']];
                 //获取当天所有用户的报表
                 $visitData = collection($this->visitModel->field($visitField)->whereTime('createtime','between',[$dateTime[0],$dateTime[1]])->where($where)->select())->toArray();
                 //先将所有数据按日期分类
@@ -568,7 +568,7 @@ class Dashboard extends Backend
             } else {
                 //获取当天的日期
                 $dateTime = $this->getBeginEndTime();
-                $where = ['admin_id',$this->adminInfo['id']];
+                $where = ['admin_id'=>$this->adminInfo['id']];
                 //获取当天所有用户的报表
                 $visitData = collection($this->visitModel->field($visitField)->whereTime('createtime','between',[$dateTime[0],$dateTime[1]])->where($where)->select())->toArray();
                 //先将所有数据按日期分类
