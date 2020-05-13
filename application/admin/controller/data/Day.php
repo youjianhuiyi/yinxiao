@@ -51,6 +51,18 @@ class Day extends Backend
     }
 
     /**
+     * 获取7天前的时间戳
+     * @return float[]|int[]
+     */
+    protected function getSevenTime()
+    {
+        $ytime = strtotime(date("Y-m-d", strtotime("-7 day")));//昨天开始时间戳
+        $zerotime = $ytime + 24 * 60 * 60;//昨天23点59分59秒+1秒
+        $totime = $zerotime + 24 * 60 * 60-1;//今天结束时间戳 23点59分59秒。
+        return [$zerotime, $totime];
+    }
+
+    /**
      * 通过字符串获取时间戳
      * @param $date
      * @return float[]|int[]
@@ -102,7 +114,6 @@ class Day extends Backend
             'pay_done_nums' => 0,
             'pay_total'     => 0.00
         ];
-//        dump($data);die;
         if ($data) {
             foreach ($data as $value) {
                 $tmp['order_count']         += 1;
@@ -179,7 +190,6 @@ class Day extends Backend
         foreach ($orderData as $orderDatum) {
             $newOrderData[$orderDatum['admin_id']][] = $orderDatum;
         }
-//        dump($newOrderData);die;
         $orderDataKeys = array_keys($newOrderData);
 
         foreach ($platUserIds as $platUserId) {
@@ -203,6 +213,7 @@ class Day extends Backend
             } else {
                 //表示对应用户没有订单数据
                 $countData = [
+                    'visit_nums'    => 0,
                     'order_count'   => 0,
                     'order_nums'    => 0,
                     'pay_done'      => 0,
@@ -212,9 +223,9 @@ class Day extends Backend
             }
 
             $pid = $this->adminModel->get($key)['pid'];
-            $teamId =  $this->adminModel->get($key)['team_id'];
+            $tid =  $this->adminModel->get($key)['team_id'];
             $newResOrderData[]  = [
-                'team_id'       => $teamId,
+                'team_id'       => $tid,
                 'pid'           => $pid,
                 'pid_name'      => $this->adminModel->get($pid)['nickname'],
                 'admin_id'      => $key,
@@ -273,32 +284,71 @@ class Day extends Backend
             //将05-05字符串转换为当前的时间戳
             $dateTime = $this->strToTimestamp('2020-'.$date);
             $row['select'] = $date;
+            $newArr = [];
             if ($zz == 0 && $yg == 0) {
                 //表示当前只针对日期进行查询
                 if ($userInfo['id'] == 1) {
                     $data = $this->doSummary($dateTime,0);
+                    $newArr = $data;
                 } elseif ($userInfo['pid'] == 0 && $userInfo['id'] != 1) {
                     //老板查看团队所有人员的数据
                     $data = $this->doSummary($dateTime,1,$this->adminInfo['team_id']);
+                    //老板查看团队所有人员的数据
+                    foreach ($data as $datum) {
+                        if ($datum['team_id'] == $userInfo['team_id']) {
+                            $newArr[] = $datum;
+                        }
+                    }
                 } elseif ($userInfo['pid'] != 0 && $userInfo['level'] != 2) {
                     //组长查看自己及以下员工的数据
-                    $userIds = $this->getUserLower();
-                    $data = $this->doSummary($dateTime,2,0,$userIds);
+                    $lowerUserIds = $this->getLowerUser($userInfo['id']);
+                    $data = $this->doSummary($dateTime,2,0,$lowerUserIds);
+                    foreach ($data as $datum) {
+                        if (in_array($datum['admin_id'],$lowerUserIds)) {
+                            $newArr[] = $datum;
+                        }
+                    }
                 } else {
                     //业务员只能查看自己的订单数据
                     $data = $this->doSummary($dateTime,3,0,[],$this->adminInfo['id']);
+                    foreach ($data as $datum) {
+                        if ($userInfo['id'] == $datum['admin_id']) {
+                            $newArr[] = $datum;
+                        }
+                    }
                 }
             } elseif ($zz != 0 && $yg == 0) {
                 //表示当前查询条件为日期和组
                 $data = $this->doSummary($dateTime,2,0,$zzIds);
+                foreach ($data as $datum) {
+                    if (in_array($datum['admin_id'],$zzIds)) {
+                        $newArr[] = $datum;
+                    }
+                }
             } elseif ($zz == 0 && $yg != 0) {
                 //表示只查询某个业务员的报表
                 $data = $this->doSummary($dateTime,3,0,[],$yg);
+                foreach ($data as $item) {
+                    if (isset($item['admin_id']) && $item['admin_id'] == $yg) {
+                        $newArr[] = $item;
+                    }
+                }
             } else {
                 //表示即查某个业务员又查对应组的报表
-                $data2 = $this->doSummary($dateTime,2,0,$zzIds);
-                $data1 = $this->doSummary($dateTime,3,0,[],$yg);
-                $data = array_merge($data1,$data2);
+                $data1 = $this->doSummary($dateTime,2,0,$zzIds);
+                $data2 = $this->doSummary($dateTime,3,0,[],$yg);
+                foreach ($data2 as $item) {
+                    if (isset($item['admin_id']) && $item['admin_id'] == $yg) {
+                        $data2 = $item;
+                    }
+                }
+                //业务员只能查看自己的订单数据
+                foreach ($data1 as $datum) {
+                    if (in_array($datum['admin_id'],$zzIds)) {
+                        $newArr[] = $datum;
+                    }
+                }
+                array_push($newArr,$data2);
             }
             //构建回显数据
             $row['zz'] = $zz;
@@ -310,43 +360,32 @@ class Day extends Backend
             if ($userInfo['id'] == 1) {
                 //表示是平台总管理员，可以查看所有记录
                 $data = $this->doSummary($dateTime,0);
+                $newArr = $data;
             } elseif ($userInfo['pid'] == 0 && $userInfo['id'] != 1) {
                 //老板查看团队所有人员的数据
                 $data = $this->doSummary($dateTime,1,$userInfo['team_id']);
+                //老板查看团队所有人员的数据
+                foreach ($data as $datum) {
+                    if ($datum['team_id'] == $userInfo['team_id']) {
+                        $newArr[] = $datum;
+                    }
+                }
             } elseif ($userInfo['pid'] != 0 && $userInfo['level'] != 2) {
                 //组长查看自己及以下员工的数据
-                $userIds = $this->getLowerUser($userInfo['id']);
-                $data = $this->doSummary($dateTime,2,0,$userIds);
+                $lowerUserIds = $this->getLowerUser($userInfo['id']);
+                $data = $this->doSummary($dateTime,2,0,$lowerUserIds);
+                foreach ($data as $datum) {
+                    if (in_array($datum['admin_id'],$lowerUserIds)) {
+                        $newArr[] = $datum;
+                    }
+                }
             } else {
                 //业务员只能查看自己的订单数据
                 $data = $this->doSummary($dateTime,3,0,[],$userInfo['id']);
-            }
-        }
-
-        //筛选订单数据，补全订单没数据，但有访问数据的业务员
-        $newArr = [];
-        if ($userInfo['id'] == 1) {
-            $newArr = $data;
-        }elseif ($userInfo['pid'] == 0 && $userInfo['id'] != 1) {
-            //老板查看团队所有人员的数据
-            foreach ($data as $datum) {
-                if ($datum['team_id'] == $userInfo['team_id']) {
-                    $newArr[] = $datum;
-                }
-            }
-        } elseif ($userInfo['pid'] != 0 && $userInfo['level'] != 2) {
-            //组长查看自己及以下员工的数据
-            $lowerUserIds = $this->getLowerUser($userInfo['id']);
-            foreach ($data as $datum) {
-                if (in_array($datum['admin_id'],$lowerUserIds)) {
-                    $newArr[] = $datum;
-                }
-            }
-        } elseif ($userInfo['level'] == 2) {
-            //业务员只能查看自己的订单数据
-            foreach ($data as $datum) {
-                if ($userInfo['id'] == $datum['admin_id']) {
-                    $newArr = $datum;
+                foreach ($data as $datum) {
+                    if ($userInfo['id'] == $datum['admin_id']) {
+                        $newArr = $datum;
+                    }
                 }
             }
         }
@@ -564,15 +603,17 @@ class Day extends Backend
         $userInfo = $this->adminModel->get($params['ids']);
         $teamData = $this->teamModel->column('name','id');
         $adminName = $this->adminModel->column('nickname','id');
+        //只查询当前时间前7天的所有数据
+        $sevenTime = $this->getSevenTime();
         //查询数据
-        $selectData = array_unique(collection($this->dataSummaryModel->field('date')->order('date','desc')->column('date'))->toArray());
+        $selectData = array_unique(collection($this->dataSummaryModel->field('date')->order('date','desc')->where('createtime','>=',$sevenTime[0])->column('date'))->toArray());
         $newSelectData = [];
         foreach ($selectData as $item) {
             $newSelectData[$item] = $this->strToTimestamp('2020-'.$item);
         }
         if (!Cache::has('history-data-for-team-'.$params['ids'])) {
-            $orderData = collection($this->orderModel->where('admin_id',$params['ids'])->select())->toArray();
-            $visitData = collection($this->visitModel->where('admin_id',$params['ids'])->select())->toArray();
+            $orderData = collection($this->orderModel->where('admin_id',$params['ids'])->where('createtime','>=',$sevenTime[0])->select())->toArray();
+            $visitData = collection($this->visitModel->where('admin_id',$params['ids'])->where('createtime','>=',$sevenTime[0])->select())->toArray();
             //获取订单每日的查询时间戳
             $newData = [];
             foreach ($newSelectData as $key => $value) {
