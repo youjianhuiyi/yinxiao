@@ -87,10 +87,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                                         title: '订单详情',
                                         classname: 'btn btn-xs btn-primary btn-dialog',
                                         icon: 'fa fa-list',
-                                        url: 'order/order/detail',
-                                        callback: function (data) {
-                                            Layer.alert("接收到回传数据：", {title: "回传数据"});
-                                        }
+                                        url: 'order/order/detail'
                                     }
                                 ]
 

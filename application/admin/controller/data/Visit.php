@@ -22,7 +22,20 @@ class Visit extends Backend
     {
         parent::_initialize();
         $this->model = new \app\admin\model\data\Visit;
-
     }
 
+    /**
+     * 查看详情
+     * @param null $ids
+     * @return string
+     * @throws \think\Exception
+     */
+    public function detail($ids=null)
+    {
+        $row = $this->model->get(['id' => $ids]);
+        if (!$row)
+            $this->error(__('No Results were found'));
+        $this->view->assign("row", $row->toArray());
+        return $this->view->fetch();
+    }
 }
