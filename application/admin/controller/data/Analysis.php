@@ -25,5 +25,20 @@ class Analysis extends Backend
 
     }
 
+    /**
+     * 添加
+     */
+    public function add()
+    {
+        die('不能手动进行添加');
+    }
 
+    /**
+     * 编辑
+     * @param null $ids
+     */
+    public function edit($ids = null)
+    {
+        die('不能手动进行编辑');
+    }
 }
