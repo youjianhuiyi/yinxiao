@@ -278,8 +278,8 @@ class Day extends Backend
             $params = $this->request->param();
             //获取当前用户信息
             $date = $params['row']['select'];
-            $zz = $params['row']['zz'];
-            $yg = $params['row']['yg'];
+            $zz = isset($params['row']['zz']) ? $params['row']['zz'] : 0;
+            $yg = isset($params['row']['yg']) ? $params['row']['yg'] : 0;
             $zzIds = $this->getLowerUser($zz);
             //将05-05字符串转换为当前的时间戳
             $dateTime = $this->strToTimestamp('2020-'.$date);
