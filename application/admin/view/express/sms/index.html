@@ -40,7 +40,7 @@
             <div class="account-stat">
                 <div class="account-stat-btn">
                     <div>扣费方式<span>预充值</span></div>
-                    <div>剩余短信数<span>{$data['balance']}</span></div>
+                    <div>剩余短信数<span>{:isset($data['balance']) ? $data['balance'] : 0}</span></div>
                 </div>
             </div>
         </div>
