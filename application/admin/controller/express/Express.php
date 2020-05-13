@@ -405,10 +405,10 @@ class Express extends Backend
             $template = explode('${code}',$smsData['template_2']);
             if (count($template) == 4) {
                 //表示有3个参数需要填写
-                $content = $template[0].$orderInfo['name'].$value['express_no'].$orderInfo['express_no'].$template[2].$value['express_com'];
-            } elseif (count($template == 3)) {
+                $content = $template[0].$orderInfo['name'].$template[1].$value['express_no'].$template[2].$value['express_com'];
+            } elseif (count($template)== 3) {
                 //表示有2个参数需要填写
-                $content = $template[0].$orderInfo['express_no'].$template[2].$value['express_com'];
+                $content = $template[0].$template[1].$orderInfo['express_no'].$template[2].$value['express_com'];
             }
             // 构建发送短信内容
             $data ='account='.$smsData['account'].'&password='.$smsData['password'].'&mobiles='.$value['phone'].'&content='.urlencode($content);
