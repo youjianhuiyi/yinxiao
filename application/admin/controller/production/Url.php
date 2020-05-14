@@ -53,6 +53,7 @@ class Url extends Backend
      */
     public function index()
     {
+        $this->setProductionData();
         //设置过滤方法
         $this->request->filter(['strip_tags']);
         //如果发送的来源是Selectpage，则转发到Selectpage
@@ -174,7 +175,6 @@ class Url extends Backend
         //不能删除现有数据，因为里面有访问数据以及成单数据
         //TODO::这里没做限制，如果用户不断点击，会重复写入数据库,可以选择真实删除，目前使用的是软删除
         if ($params) {
-//            $result = false;
             Db::startTrans();
             try {
                 $result = $this->model->allowField(true)->saveAll($params);
@@ -189,13 +189,8 @@ class Url extends Backend
                 Db::rollback();
                 $this->error($e->getMessage());
             }
-//            if ($result !== false) {
-//                $this->success();
-//            } else {
-//                $this->error(__('No rows were inserted'));
-//            }
         }
-//        $this->success('没有启用的文案可以生成链接！！');
+        return json_encode(['code'=>1]);
     }
 
     /**
