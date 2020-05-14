@@ -158,59 +158,86 @@
         <div id="myTabContent" class="tab-content">
             <div class="tab-pane fade active in" id="one">
 
-                <div class="row  table-responsive col-lg-8 col-md-8 col-xs-8 col-sm-8 table-bordered text-center col-lg-offset-2 col-md-offset-2 col-xs-offset-2 col-sm-offset-2
+                <div class="row  table-responsive col-lg-8 col-md-8 col-xs-12 col-sm-12 table-bordered text-center col-lg-offset-2 col-md-offset-2
                         " style="margin-top:15px;">
                     <table class="table table-striped table-bordered table-hover table-nowrap">
 
                         <form action="" method="post">
-                            <tr>
-                                <th colspan="4" style="vertical-align:middle">请选择日期</th>
-                                <th colspan="6" style="vertical-align:middle">
-                                    {:Form::select('row[select]', $select_data, isset($row.select) ? $row.select : 0, ['data-rule'=>'required'])}
-                                </th>
-                            </tr>
-                            {if $user.pid == 0 || $user.id == 1}
-                            <tr>
-                                <th colspan="4" style="vertical-align:middle">组长</th>
-                                <th colspan="6" style="vertical-align:middle">
-                                    {:Form::select('row[zz]', $zz_data, isset($row.zz) ? $row.zz : 0, ['data-rule'=>'required'])}
-                                </th>
-                            </tr>
-                            <tr>
-                                <th colspan="4" style="vertical-align:middle">业务员</th>
-                                <th colspan="6" style="vertical-align:middle">
-                                    {:Form::select('row[yg]', $yg_data, isset($row.yg) ? $row.yg : 0, ['data-rule'=>'required'])}
-                                </th>
-                            </tr>
+                            {if $user.id == 1}
+                                <tr>
+                                    <th colspan="5" style="vertical-align:middle" class="text-right">请选择日期:</th>
+                                    <th colspan="6" style="vertical-align:middle">
+                                        {:Form::select('row[select]', $select_data, isset($row.select) ? $row.select : 0, ['data-rule'=>'required'])}
+                                    </th>
+                                </tr>
+                                <tr class="text-right">
+                                    <th colspan="5" style="vertical-align:middle" class="text-right">组长:</th>
+                                    <th colspan="6" style="vertical-align:middle">
+                                        {:Form::select('row[zz]', $zz_data, isset($row.zz) ? $row.zz : 0, ['data-rule'=>'required'])}
+                                    </th>
+                                </tr>
+                                <tr class="text-right">
+                                    <th colspan="5" style="vertical-align:middle" class="text-right">业务员:</th>
+                                    <th colspan="6" style="vertical-align:middle">
+                                        {:Form::select('row[yg]', $yg_data, isset($row.yg) ? $row.yg : 0, ['data-rule'=>'required'])}
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th colspan="11" class="text-center">
+                                        <button class="btn btn-sm btn-success">查询</button>
+                                        <button type="reset" class="btn btn-sm btn-info">重置</button>
+                                    </th>
+                                </tr>
+                            {else}
+                                <tr>
+                                    <th colspan="4" style="vertical-align:middle" class="text-right">请选择日期:</th>
+                                    <th colspan="6" style="vertical-align:middle">
+                                        {:Form::select('row[select]', $select_data, isset($row.select) ? $row.select : 0, ['data-rule'=>'required'])}
+                                    </th>
+                                </tr>
+                                {if $user.pid == 0}
+                                <tr>
+                                    <th colspan="4" style="vertical-align:middle" class="text-right">组长:</th>
+                                    <th colspan="6" style="vertical-align:middle">
+                                        {:Form::select('row[zz]', $zz_data, isset($row.zz) ? $row.zz : 0, ['data-rule'=>'required'])}
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th colspan="4" style="vertical-align:middle" class="text-right">业务员:</th>
+                                    <th colspan="6" style="vertical-align:middle">
+                                        {:Form::select('row[yg]', $yg_data, isset($row.yg) ? $row.yg : 0, ['data-rule'=>'required'])}
+                                    </th>
+                                </tr>
+                                {/if}
+                                <tr>
+                                    <th colspan="10" class="text-center">
+                                        <button class="btn btn-sm btn-success">查询</button>
+                                        <button type="reset" class="btn btn-sm btn-info">重置</button>
+                                    </th>
+                                </tr>
                             {/if}
-                            <tr>
-                                <th colspan="10">
-                                    <button class="btn btn-sm btn-success">查询</button>
-                                    <button type="reset" class="btn btn-sm btn-info">重置</button>
-                                </th>
-                            </tr>
                         </form>
                         <tr>
                             {if $user.id == 1}
-                            <th colspan="10"><h4>{$date}:数据报表</h4></th>
+                            <th colspan="11" class="text-center bg-aqua"><h4>{:date('Y年m月d日',strtotime('2020-'.$date))}:数据报表</h4></th>
                             {else}
-                            <th colspan="10"><h4>{$date}:数据报表</h4></th>
+                            <th colspan="10" class="text-center bg-aqua"><h4>{:date('Y年m月d日',strtotime('2020-'.$date))}:数据报表</h4></th>
                             {/if}
                         </tr>
                         <tr>
                             {if $user.id == 1}
-                            <th>团队名称</th>
+                            <th class="text-center">团队名称</th>
                             {/if}
-                            <th>组长</th>
-                            <th>业务员</th>
-                            <th>访问量</th>
-                            <th>订单量</th>
-                            <th>订单商品量</th>
-                            <th>支付订单量</th>
-                            <th>支付商品量</th>
-                            <th>点击转化率</th>
-                            <th>支付成功率</th>
-                            <th>历史数据</th>
+                            <th class="text-center">组长</th>
+                            <th class="text-center">业务员</th>
+                            <th class="text-center">访问量</th>
+                            <th class="text-center">订单量</th>
+                            <th class="text-center">订单商品量</th>
+                            <th class="text-center">支付订单量</th>
+                            <th class="text-center">支付商品量</th>
+                            <th class="text-center">点击转化率</th>
+                            <th class="text-center">支付成功率</th>
+                            <th class="text-center">历史数据</th>
                         </tr>
                         <tr class="bg-green">
                             {if $user.id == 1}

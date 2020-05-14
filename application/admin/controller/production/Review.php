@@ -3,9 +3,6 @@
 namespace app\admin\controller\production;
 
 use app\common\controller\Backend;
-use think\Db;
-use think\exception\PDOException;
-use think\exception\ValidateException;
 
 /**
  * 文案预览
@@ -51,5 +48,4 @@ class Review extends Backend
         $this->assign('list',$list);
         return $this->view->fetch();
     }
-
 }

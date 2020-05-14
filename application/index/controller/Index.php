@@ -2,6 +2,7 @@
 
 namespace app\index\controller;
 
+use app\admin\model\production\Production as ProductionModel;
 use app\common\controller\Frontend;
 use think\Cache;
 use app\admin\model\production\Production_select as SelectModel;
@@ -27,6 +28,7 @@ class Index extends Frontend
     protected $paysetModel = null;
     protected $visitModel = null;
     protected $analysisModel = null;
+    protected $productionModel = null;
 
     public function _initialize()
     {
@@ -38,8 +40,37 @@ class Index extends Frontend
         $this->paysetModel = new PaySetModel();
         $this->visitModel = new VisitModel();
         $this->analysisModel = new AnalysisModel();
+        $this->productionModel = new ProductionModel();
     }
 
+    /**
+     * 文案预览
+     * @param null $ids
+     * @return string
+     * @throws \think\exception\DbException
+     * @throws \think\Exception
+     */
+    public function reviewHtml($ids = null)
+    {
+        $moduleData = $this->productionModel->get($ids)->toArray();
+        $addArr = [
+            'price' =>  $moduleData['true_price'],
+            'aid'   =>  0,
+            'tid'   =>  0,
+            'pid'   =>  0,
+            'gid'   =>  0,
+            'pay_type'   =>  0,
+            'pay_id'   =>  0,
+            'production_name'   =>  $moduleData['name'],
+            'api_domain'   =>  $this->request->url(),
+            'tp'   =>  $moduleData['module_name'],
+            'order_url'   =>  $this->request->url(),
+            'check_code' => '',
+        ];
+        $moduleData = array_merge($addArr,$moduleData);
+        $this->assign('data',$moduleData);
+        return $this->view->fetch($moduleData['module_name']);
+    }
 
     /**
      * 类单元测试方法
@@ -100,7 +131,6 @@ class Index extends Frontend
 //        $this->doPaySummary(2,1,['type'=>'money','nums'=>79.9]);
 
     }
-
 
     /**
      * 落地检测是否是微信打开
