@@ -225,9 +225,10 @@ class Frontend extends Controller
      * @comment 推广链接生成除域名外，分为三个部分，aid 表示是推广员id，gid表示推广的链接
      * @comment tid表示为所属于团队的ID，check_code表示校验码，也是唯一值。没有这个值链接就失效，防止用户去改，这个是加密算法的一个值
      * @comment 入口链接进来，获取用户的openid与业务员进行绑定，再跳转到相应的商品链接
-     * @param $data
+     * @param $data array 请求参数
+     * @param $orderInfo array 订单参数
      */
-    public function intoBefore($data)
+    public function intoBefore($data,$orderInfo)
     {
         //第一步，进来先做数据校验
         $paramString = $this->request->query();
@@ -237,7 +238,7 @@ class Frontend extends Controller
             //TODO:后期可以跳转指定的位置与对应的业务逻辑
         }
         //第二步，获取用户openid与业务员进行绑定，业务员，团队，商品id绑定一个会员。
-        $payInfo = Cache::get($this->request->ip().'-pay_config');
+        $payInfo = Cache::get($orderInfo['order_ip'].'-'.$orderInfo['check_code'].'-pay_config');
         $weChatConfig=$this->setConfig($payInfo);
         //第三步：获取当前aid对应的链接参数携带参数跳转-
         //经过上面的验证，需要对已经验证的链接进行重新组装。
