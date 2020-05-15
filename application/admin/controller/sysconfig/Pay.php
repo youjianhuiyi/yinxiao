@@ -250,6 +250,10 @@ class Pay extends Backend
 
     /**
      * 编辑
+     * @param null $ids
+     * @return string
+     * @throws \think\Exception
+     * @throws \think\exception\DbException
      */
     public function edit($ids = null)
     {

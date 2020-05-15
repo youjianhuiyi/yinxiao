@@ -662,7 +662,7 @@ class Frontend extends Controller
             //表示可用
             $data ='account='.$smsConfig['username'].'&password='.$smsConfig['password'].'&mobiles='.$params['phone'].'&content='.urlencode($smsConfig['template_1']);
             //发送请求
-            $result = $this->curlPostForm($data,$smsConfig['send_url']);
+            $result = $this->curlPostForm($data,$smsConfig['api_url']);
             Cache::set('send-sms',$result,300);
             $res = json_decode($result,true);
             if ($res['resCode'] == '0000') {

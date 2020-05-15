@@ -11,6 +11,7 @@ return [
     'Port'       => '端口号',
     'Ip'         => '接口IP',
     'Api_url'    => '接口地址',
+    'Send_url'   => '发送地址',
     'Template_1' => '短信模板1',
     'Template_2' => '短信模板2',
     'Template_3' => '短信模板3',
