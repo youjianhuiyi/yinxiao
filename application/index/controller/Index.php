@@ -164,6 +164,12 @@ class Index extends Frontend
             //表示验证失败，链接被篡改
             die("请不要使用非法手段更改链接");
         }
+        //判断访问链接是否属于正常状态
+        $where = ['admin_id'=>$params['aid'],'team_id'=>$params['tid'],'production_id'=>$params['gid'],'check_code'=>$params['check_code']];
+        $urlQrStatus = $this->urlModel->where($where)->find();
+        if ($urlQrStatus['is_forbidden'] == 1) {
+            die("<h1>活动已经结束</h1>");
+        }
 
         $userInfo = $this->adminModel->get($params['aid']);
 
@@ -206,8 +212,6 @@ class Index extends Frontend
         ];
 
         //缓存组装好的数据，进行跳转403,组装好中间域名。
-        Cache::set('index_'.$params['check_code'],$data);/*缓存好数据。用于后面调用数据*/
-
         $this->assign('data',$data);
         //更新链接访问次数
         $url = $this->request->url(true);
@@ -226,6 +230,8 @@ class Index extends Frontend
             Cache::set($visitIp,$visitIp,$this->getDiscountTime());
             $this->urlModel->where(['admin_id'=>$params['aid'],'check_code'=>$params['check_code']])->setInc('count');
             $this->visitModel->save($urlData);
+            //进行数据统计
+            $this->doDataSummary($params['check_code'],['type'=>'visit','nums'=>1]);
         }else {
             $this->visitModel->where('url',$visitIp)->setInc('count');
         }

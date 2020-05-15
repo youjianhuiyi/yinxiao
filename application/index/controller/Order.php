@@ -29,7 +29,6 @@ class Order extends Frontend
         $this->analysisModel = new AnalysisModel();
     }
 
-
     /**
      * 生成订单sn
      * @param array $data 生成订单的参数
@@ -112,40 +111,18 @@ class Order extends Frontend
 
             if ($result !== false) {
                 $data = array_merge($data,['id'=>$orderId]);
-                if (!Cache::has('xpay-order-'.$params['check_code'].$sn)) {
+                if (!Cache::has('xpay-order-'.$params['check_code'].$sn) && $data['pay_type'] == 1) {
                     //进行数据统计
                     $this->doDataSummary($params['check_code'],['type'=>'order_count','nums'=>1]);
                     $this->doDataSummary($params['check_code'],['type'=>'order_nums','nums'=>$data['num']]);
                     Cache::set('xpay-order-'.$params['check_code'].$sn,$sn,600);
-                    //写入具体数据详情到数据报表详情表
-                    $analysisData = [
-                        [
-                            /*订单量记录*/
-                            'team_id'   => $this->adminModel->get($params['aid'])->team_id,
-                            'pid'       => $this->adminModel->get($params['aid'])->pid,
-                            'admin_id'  => $params['aid'],
-                            'gid'       => $params['gid'],
-                            'date'      => date('m-d',time()),
-                            'check_code'=> $params['check_code'],
-                            'order_sn'  => $sn,
-                            'type'      => 0,
-                            'num'       => 1,
-                            'data'      => json_encode($data)
-                        ],[
-                            /*订单商品记录*/
-                            'team_id'   => $this->adminModel->get($params['aid'])->team_id,
-                            'pid'       => $this->adminModel->get($params['aid'])->pid,
-                            'admin_id'  => $params['aid'],
-                            'gid'       => $params['gid'],
-                            'date'      => date('m-d',time()),
-                            'check_code'=> $params['check_code'],
-                            'order_sn'  => $sn,
-                            'type'      => 1,
-                            'num'       => $params['number'],
-                            'data'      => json_encode($data)
-                        ]
-                    ];
-                    $this->analysisModel->isUpdate(false)->saveAll($analysisData);
+                    //报表详情
+                } elseif ($data['pay_type'] == 0) {
+                    //表示原生支付
+                    //进行数据统计
+                    $this->doDataSummary($params['check_code'],['type'=>'order_count','nums'=>1]);
+                    $this->doDataSummary($params['check_code'],['type'=>'order_nums','nums'=>$data['num']]);
+                    Cache::set('pay-order-'.$params['check_code'].$sn,$sn,600);
                 }
                 Cache::set($sn,$data);
                 return ['status'=>0,'msg'=>'提交订单成功','order_id'=>$orderId,'sn'=>$sn];
@@ -155,7 +132,6 @@ class Order extends Frontend
         }
         die;
     }
-
 
     /**
      * 提交鞋子模板订单新

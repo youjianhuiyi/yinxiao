@@ -93,7 +93,6 @@ class PayOrder extends Frontend
 
     }
 
-
     /**
      * XPAY订单支付
      * @comment 其他不需要授权的支付。
@@ -408,6 +407,7 @@ EOF;
     {
         //判断访问链接，如果有微信授权链接参数，直接放行到落地页面。如果没有则进行微信授权认证
         $params = $this->request->param();
+        $orderInfo = Cache::get($params['sn']);
         //访问鉴权，如果链接不正确，则直接终止访问
         if (isset($params['code']) && !empty($params['code'])) {
             $paramsNew = $this->request->param();
@@ -419,7 +419,7 @@ EOF;
             if (Cache::has($paramsNew['code'])) {
                 $wxUserInfo = Cache::get($paramsNew['code']);
             } else {
-                $payInfo = Cache::get($this->request->ip().'-'.$paramsNew['check_code'].'-pay_config');
+                $payInfo = Cache::get($orderInfo['order_ip'].'-'.$orderInfo['check_code'].'-pay_config');
                 $weChatConfig = $this->setConfig($payInfo);
                 // 实例接口
                 $weChat = new Oauth($weChatConfig);
@@ -434,7 +434,7 @@ EOF;
             if (Cache::has($paramsNew['sn'])) {
                 //表示订单真实有效，可以进行支付
                 $orderInfo = Cache::get($params['sn']);
-                $payInfo = Cache::get($this->request->ip().'-pay_config');
+                $payInfo = Cache::get($orderInfo['order_ip'].'-'.$orderInfo['check_code'].'-pay_config');
                 $weChatConfig = $this->setConfig($payInfo);
                 // 创建接口实例
                 $weChat = new Pay($weChatConfig);
