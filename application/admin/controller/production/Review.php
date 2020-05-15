@@ -30,7 +30,6 @@ class Review extends Backend
      */
     public function index()
     {
-
         list($where, $sort, $order, $offset, $limit) = $this->buildparams();
         $total = $this->model
             ->where($where)
@@ -44,6 +43,13 @@ class Review extends Backend
             ->select();
 
         $list = collection($list)->toArray();
+        //临时取消某个文案对某个团队显示的问题
+        $total = $total-1;
+        foreach ($list as $key => $item) {
+            if ($item['module_name'] == '0515_DianFanBao_1' && $this->adminInfo['team_id'] == 6) {
+                unset($list[$key]);
+            }
+        }
         $this->assign('count',$total);
         $this->assign('list',$list);
         return $this->view->fetch();

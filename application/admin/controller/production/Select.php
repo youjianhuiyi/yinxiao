@@ -34,11 +34,16 @@ class Select extends Backend
         $this->teamModel = new TeamModel();
         $this->productionModel = new ProductionModel();
         $this->goodsData = $this->productionModel->where('status',0)->select();
+        //临时取消某个文案对某个团队显示的问题
+        foreach ($this->goodsData as $key => $item) {
+            if ($item['module_name'] == '0515_DianFanBao_1' && $this->adminInfo['team_id'] == 6) {
+                unset($this->goodsData[$key]);
+            }
+        }
         $this->selectData = [0=>'请选择商品模板'];
         foreach ($this->goodsData as $v) {
             $this->selectData[$v['id']] = '编号--'.$v['id'].'；-产品名：'.$v['name'].'；-原销售价：'.$v['sales_price'].'；-原产品优惠价：'.$v['discount'];
         }
-
         $this->assign('selectData',$this->selectData);
         $this->assign('goodsData',$this->goodsData);
     }
