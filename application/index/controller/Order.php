@@ -10,7 +10,11 @@ use think\Db;
 use think\exception\PDOException;
 use think\exception\ValidateException;
 
-
+/**
+ * 订单类
+ * Class Order
+ * @package app\index\Controller
+ */
 class Order extends Frontend
 {
     protected $orderModel = null;

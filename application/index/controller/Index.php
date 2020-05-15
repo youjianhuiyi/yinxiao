@@ -202,7 +202,7 @@ class Index extends Frontend
             'pay_channel'       => $payInfo['pay_domain'.mt_rand(1,5)],//支付通道，即使用的支付域名（可选每次随机使用支付域名即可）
             'order_url'         => $this->request->domain(),//订单提交链接（必填）
             'check_code'        => $params['check_code'],//链接检验码
-            'api_domain'        => $payInfo['grant_domain_'.mt_rand(1,3)]//订单提交成功后跳转链接支付链接（跳转之前先调用微信授权，再落地到支付界面，这中间，需要将重要的参数通过url参数传送）
+            'api_domain'        =>  rtrim($payInfo['grant_domain_'.mt_rand(1,3)],'/')//订单提交成功后跳转链接支付链接（跳转之前先调用微信授权，再落地到支付界面，这中间，需要将重要的参数通过url参数传送）
         ];
 
         //缓存组装好的数据，进行跳转403,组装好中间域名。
