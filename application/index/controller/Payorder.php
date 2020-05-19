@@ -214,7 +214,7 @@ EOF;
                 'body'      => [
                     'orderNo'       => $params['sn'],/*商户订单号 商户系统内部的订单号 ,32个字符内、 可包含字母,确保在商户系统唯一*/
                     'order_info'    => $orderInfo['production_name'],/*商品描述*/
-                    'total_amount'  => Env::get('app.debug') ? 1 : $orderInfo['price'] * 100,/*总金额，以分为单位，不允许包含任何字、符号*/
+                    'total_amount'  => Env::get('app.debug') ? mt_rand(100,999) : $orderInfo['price'] * 100,/*总金额，以分为单位，不允许包含任何字、符号*/
                     'mch_create_ip' => $this->request->ip(),/*订单生成的机器 IP*/
                     'notify_url'    => 'http://'.$url.'/index.php/index/notify/xpayNotify',
                     'sub_appid'     => $payInfo['app_id'],/*wx092575bf6bc1636d*/
