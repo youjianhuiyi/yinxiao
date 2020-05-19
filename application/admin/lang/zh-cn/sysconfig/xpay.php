@@ -9,6 +9,7 @@ return [
     'Mch_key'    => '商户密钥',
     'openid_url' => 'openid接口',
     'Api_url'    => '接口地址',
+    'Cash_url'   => '收银台地址',
     'Is_use'     => '是否使用',
     'pay_domain_1'=> '支付域名',
     'Createtime' => '增加时间',

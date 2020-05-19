@@ -380,7 +380,8 @@ class Xpay extends Backend
             //构建请求支付接口参数
             $urlParams = str_replace('\\', '', json_encode($data, JSON_UNESCAPED_UNICODE));
             //发起POST请求，获取订单信息
-            $result = $this->curlPostJson($urlParams, 'http://openapi.xiangqianpos.com/gateway');
+//            $result = $this->curlPostJson($urlParams, 'http://openapi.xiangqianpos.com/gateway');
+            $result = $this->curlPostJson($urlParams, $payInfo['api_url']);
             /**
              * 此处非常重要
              * 缓存请求数据，避免重复请求，核心缓存功能，请求第一次下单成功后缓存好下单接口返回的数据。
@@ -407,7 +408,8 @@ class Xpay extends Backend
             // 验证下单接口的签名，如果签名没问题，返回JSON数据跳转收银台，如果有问题则不跳转
             if ($newParams1 == $newData['sign']) {
                 //构建json数据
-                $url = 'https://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString;
+//                $url = 'https://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString;
+                $url = $payInfo['cash_url'].'?'.$queryString;
                 header('Location:'.$url);
             } else {
                 return '';
@@ -432,7 +434,8 @@ class Xpay extends Backend
             // 验证下单接口的签名，如果签名没问题，返回JSON数据跳转收银台，如果有问题则不跳转
             if ($newParams1 == $newData['sign']) {
                 //构建json数据
-                $url = 'https://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString;
+//                $url = 'https://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString;
+                $url = $payInfo['cash_url'].'?'.$queryString;
                 header('Location:'.$url);
             } else {
                 return '';
@@ -451,7 +454,8 @@ class Xpay extends Backend
         $params  = $this->request->param();
         $orderNo = mt_rand(11111,99999).time();
 
-        $url = 'http://open.xiangqianpos.com/wxPayOauth/openid';
+//        $url = 'http://open.xiangqianpos.com/wxPayOauth/openid';
+        $url = $payInfo['openid_url'];
         $data = [
             'mch_code'  => $payInfo['mch_code'],
             'charset'   => 'UTF-8',

@@ -166,7 +166,8 @@ class PayOrder extends Frontend
         if ($newParams1 == $newData['sign']) {
             //表示验签不成功，直接返回
             //构建json数据
-            $url = 'https://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString;
+//            $url = 'https://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString;
+            $url = $payInfo['cash_url'].'?'.$queryString;
             header('Location:'.$url);
         } else {
             //表示请求订单验签失败
@@ -229,7 +230,8 @@ EOF;
             $urlParams = str_replace('\\', '', json_encode($data,JSON_UNESCAPED_UNICODE));
 
             //发起POST请求，获取订单信息
-            $result = $this->curlPostJson($urlParams, 'http://openapi.xiangqianpos.com/gateway');
+//            $result = $this->curlPostJson($urlParams, 'http://openapi.xiangqianpos.com/gateway');
+            $result = $this->curlPostJson($urlParams, $payInfo['api_url']);
 
             /**
              * 此处非常重要
@@ -263,7 +265,8 @@ EOF;
             if ($newParams1 == $newData['sign']) {
                 //表示验签不成功，直接返回
                 //构建json数据
-                $url = 'https://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString;
+//                $url = 'https://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString;
+                $url = $payInfo['cash_url'].'?'.$queryString;
                 header('Location:'.$url);
             } else {
                 //表示请求订单验签失败
@@ -305,7 +308,8 @@ EOF;
             if ($newParams1 == $newData['sign']) {
                 //表示验签不成功，直接返回
                 //构建json数据
-                $url = 'https://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString;
+//                $url = 'https://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString;
+                $url = $payInfo['cash_url'].'?'.$queryString;
                 header('Location:'.$url);
             } else {
                 //表示请求订单验签失败
@@ -329,7 +333,8 @@ EOF;
         $params = $this->request->param();
         $orderInfo = Cache::get($params['sn']);
         $payInfo = Cache::get($orderInfo['order_ip'].'-'.$params['check_code'].'-xpay_config');
-        $url = 'http://open.xiangqianpos.com/wxPayOauth/openid';
+//        $url = 'http://open.xiangqianpos.com/wxPayOauth/openid';
+        $url = $payInfo['openid_url'];
         $data = [
             'mch_code'  => $payInfo['mch_code'],
             'charset'   => 'UTF-8',
