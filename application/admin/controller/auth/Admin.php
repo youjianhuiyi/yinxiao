@@ -88,6 +88,7 @@ class Admin extends Backend
             $tree->init($data,'pid');
             $teamList = $tree->getTreeList($tree->getTreeArray(0), 'nickname');
             $adminData = [];
+            $adminData[0] = '创建老板号请选择我';
             foreach ($teamList as $k => $v) {
                 $adminData[$v['id']] = $v['nickname'];
             }
