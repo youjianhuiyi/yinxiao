@@ -448,11 +448,11 @@ class Summary extends Backend
         $this->view->assign([
             'paylist'          => $dateData,
             'createlist'       => $dateData,
-            'visit'            => isset($newArr['visit_nums']) ? $newArr['visit_nums'] : 0,
-            'order_count'      => isset($newArr['order_count']) ? $newArr['order_count'] : 0,
-            'order_nums'       => isset($newArr['order_nums']) ? $newArr['order_nums'] : 0,
-            'pay_done'         => isset($newArr['pay_done']) ? $newArr['pay_done'] : 0,
-            'pay_done_nums'    => isset($newArr['pay_done_nums']) ? $newArr['pay_done_nums'] : 0,
+            'visit'            => isset($newArr['visit_nums']) ? $newArr['visit_nums'] : [0],
+            'order_count'      => isset($newArr['order_count']) ? $newArr['order_count'] : [0],
+            'order_nums'       => isset($newArr['order_nums']) ? $newArr['order_nums'] : [0],
+            'pay_done'         => isset($newArr['pay_done']) ? $newArr['pay_done'] : [0],
+            'pay_done_nums'    => isset($newArr['pay_done_nums']) ? $newArr['pay_done_nums'] : [0],
         ]);
 
         return $this->view->fetch();
