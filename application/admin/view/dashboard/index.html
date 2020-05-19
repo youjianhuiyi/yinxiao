@@ -160,7 +160,7 @@
         <!-- small box -->
         <div class="small-box bg-aqua">
             <div class="inner">
-                <h3>{:ceil($data['visit']*0.9)}</h3>
+                <h3>{$data['visit']}</h3>
                 <p>今天总访问量</p>
             </div>
             <div class="icon">
@@ -230,7 +230,7 @@
                 {if $data['visit'] == 0}
                 <h3>0</h3>
                 {else}
-                <h3>{:round($data['order_count']/ceil($data['visit']*0.9),2)*100}%</h3>
+                <h3>{:round($data['order_count']/$data['visit'],2)*100}%</h3>
                 {/if}
                 <p>今天点击转换率</p>
             </div>
@@ -264,7 +264,7 @@
                 {if $data['order_count'] == 0}
                 <h3>0</h3>
                 {else}
-                <h3>￥{:round($data['pay_total']/ceil($data['visit']*0.9),2)}</h3>
+                <h3>￥{:round($data['pay_total']/$data['visit'],2)}</h3>
                 {/if}
                 <p>今天点击价格</p>
             </div>
@@ -286,7 +286,7 @@
         <!-- small box -->
         <div class="small-box bg-green">
             <div class="inner">
-                <h3>{:ceil($yesterdayData['visit']*0.9)}</h3>
+                <h3>{$yesterdayData['visit']}</h3>
                 <p>昨天总访问量</p>
             </div>
             <div class="icon">
@@ -356,7 +356,7 @@
                 {if $yesterdayData['visit'] == 0}
                 <h3>0</h3>
                 {else}
-                <h3>{:round($yesterdayData['order_count']/ceil($yesterdayData['visit']*0.9),2)*100}%</h3>
+                <h3>{:round($yesterdayData['order_count']/$yesterdayData['visit'],2)*100}%</h3>
                 {/if}
                 <p>昨天点击转换率</p>
             </div>
@@ -390,7 +390,7 @@
                 {if $yesterdayData['order_count'] == 0}
                 <h3>0</h3>
                 {else}
-                <h3>￥{:round($yesterdayData['pay_total']/ceil($yesterdayData['visit']*0.9),2)}</h3>
+                <h3>￥{:round($yesterdayData['pay_total']/$yesterdayData['visit'],2)}</h3>
                 {/if}
                 <p>昨天单价点击</p>
             </div>
@@ -412,7 +412,7 @@
         <!-- small box -->
         <div class="small-box bg-yellow">
             <div class="inner">
-                <h3>{:ceil($historyData['visit']*0.9)}</h3>
+                <h3>{$historyData['visit']}</h3>
                 <p>历史总访问量</p>
             </div>
             <div class="icon">
@@ -482,7 +482,7 @@
                 {if $historyData['visit'] == 0}
                 <h3>0</h3>
                 {else}
-                <h3>{:round($historyData['order_count']/ceil($historyData['visit']*0.9),2)*100}%</h3>
+                <h3>{:round($historyData['order_count']/$historyData['visit'],2)*100}%</h3>
                 {/if}
                 <p>历史总点击转换率</p>
             </div>
@@ -515,7 +515,7 @@
                 {if $historyData['order_count'] == 0}
                 <h3>0</h3>
                 {else}
-                <h3>￥{:round($historyData['pay_total']/ceil($historyData['visit']*0.9),2)}</h3>
+                <h3>￥{:round($historyData['pay_total']/$historyData['visit'],2)}</h3>
                 {/if}
                 <p>历史单价点击</p>
             </div>

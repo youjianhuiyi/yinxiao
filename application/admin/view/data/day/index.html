@@ -251,7 +251,7 @@
                             {/if}
                             <td>数据汇总</td>
                             <td>/</td>
-                            <td>{:ceil((int)$today_total['visit_nums']*0.9)}</td>
+                            <td>{$today_total['visit_nums']}</td>
                             <td>{$today_total['pay_done']}</td>
                             <td>{$today_total['order_nums']}</td>
                             <td>{$today_total['pay_done']}</td>
@@ -259,7 +259,7 @@
                             {if $today_total['visit_nums'] == 0}
                             <td>0</td>
                             {else}
-                            <td>{:round($today_total['order_count']/ceil($today_total['visit_nums']*0.9),2)*100}%</td>
+                            <td>{:round($today_total['order_count']/$today_total['visit_nums'],2)*100}%</td>
                             {/if}
                             {if $today_total['order_count'] == 0}
                             <td>0</td>
@@ -275,7 +275,7 @@
                             {/if}
                             <td>{:isset($adminName[$vo.pid]) ? $adminName[$vo.pid] : ''}</td>
                             <td>{$vo.nickname}</td>
-                            <td>{:ceil($vo.visit_nums*0.9)}</td>
+                            <td>{$vo.visit_nums}</td>
                             <td>{$vo.order_count}</td>
                             <td>{$vo.order_nums}</td>
                             <td>{$vo.pay_done}</td>
@@ -283,7 +283,7 @@
                             {if $vo['visit_nums'] == 0}
                             <td>0</td>
                             {else}
-                            <td>{:round($vo['order_count']/ceil($vo['visit_nums']*0.9),2)*100}%</td>
+                            <td>{:round($vo['order_count']/$vo['visit_nums'],2)*100}%</td>
                             {/if}
                             {if $vo['order_count'] == 0}
                             <td>0</td>
