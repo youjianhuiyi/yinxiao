@@ -17,6 +17,7 @@ php think menu -c production/production
 php think menu -c production/review
 php think menu -c production/select
 php think menu -c production/url
+php think menu -c production/share
 php think menu -c order/order
 php think menu -c order/ordertest
 php think menu -c order/export
