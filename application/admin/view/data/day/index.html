@@ -171,6 +171,12 @@
                                     </th>
                                 </tr>
                                 <tr class="text-right">
+                                    <th colspan="5" style="vertical-align:middle" class="text-right">团队:</th>
+                                    <th colspan="6" style="vertical-align:middle">
+                                        {:Form::select('row[td]', $td_data, isset($row.td) ? $row.td : 0, ['data-rule'=>'required'])}
+                                    </th>
+                                </tr>
+                                <tr class="text-right">
                                     <th colspan="5" style="vertical-align:middle" class="text-right">组长:</th>
                                     <th colspan="6" style="vertical-align:middle">
                                         {:Form::select('row[zz]', $zz_data, isset($row.zz) ? $row.zz : 0, ['data-rule'=>'required'])}

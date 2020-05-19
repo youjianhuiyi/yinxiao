@@ -161,9 +161,15 @@ class Day extends Backend
     protected function doSummary($dateTime,$level,$teamId = 0,$adminIds=[],$adminId = 0)
     {
         if ($level == 0) {
-            $where = 1;
+            if ($teamId != 0) {
+                //表示查询指定团队
+                $where = ['team_id' => $teamId];
+            } else {
+                //表示查询所有团队
+                $where = 1;
+            }
         } elseif ($level == 1) {
-            $where = ['team_id'=> $teamId];
+            $where = ['team_id' => $teamId];
         } elseif ($level == 2) {
             $where = ['admin_id'=> ['in',$adminIds]];
         } else {
@@ -252,6 +258,7 @@ class Day extends Backend
         $userIds = $this->shellGetAllUser();
         $userInfo = $this->adminInfo;
         $teamData = $this->teamModel->column('name','id');
+        $teamData[0] = '未知团队';/*兼容*/
         $adminName = $this->adminModel->column('nickname','id');
         $row = [];
         //构建下拉列表的日期数据
@@ -265,11 +272,15 @@ class Day extends Backend
             $zzData = $this->adminModel->where(['level' => 1])->column('nickname','id');
             //构建员工数据
             $ygData = $this->adminModel->column('nickname','id');
+            //构建团队数据
+            $tdData = $this->teamModel->column('name','id');
+            $tdData[0] = '请选择';
         } else {
             //构建组长列表数据。
             $zzData = $this->adminModel->where(['team_id'=>$this->adminInfo['team_id'],'level' => 1])->column('nickname','id');
             //构建员工数据
             $ygData = $this->adminModel->where(['team_id'=>$this->adminInfo['team_id']])->column('nickname','id');
+            $tdData[0] = $this->adminInfo['team_id'];
         }
         $zzData[0] = '请选择';
         $ygData[0] = '请选择';
@@ -277,18 +288,19 @@ class Day extends Backend
         if ($this->request->isPost()) {
             $params = $this->request->param();
             //获取当前用户信息
-            $date = $params['row']['select'];
+            $date = isset($params['row']['select']) ? $params['row']['select'] : date('m-d',time());
             $zz = isset($params['row']['zz']) ? $params['row']['zz'] : 0;
             $yg = isset($params['row']['yg']) ? $params['row']['yg'] : 0;
+            $td = isset($params['row']['td']) ? $params['row']['td'] : 0;
             $zzIds = $this->getLowerUser($zz);
             //将05-05字符串转换为当前的时间戳
             $dateTime = $this->strToTimestamp('2020-'.$date);
-            $row['select'] = $date;
+            $row['select'] = $date;/*回显数据使用*/
             if ($zz == 0 && $yg == 0) {
                 //表示当前只针对日期进行查询
                 if ($userInfo['id'] == 1) {
-                    $data = $this->doSummary($dateTime,0);
-                    $newArr[] = $data;
+                    $data = $this->doSummary($dateTime,0,$td);
+                    $newArr = $data;
                 } elseif ($userInfo['pid'] == 0 && $userInfo['id'] != 1) {
                     //老板查看团队所有人员的数据
                     $data = $this->doSummary($dateTime,1,$this->adminInfo['team_id']);
@@ -400,12 +412,12 @@ class Day extends Backend
         ];
         //当前汇总数据
         foreach ($newArr as $item) {
-            $todayTotal['visit_nums'] += $item['visit_nums'];
-            $todayTotal['order_count'] += $item['order_count'];
-            $todayTotal['order_nums'] += $item['order_nums'];
-            $todayTotal['pay_done'] += $item['pay_done'];
-            $todayTotal['pay_done_nums'] += $item['pay_done_nums'];
-            $todayTotal['pay_total'] += $item['pay_total'];
+            $todayTotal['visit_nums'] += isset($item['visit_nums']) ? $item['visit_nums'] : 0;
+            $todayTotal['order_count'] += isset($item['order_count']) ? $item['order_count'] : 0;
+            $todayTotal['order_nums'] += isset($item['order_nums']) ? $item['order_nums'] : 0;
+            $todayTotal['pay_done'] += isset($item['pay_done']) ? $item['pay_done'] : 0;
+            $todayTotal['pay_done_nums'] += isset($item['pay_done_nums']) ? $item['pay_done_nums'] : 0;
+            $todayTotal['pay_total'] += isset($item['pay_total']) ? $item['pay_total'] : 0;
         }
 
         $this->assign('user',$this->adminInfo);/*当前用户信息*/
@@ -417,6 +429,7 @@ class Day extends Backend
         $this->assign('select_data',$newSelectData);/*查询数据*/
         $this->assign('zz_data',$zzData);/*组长数据*/
         $this->assign('yg_data',$ygData);/*员工数据*/
+        $this->assign('td_data',$tdData);/*团队数据*/
         $this->assign('row',$row);
         return $this->view->fetch();
     }
