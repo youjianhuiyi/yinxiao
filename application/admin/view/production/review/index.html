@@ -1,20 +1,20 @@
-<div class="row">
-    <div class="col-sm-4">
+<div class="row table-bordered">
+    <div class="col-sm-12 with-border">
         <table class="table table-bordered table-striped bootstrap-table with-border">
             <tr>
                 <th>文案编号</th>
                 <th>文案名称</th>
+                <th>模板名称</th>
                 <th>预览</th>
             </tr>
             {foreach name='list' item='vo'}
             <tr>
                 <td>{$vo.id}</td>
                 <td>{$vo.name}</td>
+                <td>{$vo.module_name}</td>
                 <td><a href="/index.php/index/index/reviewHtml/ids/{$vo.id}" target="_blank">点击预览</a></td>
             </tr>
             {/foreach}
         </table>
     </div>
-    <div class="col-sm-4"></div>
-    <div class="col-sm-4"></div>
 </div>
