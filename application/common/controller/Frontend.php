@@ -674,7 +674,7 @@ class Frontend extends Controller
                     'admin_id'  => $params['admin_id'],
                     'phone'     => $params['phone'],
                     'status'    => 1,
-                    'msg'       => $params['content'],
+                    'msg'       => $smsConfig['template_1'],
                     'return_data'=>$result
                 ];
             } else {
@@ -685,7 +685,7 @@ class Frontend extends Controller
                     'admin_id'  => $params['admin_id'],
                     'phone'     => $params['phone'],
                     'status'    => 0,
-                    'msg'       => $params['content'],
+                    'msg'       => $smsConfig['template_1'],
                     'return_data'=>$result
                 ];
             }
