@@ -414,7 +414,7 @@ class Express extends Backend
             $data ='account='.$smsData['account'].'&password='.$smsData['password'].'&mobiles='.$value['phone'].'&content='.urlencode($content);
             //发送请求
             $result = $this->curlPostForm($data,$smsData['send_url']);
-            Cache::set('send-sms',$result,300);
+            Cache::set('send-sms',$result,1800);
             $res = json_decode($result,true);
             if ($res['resCode'] == '0000') {
                 //表示发送成功
