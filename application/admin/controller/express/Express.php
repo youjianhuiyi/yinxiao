@@ -393,7 +393,7 @@ class Express extends Backend
      */
     public function sendSMS()
     {
-        $smsData = $this->smsConfigModel->where('team_id',$this->adminInfo['team_id'])->find();
+        $smsData = $this->smsConfigModel->where(['team_id'=>$this->adminInfo['team_id'],'status'=>0])->find();
         //查找当前导入的数据里面有没有发送短信成功
         $expressData = collection($this->model->where('is_send',0)->select())->toArray();
         //进行发送短信
@@ -411,7 +411,7 @@ class Express extends Backend
                 $content = $template[0].$template[1].$orderInfo['express_no'].$template[2].$value['express_com'];
             }
             // 构建发送短信内容
-            $data ='account='.$smsData['account'].'&password='.$smsData['password'].'&mobiles='.$value['phone'].'&content='.urlencode($content);
+            $data ='account='.$smsData['username'].'&password='.$smsData['password'].'&mobiles='.$value['phone'].'&content='.urlencode($content);
             //发送请求
             $result = $this->curlPostForm($data,$smsData['send_url']);
             Cache::set('send-sms',$result,1800);
