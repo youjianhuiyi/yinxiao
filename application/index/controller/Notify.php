@@ -38,8 +38,8 @@ class Notify extends Frontend
     public function test()
     {
 
-        $orderInfo = $this->orderModel->get(1);
-        $this->sendSMS($orderInfo);
+//        $orderInfo = $this->orderModel->get(1);
+//        $this->sendSMS($orderInfo);
 //        $this->orderModel->where('sn','P2020043009492000036000065994')->update(['summary_status'=>1]);
 //        dump(strlen('P2020043009492000036000065994'));
 //        $saveData  = [
