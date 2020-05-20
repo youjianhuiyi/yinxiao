@@ -31,7 +31,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         [
                             {checkbox: true},
                             {field: 'id', title: __('Id'),operate:false},
-                            {field: 'sn', title: __('Sn')},
+                            {field: 'sn', title: __('Sn'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
                             {field: 'transaction_id', title: __('Transaction_id'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
                             {field: 'team_id', title: __('Team_id'),operate:false,visible:false},
                             {field: 'team_name_text', title: __('Team_name'),operate:false,visible:false},
@@ -56,13 +56,13 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                             {field: 'xdd_trade_no', title: '享钱单号',operate:false,visible:false},
                             {field: 'ry_order_no', title: '如意单号',operate:false,visible:false},
                             {field: 'pay_type', title: __('Pay_type'),searchList: {"0":"微信支付", "1": "其他支付"},visible:false,formatter:function (value,row,index) {
-                                    if (value ===0){return '微信支付';}
-                                    if (value ===1){return '享钱支付';}
-                                    if (value ===2){return '如意支付';}
+                                    if (value ===0){return '<span class="label bg-green">微信支付</span>';}
+                                    if (value ===1){return '<span class="label bg-orange">享钱支付</span>';}
+                                    if (value ===2){return '<span class="label bg-aqua">如意支付</span>';}
                                 }},
                             {field: 'pay_status', title: __('Pay_status'),searchList: {"1": "已付款", "0": "未付款"},formatter:function (value,row,index) {
-                                    if (value ===0){return '未付款';}
-                                    if (value ===1){return '已付款';}
+                                    if (value ===0){return '<span class="label bg-red">未付款</span>';}
+                                    if (value ===1){return '<span class="label bg-green">已付款</span>';}
                                 }},
                             {field: 'order_status', title: __('Order_status'),searchList: {
                                     "0":"正在出库中",
@@ -71,11 +71,11 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                                     "3":"退款",
                                     "4":"退货退款",
                                 },formatter:function (value,row,index) {
-                                    if (value ===0){return '正在出库中';}
-                                    if (value ===1){return '已发货';}
-                                    if (value ===2){return '补货';}
-                                    if (value ===3){return '退款';}
-                                    if (value ===4){return '退货退款';}
+                                    if (value ===0){return '<span class="label bg-green-active">正在出库中</span>';}
+                                    if (value ===1){return '<span class="label bg-green">已发货</span>';}
+                                    if (value ===2){return '<span class="label bg-red">补货</span>';}
+                                    if (value ===3){return '<span class="label bg-red">退款</span>';}
+                                    if (value ===4){return '<span class="label bg-red">退货退款</span>';}
                                 }},
                             {field: 'createtime', title: __('Createtime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
                             {field: 'updatetime', title: __('Updatetime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime,visible:false},
@@ -132,26 +132,26 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                             {field: 'xdd_trade_no', title: '享钱单号',operate:false,visible:false},
                             {field: 'ry_order_no', title: '如意单号',operate:false,visible:false},
                             {field: 'pay_type', title: __('Pay_type'),searchList: {"0":"微信支付", "1": "其他支付"},visible:false,formatter:function (value,row,index) {
-                                    if (value ===0){return '微信支付';}
-                                    if (value ===1){return '享钱支付';}
-                                    if (value ===2){return '如意支付';}
+                                    if (value ===0){return '<span class="label bg-green">微信支付</span>';}
+                                    if (value ===1){return '<span class="label bg-orange">享钱支付</span>';}
+                                    if (value ===2){return '<span class="label bg-aqua">如意支付</span>';}
                                 }},
                             {field: 'pay_status', title: __('Pay_status'),searchList: {"1": "已付款", "0": "未付款"},formatter:function (value,row,index) {
-                                    if (value ===0){return '未付款';}
-                                    if (value ===1){return '已付款';}
+                                    if (value ===0){return '<span class="label bg-red">未付款</span>';}
+                                    if (value ===1){return '<span class="label bg-green">已付款</span>';}
                                 }},
-                            {field: 'order_status', title: __('Order_status'),searchList:{
+                            {field: 'order_status', title: __('Order_status'),searchList: {
                                     "0":"正在出库中",
                                     "1":"已发货",
                                     "2":"补货",
                                     "3":"退款",
-                                    "4":"退货退款"
+                                    "4":"退货退款",
                                 },formatter:function (value,row,index) {
-                                    if (value ===0){return '正在出库中';}
-                                    if (value ===1){return '已发货';}
-                                    if (value ===2){return '补货';}
-                                    if (value ===3){return '退款';}
-                                    if (value ===4){return '退货退款';}
+                                    if (value ===0){return '<span class="label bg-green-active">正在出库中</span>';}
+                                    if (value ===1){return '<span class="label bg-green">已发货</span>';}
+                                    if (value ===2){return '<span class="label bg-red">补货</span>';}
+                                    if (value ===3){return '<span class="label bg-red">退款</span>';}
+                                    if (value ===4){return '<span class="label bg-red">退货退款</span>';}
                                 }},
                             {field: 'createtime', title: __('Createtime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
                             {field: 'updatetime', title: __('Updatetime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime,visible:false},
@@ -211,26 +211,26 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                             {field: 'xdd_trade_no', title: __('xdd_trade_no'),operate:false,visible:false},
                             {field: 'ry_order_no', title: __('ry_order_no'),operate:false,visible:false},
                             {field: 'pay_type', title: __('Pay_type'),searchList: {"0":"微信支付", "1": "其他支付"},visible:false,formatter:function (value,row,index) {
-                                    if (value ===0){return '微信支付';}
-                                    if (value ===1){return '享钱支付';}
-                                    if (value ===2){return '如意支付';}
+                                    if (value ===0){return '<span class="label bg-green">微信支付</span>';}
+                                    if (value ===1){return '<span class="label bg-orange">享钱支付</span>';}
+                                    if (value ===2){return '<span class="label bg-aqua">如意支付</span>';}
                                 }},
                             {field: 'pay_status', title: __('Pay_status'),searchList: {"1": "已付款", "0": "未付款"},formatter:function (value,row,index) {
-                                    if (value ===0){return '未付款';}
-                                    if (value ===1){return '已付款';}
+                                    if (value ===0){return '<span class="label bg-red">未付款</span>';}
+                                    if (value ===1){return '<span class="label bg-green">已付款</span>';}
                                 }},
-                            {field: 'order_status',title: __('Order_status'),searchList: {
+                            {field: 'order_status', title: __('Order_status'),searchList: {
                                     "0":"正在出库中",
                                     "1":"已发货",
                                     "2":"补货",
                                     "3":"退款",
-                                    "4":"退货退款"
+                                    "4":"退货退款",
                                 },formatter:function (value,row,index) {
-                                    if (value ===0){return '正在出库中';}
-                                    if (value ===1){return '已发货';}
-                                    if (value ===2){return '补货';}
-                                    if (value ===3){return '退款';}
-                                    if (value ===4){return '退货退款';}
+                                    if (value ===0){return '<span class="label bg-green-active">正在出库中</span>';}
+                                    if (value ===1){return '<span class="label bg-green">已发货</span>';}
+                                    if (value ===2){return '<span class="label bg-red">补货</span>';}
+                                    if (value ===3){return '<span class="label bg-red">退款</span>';}
+                                    if (value ===4){return '<span class="label bg-red">退货退款</span>';}
                                 }},
                             {field: 'createtime', title: __('Createtime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
                             {field: 'updatetime', title: __('Updatetime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime,visible:false},

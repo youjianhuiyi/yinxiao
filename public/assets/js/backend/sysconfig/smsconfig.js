@@ -43,8 +43,8 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                                 "0":"正常",
                                 "1":"关闭",
                             },formatter:function (value,row,index) {
-                                if (value == 0){return '正常';}
-                                if (value == 1){return '关闭';}
+                                if (value == 0){return '<span class="label bg-green">正常</span>';}
+                                if (value == 1){return '<span class="label bg-red">关闭</span>';}
                             }
                         },
                         {field: 'createtime', title: __('Createtime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},

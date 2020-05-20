@@ -31,13 +31,13 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {field: 'team_id', title: __('Team_id'),operate:false,visible:false},
                         {field: 'team_name', title: __('Team_name')},
                         {field: 'is_forbidden', title: __('Is_forbidden'),searchList: {"1": "已封", "0": "正常"}, formatter: function(value,row,index){
-                                if(value === 1){return '已封';}
-                                if(value === 0){return '正常';}
+                                if (value == 0){return '<span class="label bg-green">正常</span>';}
+                                if (value == 1){return '<span class="label bg-red">已封</span>';}
                             }
                         },
-                        {field: 'is_inuse', title: __('is_inuse'),searchList: {"1": "已使用", "0": "未使用"}, formatter: function(value,row,index){
-                                if(value === 1){return '已封';}
-                                if(value === 0){return '正常';}
+                        {field: 'is_inuse', title: __('is_inuse'),searchList: {"1": "正在使用", "0": "未使用"}, formatter: function(value,row,index){
+                                if (value == 0){return '<span class="label bg-green">未使用</span>';}
+                                if (value == 1){return '<span class="label bg-red">正在使用</span>';}
                             }
                         },
                         {field: 'createtime', title: __('Createtime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},

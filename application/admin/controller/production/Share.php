@@ -164,16 +164,6 @@ class Share extends Backend
     {
         //获取当前选择项目的数据
         $urlData = $this->model->get($ids);
-        //获取主表商品相关数据
-//        if ($selectData['is_use'] == 0) {
-//            //表示没有启动模板，不能获取推广链接
-//            $urlData['app-debug'] = false;
-//            $urlData['is_use'] = false;
-//            $urlData['production_url'] = '';
-//            $this->assign('data',$urlData);
-//            return $this->view->fetch();
-//        }
-        //加密算法
         //获取快站链接，是否指定为固定
         $kzDomain = collection($this->kzModel->where(['status'=>1,'is_forbidden'=>0])->select())->toArray();
         if (count($kzDomain) > 1) {

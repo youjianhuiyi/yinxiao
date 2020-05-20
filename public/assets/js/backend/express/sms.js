@@ -28,8 +28,8 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {field: 'order_id', title: __('Order_id'),operate:false},
                         {field: 'phone', title: __('Phone'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
                         {field: 'status', title: __('Status'),searchList:{0:"失败",1:"成功"},formatter:function(value,index,data){
-                                if (value == 0) {return '<span color="red">失败</span>';}
-                                if (value == 1) {return '<span color="green">成功span>';}
+                                if (value == 0) {return '<span class="label bg-red">失败</span>';}
+                                if (value == 1) {return '<span class="label bg-green">成功</span>';}
                             }},
                         {field: 'team_id', title: __('Team_id'),operate: false,visible: false},
                         {field: 'admin_id', title: __('Admin_id'),operate: false,visible: false},

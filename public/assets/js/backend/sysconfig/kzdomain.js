@@ -30,13 +30,13 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {field: 'team_id', title: __('Team_id'),operate:false,visible:false},
                         {field: 'team_name', title: __('Team_name'),operate: false,visible:false},
                         {field: 'is_rand', title: __('Is_rand'),formatter: function (value,row,index) {
-                            if (value === 0) {return "随机";}
-                            if (value === 1) {return "固定";}
+                            if (value == 0) {return "随机";}
+                            if (value == 1) {return "固定";}
                             }},
-                        {field: 'status', title: __('Status'),searchList: {"0":"未使用","1": "使用中", "2": "已封"},formatter: function (value,row,index) {
-                                if (value === 0) {return "未使用";}
-                                if (value === 1) {return "使用中";}
-                                if (value === 2) {return "已封";}
+                        {field: 'status', title: __('Status'),searchList: {"0":"未使用","1": "正在使用", "2": "已封"},formatter: function (value,row,index) {
+                                if (value == 0){return '<span class="label bg-green">未使用</span>';}
+                                if (value == 1){return '<span class="label bg-red">正在使用</span>';}
+                                if (value == 1){return '<span class="label bg-yellow-active">已封</span>';}
                             },},
                         {field: 'createtime', title: __('Createtime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
                         {field: 'updatetime', title: __('Updatetime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
