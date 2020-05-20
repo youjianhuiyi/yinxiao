@@ -532,7 +532,7 @@ class Index extends Frontend
             'tongji'    => $goodsData['tongji'],
             'production_name'   => $goodsData['own_name'] == '' ? $goodsData['production_name'] : $goodsData['own_name'],//商品名称（必填）
             'share_code'        => $params['check_code'],//链接检验码
-            'shop_url'          => $urlQrStatus['url'],
+            'shop_url'          => $this->urlModel->where('share_code',$params['check_code'])->find()['url'],
         ];
 
         $this->assign('data',$data);
