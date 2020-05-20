@@ -429,22 +429,19 @@ class Index extends Frontend
                 //表示没有支付
                 die("支付通道无效，请联系老板！！！");
             }
-
             //对参数进行验证
             if ($str === $params['code']) {
                 //获取落地域名，一个个的消耗。
                 $luckDomain = $this->getLuckDomain();
-
                 //更新支付使用情况，只要生成一次落地就使用一次支付
                 $this->paysetModel->where(['team_id'=>$condition['tid'],'pay_id'=>$payInfo['id']])->setInc("count");
-
                 //根据不同的支付类型，跳转不同的支付方法与落地页面
                 $wholeDomain = 'http://'.time().'.'.$luckDomain.'/index.php/index/index/index'.$payInfo['type'].'?'.$queryStr;
                 echo "handler('successcode','{$wholeDomain}')";
                 die;
             } else {
                 //表示验证失败，目前暂时没做。后台响应
-                echo "handler('failure','http://www.qq.com')";
+                echo "handler('failure','https://news.qq.com')";
                 die;
             }
         } else {
@@ -458,7 +455,7 @@ class Index extends Frontend
                 $queryStr = $this->urlModel->where(['check_code'=>$checkCode])->find()['query_string'];
             }
             $str = md5(explode('&check_code',$queryStr)[0]).base64_encode('shop');
-            //对参数进行验证
+            //对share_code 进行验证
             if ($str === $params['code']) {
                 $luckDomain = $this->getLuckDomain();
                 //根据不同的支付类型，跳转不同的支付方法与落地页面
@@ -478,9 +475,9 @@ class Index extends Frontend
      */
     public function share()
     {
-        if (!$this->isWx()) {
-            die("请用微信打开页面~~");
-        }
+//        if (!$this->isWx()) {
+//            die("请用微信打开页面~~");
+//        }
         //判断访问链接，如果有微信授权链接参数，直接放行到落地页面。如果没有则进行微信授权认证
         $params = $this->request->param();
         if (empty($params)) {
