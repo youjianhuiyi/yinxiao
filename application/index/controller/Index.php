@@ -449,7 +449,7 @@ class Index extends Frontend
             }
         } else {
             //表示该访问方法为分享二维码，落地
-            $checkCode = explode(base64_encode('shop'),$params['code']);
+            $checkCode = explode(base64_encode('shop'),$params['code'])[0];
             //表示验签参数可能有效，接下来进行验证,先查缓存，缓存不存在则查数据库
             if (Cache::has($checkCode)) {
                 $queryStr = Cache::get($checkCode);
