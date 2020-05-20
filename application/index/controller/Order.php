@@ -2,6 +2,7 @@
 namespace app\index\Controller;
 
 use app\admin\model\order\Order as OrderModel;
+use app\admin\model\order\Sharedata as ShareDataModel;
 use app\admin\model\team\Team as TeamModel;
 use app\admin\model\data\Analysis as AnalysisModel;
 use app\common\controller\Frontend;
@@ -20,6 +21,7 @@ class Order extends Frontend
     protected $orderModel = null;
     protected $teamModel = null;
     protected $analysisModel = null;
+    protected $shareDataModel = null;
 
     public function _initialize()
     {
@@ -27,6 +29,7 @@ class Order extends Frontend
         $this->orderModel = new OrderModel();
         $this->teamModel = new TeamModel();
         $this->analysisModel = new AnalysisModel();
+        $this->shareDataModel = new SharedataModel();
     }
 
     /**
@@ -231,5 +234,56 @@ class Order extends Frontend
             return $data;
         }
         return $this->view->fetch('orderquery');
+    }
+
+    /**
+     * 分类有礼数据提交
+     */
+    public function shareSubmit()
+    {
+        if ($this->request->isAjax()) {
+            $params = $this->request->param();
+            //TODO::测试流程先不判断订单是否有效，后面再做这块的检验
+            $sn = $this->orderSn($params);
+            //构建订单数据
+            $data = [
+                'admin_id'  => $params['aid'],
+                'pid'       => $params['pid'],
+                'name'      => $params['name'],
+                'phone'     => $params['mobile'],
+                'address'   => $params['province'].$params['city'].$params['district'].$params['detailaddress'],
+                'team_id'   => $params['tid'],
+                'production_id'     => $params['gid'],
+                'production_name'   => $params['production_name'],
+                'goods_info'=> $params['tips'],
+                'sn'        => $sn,
+                'order_ip'  => $this->request->ip(),
+                'share_code'=> $params['share_code'],
+            ];
+
+            $result = false;
+            Db::startTrans();
+            try {
+                $result = $this->shareDataModel->isUpdate(false)->save($data);
+                $orderId = $this->shareDataModel->id;
+                Db::commit();
+            } catch (ValidateException $e) {
+                Db::rollback();
+                $this->error($e->getMessage());
+            } catch (PDOException $e) {
+                Db::rollback();
+                $this->error($e->getMessage());
+            } catch (\Exception $e) {
+                Db::rollback();
+                $this->error($e->getMessage());
+            }
+
+            if ($result !== false) {
+                return ['status'=>0,'msg'=>'提交信息成功','order_id'=>$orderId,'sn'=>$sn];
+            } else {
+                return ['status'=>1,'msg'=>'提交信息失败，请稍候再试~'];
+            }
+        }
+        die;
     }
 }

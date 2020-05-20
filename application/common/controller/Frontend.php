@@ -110,15 +110,29 @@ class Frontend extends Controller
     }
 
     /**
-     * 检验链接是否完整
+     * 检验推广链接是否完整
      * @param $data
      * @return bool
      */
     public function verifyCheckCode($data)
     {
         $newCode = $this->getCheckCode($data);
-        return $data['check_code'] == $newCode ? true : false;
+        return $data['check_code'] == $newCode;
     }
+
+
+    /**
+     * 检验分享链接是否完整
+     * @param $data
+     * @return bool
+     */
+    public function verifyShareCode($data)
+    {
+        $newCode = $this->getCheckCode($data).base64_encode('shop');
+        return $data['check_code'] == $newCode;
+    }
+
+
 
     /**
      * 检验微信授权后的链接是否完整
@@ -128,7 +142,7 @@ class Frontend extends Controller
     public function verifyCheckKey($data)
     {
         $newKey = $this->getCheckKey($data);
-        return $data['check_key'] == $newKey ? true : false;
+        return $data['check_key'] == $newKey;
     }
 
     /**
