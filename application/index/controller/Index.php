@@ -406,7 +406,6 @@ class Index extends Frontend
         header('Access-Control-Allow-Headers: Content-Type,Content-Length,Accept-Encoding,X-Requested-with,X_Requested_With,Origin,application/json'); // 设置允许自定义请求头的字段
         //接收403页面来的参数请求
         $params = $this->request->param();
-        $params['code'] = urldecode($params['code']);
         if (strlen($params['code'] == 32)) {
             //表示验签参数可能有效，接下来进行验证,先查缓存，缓存不存在则查数据库
             if (Cache::has($params['code'])) {
@@ -450,6 +449,7 @@ class Index extends Frontend
             }
         } else {
             //表示该访问方法为分享二维码，落地
+            $params['code'] = $params['code'].'==';/*为防止传输过程中丢失特殊符号，落地拼接*/
             $checkCode = explode(base64_encode('shop'),$params['code'])[0];
             //表示验签参数可能有效，接下来进行验证,先查缓存，缓存不存在则查数据库
             if (Cache::has($checkCode)) {
