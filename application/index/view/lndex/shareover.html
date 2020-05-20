@@ -364,10 +364,12 @@
             dataType : "json",
             success : function(result) {
                 if (result.status == 0){
-                    layer.confirm('提交成功，可以跳转到商城，是否要跳转？', {icon: 3, title:'提示'}, function(index){
+                    var confirm = window.confirm('提交成功，可以跳转到商城，是否要跳转？');
+                    if (confirm == true) {
                       window.location.href = "https://www.baidu.com"
+                    } else {
                       layer.close(index);
-                    });
+                    }
                 }else{
                     layer.close(jz);
                     $('#subbtn').removeAttr("disabled");
