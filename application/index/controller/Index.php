@@ -458,7 +458,7 @@ class Index extends Frontend
             }
             $str = md5(explode('&check_code',$queryStr)[0]).base64_encode('shop');
             //对参数进行验证
-            if ($str === $checkCode) {
+            if ($str === $params['code']) {
                 $luckDomain = $this->getLuckDomain();
                 //根据不同的支付类型，跳转不同的支付方法与落地页面
                 $wholeDomain = 'http://'.time().'.'.$luckDomain.'/index.php/index/index/share?'.$queryStr.base64_encode('shop');
