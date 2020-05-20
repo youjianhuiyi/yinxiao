@@ -279,6 +279,7 @@ class Order extends Frontend
             }
 
             if ($result !== false) {
+                $data = array_merge($data,['id'=>$orderId]);
                 $res = $this->sendShareSMS($data);
                 if ($res) {
                     $this->shareDataModel->setInc('send_status');
