@@ -406,7 +406,7 @@ class Index extends Frontend
         header('Access-Control-Allow-Headers: Content-Type,Content-Length,Accept-Encoding,X-Requested-with,X_Requested_With,Origin,application/json'); // 设置允许自定义请求头的字段
         //接收403页面来的参数请求
         $params = $this->request->param();
-        if (strlen($params['code'] == 32)) {
+        if (strlen($params['code']) == 32) {
             //表示验签参数可能有效，接下来进行验证,先查缓存，缓存不存在则查数据库
             if (Cache::has($params['code'])) {
                 $queryStr = Cache::get($params['code']);
@@ -475,9 +475,9 @@ class Index extends Frontend
      */
     public function share()
     {
-//        if (!$this->isWx()) {
-//            die("请用微信打开页面~~");
-//        }
+        if (!$this->isWx()) {
+            die("请用微信打开页面~~");
+        }
         //判断访问链接，如果有微信授权链接参数，直接放行到落地页面。如果没有则进行微信授权认证
         $params = $this->request->param();
         if (empty($params)) {
