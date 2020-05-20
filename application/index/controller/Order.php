@@ -282,7 +282,7 @@ class Order extends Frontend
                 $data = array_merge($data,['id'=>$orderId]);
                 $res = $this->sendShareSMS($data);
                 if ($res) {
-                    $this->shareDataModel->setInc('send_status');
+                    $this->shareDataModel->isUpdate(true)->save(['id'=>$orderId,'send_status'=>1]);
                 }
                 return ['status'=>0,'msg'=>'提交信息成功','order_id'=>$orderId,'sn'=>$sn];
             } else {
