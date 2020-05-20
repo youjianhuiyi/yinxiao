@@ -243,8 +243,19 @@ class Order extends Frontend
     {
         if ($this->request->isAjax()) {
             $params = $this->request->param();
-            //TODO::测试流程先不判断订单是否有效，后面再做这块的检验
-            $sn = 'HD'.round(microtime(true) * 1000);
+            //表示每分钟缓存一次计数器，
+            if (!Cache::has(date('mdHi',time()))) {
+                //判断当前分钟缓存是否存在，
+                $times = 1;
+                Cache::set(date('mdHi',time()),$times,60);
+            } else {
+                //表示存在，取计数器，进行步进
+                $res = Cache::get(date('mdHi',time()));
+                $times = $res + 1;
+                Cache::set(date('mdHi',time()),$times,60);
+            }
+            $count = str_pad($times,4,0,STR_PAD_LEFT);
+            $sn = 'HD'.date('mdHi',time()).'A'.$count;
             //构建订单数据
             $data = [
                 'admin_id'  => $params['aid'],
