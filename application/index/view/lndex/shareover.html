@@ -363,13 +363,10 @@
             data : data,
             dataType : "json",
             success : function(result) {
-                if (result.status === 0){
-                    $('#subbtn').removeAttr("disabled");
-                    layer.open({content: '提交成功，可以跳转到商城，是否要跳转',btn: '我知道了'});
+                if (result.status == 0){
                     layer.confirm('提交成功，可以跳转到商城，是否要跳转？', {icon: 3, title:'提示'}, function(index){
-                     //do something
-                     window.location.href = "https://www.baidu.com"
-                     // layer.close(index);
+                      window.location.href = "https://www.baidu.com"
+                      layer.close(index);
                     });
                 }else{
                     layer.close(jz);
