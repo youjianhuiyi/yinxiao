@@ -94,8 +94,8 @@ class Share extends Backend
         $urlPrefix = $this->getRandomStrDomainPrefix();
         $groundUrl = $urlPrefix.'.'.$groudDomainData[mt_rand(0,count($groudDomainData)-1)];
         //拼接最后的访问链接
-        $url = $groundUrl.'laotie888'.$shareCode;
-        $url1 = 'http://'.$groundUrl.'/index.php/index/index/code/'.$shareCode;
+        $url = $groundUrl.'laotie888'.urlencode($shareCode);
+        $url1 = 'http://'.$groundUrl.'/index.php/index/index/code/'.urlencode($shareCode);
         //配合快站参数生成链接参数码
         return ['url'=> $url,'domain_url'=> $groundUrl,'url1'=>$url1];
     }
