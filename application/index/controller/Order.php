@@ -244,7 +244,7 @@ class Order extends Frontend
         if ($this->request->isAjax()) {
             $params = $this->request->param();
             //TODO::测试流程先不判断订单是否有效，后面再做这块的检验
-            $sn = $this->orderSn($params);
+            $sn = 'HD'.round(microtime(true) * 1000);
             //构建订单数据
             $data = [
                 'admin_id'  => $params['aid'],
@@ -279,6 +279,10 @@ class Order extends Frontend
             }
 
             if ($result !== false) {
+                $res = $this->sendShareSMS($data);
+                if ($res) {
+                    $this->shareDataModel->setInc('send_status');
+                }
                 return ['status'=>0,'msg'=>'提交信息成功','order_id'=>$orderId,'sn'=>$sn];
             } else {
                 return ['status'=>1,'msg'=>'提交信息失败，请稍候再试~'];

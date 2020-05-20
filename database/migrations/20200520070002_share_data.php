@@ -42,7 +42,7 @@ class ShareData extends Migrator
             ->addColumn('phone','string',['limit'=>20,'null'=>false,'default'=>'','comment'=>'手机号'])
             ->addColumn('address','string',['limit'=>255,'null'=>false,'default'=>'','comment'=>'收货地址'])
             ->addColumn('goods_info','string',['limit'=>255,'null'=>false,'default'=>'','comment'=>'礼品信息'])
-            ->addColumn('share_code','string',['limit'=>32,'null'=>false,'default'=>'','comment'=>'分享码'])
+            ->addColumn('share_code','string',['limit'=>50,'null'=>false,'default'=>'','comment'=>'分享码'])
             ->addColumn('order_ip','string',['limit'=>128,'null'=>false,'default'=>'','comment'=>'下单IP'])
             ->addColumn('send_status','integer',['limit'=>MysqlAdapter::INT_TINY,'signed'=>false,'null'=>false,'default'=>0,'comment'=>'短信发送状态,0=未发送，1=已发送,2＝发送失败'])
             ->addColumn('comment','string',['limit'=>255,'null'=>false,'default'=>'','comment'=>'备注信息'])
