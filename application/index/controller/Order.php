@@ -41,10 +41,10 @@ class Order extends Frontend
     {
         $adminId = $data['aid'];
         $teamId = $data['tid'];
-        return 'P'.date('mdHi',time())
+        return 'P'.date('mdHis',time())
             .str_pad($adminId,4,'0',STR_PAD_LEFT)
             .str_pad($teamId,3,'0',STR_PAD_LEFT)
-            .str_pad(mt_rand(0,999),3,'0',STR_PAD_LEFT);
+            .str_pad(mt_rand(0,9999),4,'0',STR_PAD_LEFT);
     }
 
     /**
