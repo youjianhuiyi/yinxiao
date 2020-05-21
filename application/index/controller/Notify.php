@@ -120,6 +120,7 @@ class Notify extends Frontend
     public function WeChatNotify()
     {
         $result = $this->xml2arr(file_get_contents('php://input'));
+        Cache::set('wxnotify',$result,600);
         //通过回调的信息反查订单相关信息
         $orderInfo = $this->orderModel->where(['sn'=>$result['out_trade_no']])->find()->toArray();
         //根据订单数据提取支付信息
