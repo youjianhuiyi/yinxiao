@@ -145,7 +145,7 @@ class Notify extends Frontend
 //        [transaction_id]=>4200000495202004060198644235
         // 先回调验签
         $newSign = $this->paySignParams($result,$payInfo['mch_key']);
-        Cache::set('wxnewsign',$newSign,300);
+//        Cache::set('wxnewsign',$newSign,300);
         if ($result['sign'] === $newSign) {
             //表示验签成功
             $data  = [
