@@ -46,10 +46,10 @@ class Notify extends Frontend
         //进行判断，如果订单只要有回调数据，就更新一次，
         $newOrderInfo = $this->orderModel->where('sn',$orderSn)->find();
         //判断订单是否是当天的
-        //发送短信提醒
-        $this->sendOrderSMS($orderInfo);
         $date = date('m-d',time());
         if ($newOrderInfo['summary_status'] == 0 && $date == date('m-d',$orderInfo['createtime'])) {
+            //发送短信提醒
+            $this->sendOrderSMS($orderInfo);
             //增加订单完成次数
             $this->urlModel->where('admin_id',$orderInfo['admin_id'])->setInc('order_done');
             //数据统计
@@ -60,34 +60,34 @@ class Notify extends Frontend
             $this->doPaySummary($payInfo['id'],1,['type'=>'pay_nums','nums'=>1]);
             //因为回调最长时间一天
             //写入具体数据详情到数据报表详情表
-            $analysisData = [
-                [
-                    /*订单量记录*/
-                    'team_id'   => $orderInfo['team_id'],
-                    'pid'       => $orderInfo['pid'],
-                    'admin_id'  => $orderInfo['admin_id'],
-                    'gid'       => $orderInfo['production_id'],
-                    'date'      => date('m-d',time()),
-                    'check_code'=> $orderInfo['check_code'],
-                    'order_sn'  => $orderInfo['sn'],
-                    'type'      => 2,/*支付数量*/
-                    'num'       => 1,
-                    'data'      => $returnData
-                ],[
-                    /*订单商品记录*/
-                    'team_id'   => $orderInfo['team_id'],
-                    'pid'       => $orderInfo['pid'],
-                    'admin_id'  => $orderInfo['admin_id'],
-                    'gid'       => $orderInfo['production_id'],
-                    'date'      => date('m-d',time()),
-                    'check_code'=> $orderInfo['check_code'],
-                    'order_sn'  => $orderInfo['sn'],
-                    'type'      => 3,/*支付商品数量*/
-                    'num'       => $orderInfo['num'],
-                    'data'      => $returnData
-                ]
-            ];
-            $this->analysisModel->isUpdate(false)->saveAll($analysisData);
+//            $analysisData = [
+//                [
+//                    /*订单量记录*/
+//                    'team_id'   => $orderInfo['team_id'],
+//                    'pid'       => $orderInfo['pid'],
+//                    'admin_id'  => $orderInfo['admin_id'],
+//                    'gid'       => $orderInfo['production_id'],
+//                    'date'      => date('m-d',time()),
+//                    'check_code'=> $orderInfo['check_code'],
+//                    'order_sn'  => $orderInfo['sn'],
+//                    'type'      => 2,/*支付数量*/
+//                    'num'       => 1,
+//                    'data'      => $returnData
+//                ],[
+//                    /*订单商品记录*/
+//                    'team_id'   => $orderInfo['team_id'],
+//                    'pid'       => $orderInfo['pid'],
+//                    'admin_id'  => $orderInfo['admin_id'],
+//                    'gid'       => $orderInfo['production_id'],
+//                    'date'      => date('m-d',time()),
+//                    'check_code'=> $orderInfo['check_code'],
+//                    'order_sn'  => $orderInfo['sn'],
+//                    'type'      => 3,/*支付商品数量*/
+//                    'num'       => $orderInfo['num'],
+//                    'data'      => $returnData
+//                ]
+//            ];
+//            $this->analysisModel->isUpdate(false)->saveAll($analysisData);
             $this->orderModel->where('sn',$orderInfo['sn'])->update(['summary_status'=>1]);
         }
     }
@@ -100,6 +100,7 @@ class Notify extends Frontend
 //        $orderInfo = $this->orderModel->get(40);
 //        $payInfo = $this->payModel->get(5);
 //        $this->notifyDoSummary($orderInfo['sn'],$orderInfo,$payInfo,$orderInfo['sn']);
+//        $this->orderModel->where('sn','P052121170500490099737')->update(['summary_status'=>1]);
     }
 
     /**
