@@ -143,6 +143,7 @@ class Summary extends Backend
                 $visitData = $this->visitModel
                     ->where('updatetime','>',$timeData[0])
                     ->where('updatetime','<',$timeData[1])
+                    ->where('type',0)
                     ->select();
                 $visitData = collection($visitData)->toArray();
                 $visitData = $this->dataGroup($visitData,'admin_id',$userIds);
@@ -176,6 +177,7 @@ class Summary extends Backend
                     ->where('updatetime','>',$timeData[0])
                     ->where('updatetime','<',$timeData[1])
                     ->where('team_id',$userInfo['team_id'])
+                    ->where('type',0)
                     ->select();
                 $visitData = collection($visitData)->toArray();
                 $visitData = $this->dataGroup($visitData,'admin_id',$userIds);
@@ -214,6 +216,7 @@ class Summary extends Backend
                     ->where('updatetime','<',$timeData[1])
                     ->where('team_id',$userInfo['team_id'])
                     ->where('admin_id','in',$userIds)
+                    ->where('type',0)
                     ->select();
                 $visitData = collection($visitData)->toArray();
                 $visitData = $this->dataGroup($visitData,'admin_id',$userIds);
@@ -250,6 +253,7 @@ class Summary extends Backend
                     ->where('updatetime','>',$timeData[0])
                     ->where('updatetime','<',$timeData[1])
                     ->where('admin_id',$userInfo['id'])
+                    ->where('type',0)
                     ->select();
                 $visitData = collection($visitData)->toArray();
                 $visitData = $this->dataGroup($visitData,'admin_id',$userIds);
@@ -336,6 +340,7 @@ class Summary extends Backend
         $visitSummary = $this->visitModel
             ->where('createtime','>',$dateTime[0])
             ->where('createtime','<',$dateTime[1])
+            ->where('type',0)
             ->select();
         $visitSummary = collection($visitSummary)->toArray();
         //整理数据访问记录数据

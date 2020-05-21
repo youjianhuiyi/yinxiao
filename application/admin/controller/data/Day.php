@@ -176,7 +176,7 @@ class Day extends Backend
             $where = ['admin_id'=> $adminId];
         }
         //访问记录
-        $visitSummary = $this->visitModel->whereTime('createtime','between',[$dateTime[0],$dateTime[1]])->where($where)->select();
+        $visitSummary = $this->visitModel->whereTime('createtime','between',[$dateTime[0],$dateTime[1]])->where($where)->where('type',0)->select();
         //获取订单数据
         $orderData = $this->orderModel->whereTime('createtime','between',[$dateTime[0],$dateTime[1]])->where($where)->select();
         $visitSummary = collection($visitSummary)->toArray();
@@ -625,7 +625,7 @@ class Day extends Backend
         }
         if (!Cache::has('history-data-for-team-'.$params['ids'])) {
             $orderData = collection($this->orderModel->where('admin_id',$params['ids'])->where('createtime','>=',$sevenTime[0])->select())->toArray();
-            $visitData = collection($this->visitModel->where('admin_id',$params['ids'])->where('createtime','>=',$sevenTime[0])->select())->toArray();
+            $visitData = collection($this->visitModel->where('admin_id',$params['ids'])->where('type',0)->where('createtime','>=',$sevenTime[0])->select())->toArray();
             //获取订单每日的查询时间戳
             $newData = [];
             foreach ($newSelectData as $key => $value) {
