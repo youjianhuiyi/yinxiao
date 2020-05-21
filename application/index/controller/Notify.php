@@ -32,6 +32,67 @@ class Notify extends Frontend
         $this->analysisModel = new AnalysisModel();
     }
 
+
+    /**
+     * 回调数据统计
+     * @param $orderSn  string  回调订单号
+     * @param $orderInfo    object  订单数据
+     * @param $payInfo      object  支付数据
+     * @param $returnData   mixed   回调数据
+     */
+    private function notifyDoSummary($orderSn,$orderInfo,$payInfo,$returnData)
+    {
+        //数据统计，防止重复回调造成的数据不正确的问题
+//        if (!Cache::has('xpay-notify-'.$checkCode.'-'.$orderInfo['sn'])) {
+            //进行判断，如果订单只要有回调数据，就更新一次，
+            $newOrderInfo = $this->orderModel->where('sn',$orderSn)->find();
+            //判断订单是否是当天的
+            $date = date('m-d',time());
+            if ($newOrderInfo['summary_status'] == 0 && $date == date('m-d',$orderInfo['createtime'])) {
+                //增加订单完成次数
+                $this->urlModel->where('admin_id',$orderInfo['admin_id'])->setInc('order_done');
+                //数据统计
+                $this->doDataSummary($newOrderInfo['check_code'],['type'=>'pay_done','nums'=>1]);
+                $this->doDataSummary($newOrderInfo['check_code'],['type'=>'pay_nums','nums'=>$orderInfo['num']]);
+                //支付商户统计
+                $this->doPaySummary($payInfo['id'],1,['type'=>'money','nums'=>$orderInfo['price']]);
+                $this->doPaySummary($payInfo['id'],1,['type'=>'pay_nums','nums'=>1]);
+                //因为回调最长时间一天
+//                Cache::set('xpay-notify-'.$checkCode.'-'.$orderInfo['sn'],'ok',86400*2);
+                //写入具体数据详情到数据报表详情表
+                $analysisData = [
+                    [
+                        /*订单量记录*/
+                        'team_id'   => $orderInfo['team_id'],
+                        'pid'       => $orderInfo['pid'],
+                        'admin_id'  => $orderInfo['admin_id'],
+                        'gid'       => $orderInfo['production_id'],
+                        'date'      => date('m-d',time()),
+                        'check_code'=> $orderInfo['check_code'],
+                        'order_sn'  => $orderInfo['sn'],
+                        'type'      => 2,/*支付数量*/
+                        'num'       => 1,
+                        'data'      => $returnData
+                    ],[
+                        /*订单商品记录*/
+                        'team_id'   => $orderInfo['team_id'],
+                        'pid'       => $orderInfo['pid'],
+                        'admin_id'  => $orderInfo['admin_id'],
+                        'gid'       => $orderInfo['production_id'],
+                        'date'      => date('m-d',time()),
+                        'check_code'=> $orderInfo['check_code'],
+                        'order_sn'  => $orderInfo['sn'],
+                        'type'      => 3,/*支付商品数量*/
+                        'num'       => $orderInfo['num'],
+                        'data'      => $returnData
+                    ]
+                ];
+                $this->analysisModel->isUpdate(false)->saveAll($analysisData);
+                $this->orderModel->where('sn',$orderSn)->update(['summary_status'=>1]);
+            }
+//        }
+    }
+
     /**
      * 类的测试方法
      */
@@ -62,7 +123,7 @@ class Notify extends Frontend
         //通过回调的信息反查订单相关信息
         $orderInfo = $this->orderModel->where(['sn'=>$result['out_trade_no']])->find()->toArray();
         //根据订单数据提取支付信息
-        $payInfo = Cache::get($orderInfo['order_ip'].'-pay_config');
+        $payInfo = Cache::get($orderInfo['order_ip'].$orderInfo['check_code'].'-pay_config');
         // 创建接口实例
 //        [appid]=>wx90588380da4a2bb0
 //        [bank_type]=>OTHERS
@@ -109,6 +170,13 @@ class Notify extends Frontend
                 Db::rollback();
                 $this->error($e->getMessage());
             }
+
+            //回调数据统计
+//            if (!Cache::has('pay-notify-'.$orderInfo['check_code'].'-'.$orderInfo['sn'])) {
+                $this->notifyDoSummary($data['orderNo'], $orderInfo, $payInfo, $result);
+                //发送短信提醒
+                $this->sendSMS($orderInfo);
+//            }
             //返回成功
             $str = '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
             echo $str;
@@ -167,56 +235,59 @@ class Notify extends Frontend
             }
 
             //数据统计，防止重复回调造成的数据不正确的问题
-            if (!Cache::has('xpay-notify-'.$checkCode.'-'.$orderInfo['sn'])) {
-                //进行判断，如果订单只要有回调数据，就更新一次，
-                $newOrderInfo = $this->orderModel->where('sn',$data['orderNo'])->find();
-                //判断订单是否是当天的
-                $date = date('m-d',time());
-                if ($newOrderInfo['summary_status'] == 0 && $date == date('m-d',$orderInfo['createtime'])) {
-                    //增加订单完成次数
-                    $this->urlModel->where('admin_id',$orderInfo['admin_id'])->setInc('order_done');
-                    //数据统计
-                    $this->doDataSummary($checkCode,['type'=>'pay_done','nums'=>1]);
-                    $this->doDataSummary($checkCode,['type'=>'pay_nums','nums'=>$orderInfo['num']]);
-                    //支付商户统计
-                    $this->doPaySummary($payInfo['id'],1,['type'=>'money','nums'=>$orderInfo['price']]);
-                    $this->doPaySummary($payInfo['id'],1,['type'=>'pay_nums','nums'=>1]);
-                    //发送短信提醒
-                    $this->sendSMS($orderInfo);
-                    //因为回调最长时间一天
-                    Cache::set('xpay-notify-'.$checkCode.'-'.$orderInfo['sn'],'ok',86400*2);
-                    //写入具体数据详情到数据报表详情表
-                    $analysisData = [
-                        [
-                            /*订单量记录*/
-                            'team_id'   => $orderInfo['team_id'],
-                            'pid'       => $orderInfo['pid'],
-                            'admin_id'  => $orderInfo['admin_id'],
-                            'gid'       => $orderInfo['production_id'],
-                            'date'      => date('m-d',time()),
-                            'check_code'=> $orderInfo['check_code'],
-                            'order_sn'  => $orderInfo['sn'],
-                            'type'      => 2,/*支付数量*/
-                            'num'       => 1,
-                            'data'      => $returnData
-                        ],[
-                            /*订单商品记录*/
-                            'team_id'   => $orderInfo['team_id'],
-                            'pid'       => $orderInfo['pid'],
-                            'admin_id'  => $orderInfo['admin_id'],
-                            'gid'       => $orderInfo['production_id'],
-                            'date'      => date('m-d',time()),
-                            'check_code'=> $orderInfo['check_code'],
-                            'order_sn'  => $orderInfo['sn'],
-                            'type'      => 3,/*支付商品数量*/
-                            'num'       => $orderInfo['num'],
-                            'data'      => $returnData
-                        ]
-                    ];
-                    $this->analysisModel->isUpdate(false)->saveAll($analysisData);
-                    $this->orderModel->where('sn',$data['orderNo'])->update(['summary_status'=>1]);
-                }
-            }
+//            if (!Cache::has('xpay-notify-'.$checkCode.'-'.$orderInfo['sn'])) {
+                $this-> notifyDoSummary($data['orderNo'],$orderInfo,$payInfo,$returnData);
+                //发送短信提醒
+                $this->sendSMS($orderInfo);
+//                //进行判断，如果订单只要有回调数据，就更新一次，
+//                $newOrderInfo = $this->orderModel->where('sn',$data['orderNo'])->find();
+//                //判断订单是否是当天的
+//                $date = date('m-d',time());
+//                if ($newOrderInfo['summary_status'] == 0 && $date == date('m-d',$orderInfo['createtime'])) {
+//                    //增加订单完成次数
+//                    $this->urlModel->where('admin_id',$orderInfo['admin_id'])->setInc('order_done');
+//                    //数据统计
+//                    $this->doDataSummary($checkCode,['type'=>'pay_done','nums'=>1]);
+//                    $this->doDataSummary($checkCode,['type'=>'pay_nums','nums'=>$orderInfo['num']]);
+//                    //支付商户统计
+//                    $this->doPaySummary($payInfo['id'],1,['type'=>'money','nums'=>$orderInfo['price']]);
+//                    $this->doPaySummary($payInfo['id'],1,['type'=>'pay_nums','nums'=>1]);
+//                    //发送短信提醒
+//                    $this->sendSMS($orderInfo);
+//                    //因为回调最长时间一天
+//                    Cache::set('xpay-notify-'.$checkCode.'-'.$orderInfo['sn'],'ok',86400*2);
+//                    //写入具体数据详情到数据报表详情表
+//                    $analysisData = [
+//                        [
+//                            /*订单量记录*/
+//                            'team_id'   => $orderInfo['team_id'],
+//                            'pid'       => $orderInfo['pid'],
+//                            'admin_id'  => $orderInfo['admin_id'],
+//                            'gid'       => $orderInfo['production_id'],
+//                            'date'      => date('m-d',time()),
+//                            'check_code'=> $orderInfo['check_code'],
+//                            'order_sn'  => $orderInfo['sn'],
+//                            'type'      => 2,/*支付数量*/
+//                            'num'       => 1,
+//                            'data'      => $returnData
+//                        ],[
+//                            /*订单商品记录*/
+//                            'team_id'   => $orderInfo['team_id'],
+//                            'pid'       => $orderInfo['pid'],
+//                            'admin_id'  => $orderInfo['admin_id'],
+//                            'gid'       => $orderInfo['production_id'],
+//                            'date'      => date('m-d',time()),
+//                            'check_code'=> $orderInfo['check_code'],
+//                            'order_sn'  => $orderInfo['sn'],
+//                            'type'      => 3,/*支付商品数量*/
+//                            'num'       => $orderInfo['num'],
+//                            'data'      => $returnData
+//                        ]
+//                    ];
+//                    $this->analysisModel->isUpdate(false)->saveAll($analysisData);
+//                    $this->orderModel->where('sn',$data['orderNo'])->update(['summary_status'=>1]);
+//                }
+//            }
             //返回成功
             $str = 'SUCCESS';
             echo $str;
@@ -272,6 +343,7 @@ class Notify extends Frontend
                 Db::rollback();
                 $this->error($e->getMessage());
             }
+
             //增加订单完成次数
             $this->urlModel->where('admin_id',$orderInfo['admin_id'])->setInc('order_done');
             //数据统计
