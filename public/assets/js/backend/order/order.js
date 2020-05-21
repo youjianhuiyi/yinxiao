@@ -26,6 +26,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                     search:false,
                     showColumns: show_column,
                     showExport:show_column,
+                    showToggle:false,
                     exportTypes:["excel"],
                     columns: [
                         [
@@ -41,7 +42,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                             {field: 'production_name', title: __('Production_name'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
                             {field: 'address', title: __('Address'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符',visible:false},
                             {field: 'goods_info', title: __('Goods_info'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符',visible:false},
-                            {field: 'comment', title: '第二双备注',operate: 'LIKE %...%',placeholder: '模糊搜索，*表示任意字符'},
+                            {field: 'comment', title: '订单备注',operate: 'LIKE %...%',placeholder: '模糊搜索，*表示任意字符'},
                             {field: 'price', title: __('Price'),operate: 'LIKE %...%',placeholder: '模糊搜索，*表示任意字符'},
                             {field: 'num', title: __('Num')},
                             {field: 'admin_id', title: __('Admin_id'),operate:false,visible:false},
@@ -55,7 +56,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                             {field: 'order_ip', title: '下单IP',operate:false,visible:false},
                             {field: 'xdd_trade_no', title: '享钱单号',operate:false,visible:false},
                             {field: 'ry_order_no', title: '如意单号',operate:false,visible:false},
-                            {field: 'pay_type', title: __('Pay_type'),searchList: {"0":"微信支付", "1": "其他支付"},visible:false,formatter:function (value,row,index) {
+                            {field: 'pay_type', title: __('Pay_type'),searchList: {"0":"微信支付", "1": "享钱支付", "2": "如意支付"},visible:false,formatter:function (value,row,index) {
                                     if (value ===0){return '<span class="label bg-green">微信支付</span>';}
                                     if (value ===1){return '<span class="label bg-orange">享钱支付</span>';}
                                     if (value ===2){return '<span class="label bg-aqua">如意支付</span>';}
@@ -104,6 +105,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                     search:false,
                     showColumns: show_column,
                     showExport:show_column,
+                    showToggle: false,
                     exportTypes:["excel"],
                     columns: [
                         [
@@ -131,7 +133,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                             {field: 'order_ip', title:  '下单IP',operate:false,visible:false},
                             {field: 'xdd_trade_no', title: '享钱单号',operate:false,visible:false},
                             {field: 'ry_order_no', title: '如意单号',operate:false,visible:false},
-                            {field: 'pay_type', title: __('Pay_type'),searchList: {"0":"微信支付", "1": "其他支付"},visible:false,formatter:function (value,row,index) {
+                            {field: 'pay_type', title: __('Pay_type'),searchList: {"0":"微信支付", "1": "享钱支付", "2": "如意支付"},visible:false,formatter:function (value,row,index) {
                                     if (value ===0){return '<span class="label bg-green">微信支付</span>';}
                                     if (value ===1){return '<span class="label bg-orange">享钱支付</span>';}
                                     if (value ===2){return '<span class="label bg-aqua">如意支付</span>';}
@@ -181,6 +183,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                     pk: 'id',
                     sortName: 'id',
                     search:false,
+                    showToggle:false,
                     showColumns: show_column,
                     showExport:show_column,
                     exportTypes:["excel"],
@@ -210,7 +213,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                             {field: 'order_ip', title: '下单IP',operate:false,visible:false},
                             {field: 'xdd_trade_no', title: __('xdd_trade_no'),operate:false,visible:false},
                             {field: 'ry_order_no', title: __('ry_order_no'),operate:false,visible:false},
-                            {field: 'pay_type', title: __('Pay_type'),searchList: {"0":"微信支付", "1": "其他支付"},visible:false,formatter:function (value,row,index) {
+                            {field: 'pay_type', title: __('Pay_type'),searchList: {"0":"微信支付", "1": "享钱支付", "2": "如意支付"},visible:false,formatter:function (value,row,index) {
                                     if (value ===0){return '<span class="label bg-green">微信支付</span>';}
                                     if (value ===1){return '<span class="label bg-orange">享钱支付</span>';}
                                     if (value ===2){return '<span class="label bg-aqua">如意支付</span>';}
@@ -253,67 +256,6 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                     ]
                 });
             }
-
-
-            // 为表格绑定事件
-            Table.api.bindevent(table);
-        },
-        recyclebin: function () {
-            // 初始化表格参数配置
-            Table.api.init({
-                extend: {
-                    'dragsort_url': ''
-                }
-            });
-
-            var table = $("#table");
-
-            // 初始化表格
-            table.bootstrapTable({
-                url: 'order/order/recyclebin' + location.search,
-                pk: 'id',
-                sortName: 'id',
-                columns: [
-                    [
-                        {checkbox: true},
-                        {field: 'id', title: __('Id')},
-                        {field: 'name', title: __('Name'), align: 'left'},
-                        {
-                            field: 'deletetime',
-                            title: __('Deletetime'),
-                            operate: 'RANGE',
-                            addclass: 'datetimerange',
-                            formatter: Table.api.formatter.datetime
-                        },
-                        {
-                            field: 'operate',
-                            width: '130px',
-                            title: __('Operate'),
-                            table: table,
-                            events: Table.api.events.operate,
-                            buttons: [
-                                {
-                                    name: 'Restore',
-                                    text: __('Restore'),
-                                    classname: 'btn btn-xs btn-info btn-ajax btn-restoreit',
-                                    icon: 'fa fa-rotate-left',
-                                    url: 'order/order/restore',
-                                    refresh: true
-                                },
-                                {
-                                    name: 'Destroy',
-                                    text: __('Destroy'),
-                                    classname: 'btn btn-xs btn-danger btn-ajax btn-destroyit',
-                                    icon: 'fa fa-times',
-                                    url: 'order/order/destroy',
-                                    refresh: true
-                                }
-                            ],
-                            formatter: Table.api.formatter.operate
-                        }
-                    ]
-                ]
-            });
             // 为表格绑定事件
             Table.api.bindevent(table);
         },

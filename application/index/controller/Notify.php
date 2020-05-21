@@ -272,7 +272,14 @@ class Notify extends Frontend
                 Db::rollback();
                 $this->error($e->getMessage());
             }
-
+            //增加订单完成次数
+            $this->urlModel->where('admin_id',$orderInfo['admin_id'])->setInc('order_done');
+            //数据统计
+            $this->doDataSummary($orderInfo['check_code'],['type'=>'pay_done','nums'=>1]);
+            $this->doDataSummary($orderInfo['check_code'],['type'=>'pay_nums','nums'=>$orderInfo['num']]);
+            //支付商户统计
+            $this->doPaySummary($payInfo['id'],1,['type'=>'money','nums'=>$orderInfo['price']]);
+            $this->doPaySummary($payInfo['id'],1,['type'=>'pay_nums','nums'=>1]);
             //返回成功
             $str = 'SUCCESS';
             echo $str;

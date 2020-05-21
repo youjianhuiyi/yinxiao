@@ -327,7 +327,6 @@ class Xpay extends Backend
         $params = $this->request->param();
         $payInfo = $this->model->get($params['pay_id']);
         //缓存支付数据用于回调时使用
-//        $payInfo = Cache::get($orderInfo['order_ip'].'-'.$checkCode.'-xpay_config');
         $url = $this->urlModel->where('admin_id',$this->adminInfo['id'])->find();
         Cache::set($this->request->ip().'-'.$url['check_code'].'-xpay_config',$payInfo,1800);
         $teamData = $this->teamModel->get($params['tid']);
@@ -350,6 +349,7 @@ class Xpay extends Backend
             'pay_type'  => 1,
             'sn'        => $params['sn'],
             'order_ip'  => $this->request->ip(),
+            'check_code'=> md5($this->adminInfo['id']),
         ];
 
         $this->orderTestModel->isUpdate(false)->save($data);
@@ -380,7 +380,6 @@ class Xpay extends Backend
             //构建请求支付接口参数
             $urlParams = str_replace('\\', '', json_encode($data, JSON_UNESCAPED_UNICODE));
             //发起POST请求，获取订单信息
-//            $result = $this->curlPostJson($urlParams, 'http://openapi.xiangqianpos.com/gateway');
             $result = $this->curlPostJson($urlParams, $payInfo['api_url']);
             /**
              * 此处非常重要
@@ -408,7 +407,6 @@ class Xpay extends Backend
             // 验证下单接口的签名，如果签名没问题，返回JSON数据跳转收银台，如果有问题则不跳转
             if ($newParams1 == $newData['sign']) {
                 //构建json数据
-//                $url = 'https://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString;
                 $url = $payInfo['cash_url'].'?'.$queryString;
                 header('Location:'.$url);
             } else {
@@ -434,7 +432,6 @@ class Xpay extends Backend
             // 验证下单接口的签名，如果签名没问题，返回JSON数据跳转收银台，如果有问题则不跳转
             if ($newParams1 == $newData['sign']) {
                 //构建json数据
-//                $url = 'https://open.xiangqianpos.com/wxJsPayV3/casher'.'?'.$queryString;
                 $url = $payInfo['cash_url'].'?'.$queryString;
                 header('Location:'.$url);
             } else {
@@ -454,7 +451,6 @@ class Xpay extends Backend
         $params  = $this->request->param();
         $orderNo = mt_rand(11111,99999).time();
 
-//        $url = 'http://open.xiangqianpos.com/wxPayOauth/openid';
         $url = $payInfo['openid_url'];
         $data = [
             'mch_code'  => $payInfo['mch_code'],

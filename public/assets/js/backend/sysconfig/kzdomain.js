@@ -21,12 +21,13 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                 pk: 'id',
                 sortName: 'id',
                 search:false,
+                exportTypes:['excel'],
                 columns: [
                     [
                         {checkbox: true},
                         {field: 'id', title: __('Id'),operate:false},
                         {field: 'domain_url', title: __('Domain_url')},
-                        {field: 'count', title: __('Count')},
+                        {field: 'count', title: __('Count'),operate: false,visible: false},
                         {field: 'team_id', title: __('Team_id'),operate:false,visible:false},
                         {field: 'team_name', title: __('Team_name'),operate: false,visible:false},
                         {field: 'is_rand', title: __('Is_rand'),formatter: function (value,row,index) {
@@ -39,8 +40,8 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                                 if (value == 1){return '<span class="label bg-yellow-active">已封</span>';}
                             },},
                         {field: 'createtime', title: __('Createtime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
-                        {field: 'updatetime', title: __('Updatetime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
-                        {field: 'forbiddentime', title: __('Forbiddentime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
+                        {field: 'updatetime', title: __('Updatetime'), operate:false, addclass:'datetimerange', formatter: Table.api.formatter.datetime,visible: false},
+                        {field: 'forbiddentime', title: __('Forbiddentime'), operate:false, addclass:'datetimerange', formatter: Table.api.formatter.datetime,visible: false},
                         {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate, formatter: Table.api.formatter.operate}
                     ]
                 ]

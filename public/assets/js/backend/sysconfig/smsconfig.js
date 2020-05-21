@@ -22,7 +22,6 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                 pk: 'id',
                 sortName: 'id',
                 search:false,
-                showToggle:false,
                 showExport:false,
                 columns: [
                     [
@@ -37,7 +36,11 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {field: 'server_id', title: __('Server_id'),operate: false,visible: false},
                         {field: 'ip', title: __('Ip')},
                         {field: 'port', title: __('Port'),operate: false},
-                        {field: 'template_1', title: __('Template_1'),operate: false},
+                        {field: 'template_1', title: __('Template_1'),operate: false,visible: false},
+                        {field: 'template_2', title: __('template_2'),operate: false,visible: false},
+                        {field: 'template_3', title: __('template_3'),operate: false,visible: false},
+                        {field: 'template_4', title: __('template_4'),operate: false,visible: false},
+                        {field: 'template_5', title: __('template_5'),operate: false,visible: false},
                         {field: 'api_url', title: __('Api_url'), visible: false,operate: false},
                         {field: 'status', title: __('Status'),searchList: {
                                 "0":"正常",
