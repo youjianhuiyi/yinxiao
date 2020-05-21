@@ -53,8 +53,8 @@ class Notify extends Frontend
             //增加订单完成次数
             $this->urlModel->where('admin_id',$orderInfo['admin_id'])->setInc('order_done');
             //数据统计
-            $this->doDataSummary($newOrderInfo['check_code'],['type'=>'pay_done','nums'=>1]);
-            $this->doDataSummary($newOrderInfo['check_code'],['type'=>'pay_nums','nums'=>$orderInfo['num']]);
+            $this->doDataSummary($orderInfo['check_code'],['type'=>'pay_done','nums'=>1]);
+            $this->doDataSummary($orderInfo['check_code'],['type'=>'pay_nums','nums'=>$orderInfo['num']]);
             //支付商户统计
             $this->doPaySummary($payInfo['id'],1,['type'=>'money','nums'=>$orderInfo['price']]);
             $this->doPaySummary($payInfo['id'],1,['type'=>'pay_nums','nums'=>1]);
@@ -88,7 +88,7 @@ class Notify extends Frontend
                 ]
             ];
             $this->analysisModel->isUpdate(false)->saveAll($analysisData);
-            $this->orderModel->where('sn',$orderSn)->update(['summary_status'=>1]);
+            $this->orderModel->where('sn',$orderInfo['sn'])->update(['summary_status'=>1]);
         }
     }
 
@@ -97,6 +97,9 @@ class Notify extends Frontend
      */
     public function test()
     {
+//        $orderInfo = $this->orderModel->get(40);
+//        $payInfo = $this->payModel->get(5);
+//        $this->notifyDoSummary($orderInfo['sn'],$orderInfo,$payInfo,$orderInfo['sn']);
     }
 
     /**
@@ -136,11 +139,11 @@ class Notify extends Frontend
                 Db::rollback();
                 $this->error($e->getMessage());
             }
-            //回调数据统计
-            $this->notifyDoSummary($orderInfo['sn'], $orderInfo, $payInfo, $result);
             //返回成功
             $str = '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
             echo $str;
+            //回调数据统计
+            $this->notifyDoSummary($orderInfo['sn'], $orderInfo, $payInfo, $result);
             return ;
         } else {
             //返回失败
@@ -194,11 +197,11 @@ class Notify extends Frontend
                 Db::rollback();
                 $this->error($e->getMessage());
             }
-            //数据统计，防止重复回调造成的数据不正确的问题
-            $this->notifyDoSummary($orderInfo['sn'],$orderInfo,$payInfo,$returnData);
             //返回成功
             $str = 'SUCCESS';
             echo $str;
+            //数据统计，防止重复回调造成的数据不正确的问题
+            $this->notifyDoSummary($orderInfo['sn'],$orderInfo,$payInfo,$returnData);
             return ;
         } else {
             //返回失败
