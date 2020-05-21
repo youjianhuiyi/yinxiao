@@ -759,4 +759,51 @@ class Frontend extends Controller
         }
 
     }
+
+    /**
+     * 发送订单支付成功短信
+     * @param $params array 订单信息数组
+     * @return mixed
+     */
+    public function sendOrderSMS($params)
+    {
+        $smsConfig = $this->smsConfigModel->where('team_id',$params['team_id'])->find();
+        if ($smsConfig['status'] == 0) {
+            //表示可用
+            $template = explode('${code}',$smsConfig['template_4']);
+            $content = $template[0].$params['sn'].$template[1];
+            $data ='account='.$smsConfig['username'].'&password='.$smsConfig['password'].'&mobiles='.$params['phone'].'&content='.urlencode($content);
+            //发送请求
+            $result = $this->curlPostForm($data,$smsConfig['send_url']);
+            Cache::set('send-sms',$result,600);
+            $res = json_decode($result,true);
+            if ($res['resCode'] == '0000') {
+                //表示发送成功
+                $newData = [
+                    'order_id'  => $params['id'],
+                    'team_id'   => $params['team_id'],
+                    'admin_id'  => $params['admin_id'],
+                    'phone'     => $params['phone'],
+                    'status'    => 1,
+                    'msg'       => $content,
+                    'return_data'=>$result
+                ];
+            } else {
+                //表示发送失败
+                $newData = [
+                    'order_id'  => $params['id'],
+                    'team_id'   => $params['team_id'],
+                    'admin_id'  => $params['admin_id'],
+                    'phone'     => $params['phone'],
+                    'status'    => 0,
+                    'msg'       => $content,
+                    'return_data'=>$result
+                ];
+            }
+
+            $result = $this->smsModel->isUpdate(false)->save($newData);
+            return $result ? true : false;
+        }
+
+    }
 }

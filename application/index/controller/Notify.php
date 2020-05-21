@@ -178,7 +178,7 @@ class Notify extends Frontend
 //            if (!Cache::has('pay-notify-'.$orderInfo['check_code'].'-'.$orderInfo['sn'])) {
                 $this->notifyDoSummary($data['orderNo'], $orderInfo, $payInfo, $result);
                 //发送短信提醒
-                $this->sendSMS($orderInfo);
+                $this->sendOrderSMS($orderInfo);
 //            }
             //返回成功
             $str = '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
@@ -241,7 +241,7 @@ class Notify extends Frontend
 //            if (!Cache::has('xpay-notify-'.$checkCode.'-'.$orderInfo['sn'])) {
                 $this-> notifyDoSummary($data['orderNo'],$orderInfo,$payInfo,$returnData);
                 //发送短信提醒
-                $this->sendSMS($orderInfo);
+                $this->sendOrderSMS($orderInfo);
 //                //进行判断，如果订单只要有回调数据，就更新一次，
 //                $newOrderInfo = $this->orderModel->where('sn',$data['orderNo'])->find();
 //                //判断订单是否是当天的
