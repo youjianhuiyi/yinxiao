@@ -30,19 +30,19 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {field: 'id', title: __('Id'),operate:false},
                         {field: 'name', title: __('Name'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
                         {field: 'module_name', title: __('module_name'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
-                        {field: 'sales_price', title: __('Sales_price'), operate:'BETWEEN'},
-                        {field: 'discount', title: __('Discount'), operate:'BETWEEN'},
+                        {field: 'sales_price', title: __('Sales_price'), operate:false},
+                        {field: 'discount', title: __('Discount'), operate:false},
                         {field: 'true_price', title: __('True_price'), operate:'BETWEEN'},
                         {field: 'phone1', title: __('Phone1'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
                         {field: 'phone2', title: __('Phone2'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
-                        {field: 'modulefile', title: __('Modulefile'),formatter: Table.api.formatter.url,operate:false},
+                        {field: 'modulefile', title: __('Modulefile'),visible: false,operate:false},
                         {field: 'special_code', title: __('Special_code'),operate:false,visible:false},
                         {field: 'tongji', title: __('Tongji'),operate:false,visible:false},
                         {field: 'status', title: __('Status'),operate:false,formatter:function (value,row,index) {
                                 if (value === 0 ) {return '<span class="label bg-green">正常</span>';}
                                 if (value === 1 ) {return '<span class="label bg-red">停用</span>';}
                             }},
-                        {field: 'count', title: __('Count')},
+                        {field: 'count', title: __('Count'),operate: false,visible: false},
                         {field: 'createtime', title: __('Createtime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime},
                         {field: 'updatetime', title: __('Updatetime'), operate:'RANGE', addclass:'datetimerange', formatter: Table.api.formatter.datetime,visible:false},
                         {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate, formatter: Table.api.formatter.operate}
