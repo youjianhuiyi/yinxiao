@@ -198,18 +198,37 @@ class Day extends Backend
         }
         $orderDataKeys = array_keys($newOrderData);
 
-        foreach ($platUserIds as $platUserId) {
-            //判断当前有数据的浏览记录是否存在
-            if (!in_array($platUserId,$visitSummaryKeys)) {
-                $newVisitSummary[$platUserId] = 0;
-            } else {
-                $newVisitSummary[$platUserId] = count($newVisitSummary[$platUserId]);
+        //判断是否属于指定团队查询，
+        if ($teamId == 0) {
+            foreach ($platUserIds as $platUserId) {
+                //判断当前有数据的浏览记录是否存在
+                if (!in_array($platUserId,$visitSummaryKeys)) {
+                    $newVisitSummary[$platUserId] = 0;
+                } else {
+                    $newVisitSummary[$platUserId] = count($newVisitSummary[$platUserId]);
+                }
+                //订单数据补全
+                if (!in_array($platUserId,$orderDataKeys)) {
+                    $newOrderData[$platUserId] = '';
+                }
             }
-            //订单数据补全
-            if (!in_array($platUserId,$orderDataKeys)) {
-                $newOrderData[$platUserId] = '';
+        } else {
+            //表示是指定团队的查询结果
+            $teamUserIds = $this->adminModel->where('team_id',$teamId)->column('id');
+            foreach ($teamUserIds as $teamUserId) {
+                //判断当前有数据的浏览记录是否存在
+                if (!in_array($teamUserId,$visitSummaryKeys)) {
+                    $newVisitSummary[$teamUserId] = 0;
+                } else {
+                    $newVisitSummary[$teamUserId] = count($newVisitSummary[$teamUserId]);
+                }
+                //订单数据补全
+                if (!in_array($teamUserId,$orderDataKeys)) {
+                    $newOrderData[$teamUserId] = '';
+                }
             }
         }
+
         //订单数据统计，订单数量，订单支付，订单支付成功量
         $newResOrderData = [];
         foreach ($newOrderData as $key => $item) {
