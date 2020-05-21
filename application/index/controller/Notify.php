@@ -108,26 +108,8 @@ class Notify extends Frontend
         $orderInfo = $this->orderModel->where(['sn'=>$result['out_trade_no']])->find()->toArray();
         //根据订单数据提取支付信息
         $payInfo = Cache::get($orderInfo['order_ip'].'-'.$orderInfo['check_code'].'-pay_config');
-        // 创建接口实例
-//        [appid]=>wx90588380da4a2bb0
-//        [bank_type]=>OTHERS
-//        [cash_fee]=>1
-//        [fee_type]=>CNY
-//        [is_subscribe]=>Y
-//        [mch_id]=>1583492131
-//        [nonce_str]=>nrdclxldx8r05pi555dw7o51gqa0vxgr
-//        [openid]=>of5TOwBkJC0jSnth-D20xiL1W_i4
-//        [out_trade_no]=>2020040600445700003000026634
-//        [result_code]=>SUCCESS
-//        [return_code]=>SUCCESS
-//        [sign]=>A654BED136BDA766BB930D9C4ED124CF
-//        [time_end]=>20200406004505
-//        [total_fee]=>1
-//        [trade_type]=>JSAPI
-//        [transaction_id]=>4200000495202004060198644235
         // 先回调验签
         $newSign = $this->paySignParams($result,$payInfo['mch_key']);
-//        Cache::set('wxnewsign',$newSign,300);
         if ($result['sign'] === $newSign) {
             //表示验签成功
             $data  = [
@@ -158,8 +140,7 @@ class Notify extends Frontend
             //发送短信提醒
             $this->sendOrderSMS($orderInfo);
             //回调数据统计
-            $this->notifyDoSummary($data['orderNo'], $orderInfo, $payInfo, $result);
-
+            $this->notifyDoSummary($orderInfo['sn'], $orderInfo, $payInfo, $result);
             //返回成功
             $str = '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
             echo $str;
@@ -219,7 +200,7 @@ class Notify extends Frontend
             //发送短信提醒
             $this->sendOrderSMS($orderInfo);
             //数据统计，防止重复回调造成的数据不正确的问题
-            $this->notifyDoSummary($data['orderNo'],$orderInfo,$payInfo,$returnData);
+            $this->notifyDoSummary($orderInfo['sn'],$orderInfo,$payInfo,$returnData);
             //返回成功
             $str = 'SUCCESS';
             echo $str;

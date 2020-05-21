@@ -424,10 +424,11 @@ class Index extends Frontend
             //根据查询出来的数据，生成支付通道。获取指定的支付域名。
             $payInfo = $this->getPayChannel($payPool,$params['code']);
             Cache::set('403-payinfo',$payInfo,600);
-            if (false === $payInfo) {
+            if (false === $payInfo || $payInfo['status'] == 0) {
                 //表示没有支付
                 die("支付通道无效，请联系老板！！！");
             }
+
             //对参数进行验证
             if ($str === $params['code']) {
                 //获取落地域名，一个个的消耗。
