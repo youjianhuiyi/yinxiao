@@ -363,7 +363,6 @@ class Index extends Frontend
         return $this->view->fetch($params['tp']);
     }
 
-
     /**
      * 获取落地链接
      * @return string

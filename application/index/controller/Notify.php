@@ -124,7 +124,8 @@ class Notify extends Frontend
         //通过回调的信息反查订单相关信息
         $orderInfo = $this->orderModel->where(['sn'=>$result['out_trade_no']])->find()->toArray();
         //根据订单数据提取支付信息
-        $payInfo = Cache::get($orderInfo['order_ip'].$orderInfo['check_code'].'-pay_config');
+//        $userIp.'-'.$checkCode.'-pay_config',$payId,$type
+        $payInfo = Cache::get($orderInfo['order_ip'].'-'.$orderInfo['check_code'].'-pay_config');
         // 创建接口实例
 //        [appid]=>wx90588380da4a2bb0
 //        [bank_type]=>OTHERS
@@ -144,6 +145,7 @@ class Notify extends Frontend
 //        [transaction_id]=>4200000495202004060198644235
         // 先回调验签
         $newSign = $this->paySignParams($result,$payInfo['mch_key']);
+        Cache::set('wxnewsign',$newSign,300);
         if ($result['sign'] === $newSign) {
             //表示验签成功
             $data  = [
