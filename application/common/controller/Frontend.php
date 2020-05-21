@@ -800,9 +800,8 @@ class Frontend extends Controller
                     'return_data'=>$result
                 ];
             }
-
-            $result = $this->smsModel->isUpdate(false)->save($newData);
-            return $result ? true : false;
+            $res = $this->smsModel->isUpdate(false)->save($newData);
+            return $res ? true : false;
         }
 
     }
