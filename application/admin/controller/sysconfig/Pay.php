@@ -5,6 +5,7 @@ namespace app\admin\controller\sysconfig;
 use app\admin\model\data\PayRecord as PayRecordModel;
 use app\admin\model\sysconfig\Payset as PaySetModel;
 use app\common\controller\Backend;
+use think\Cache;
 use think\Db;
 use think\exception\PDOException;
 use think\exception\ValidateException;
@@ -225,6 +226,9 @@ class Pay extends Backend
                     $result1 = $this->payRecordMode->isUpdate(false)->save($newData);
                     //如果是新加商户，直接同步到支付管理表。并开启
                     $result2 = $this->addPayManagement($params,$this->model->id);
+                    //更新定位
+                    $data = $this->model->get($this->model->id);
+                    Cache::set($data['mch_id'],$data['status'],0);
                     Db::commit();
                 } catch (ValidateException $e) {
                     Db::rollback();
@@ -296,6 +300,9 @@ class Pay extends Backend
                     $params['team_id'] = $row['team_id'];
                     $params['pay_name'] = $row['pay_name'];
                     $result1 = $this->editPayManagement($params,$ids);
+                    //更新定位
+                    $data = $this->model->get($ids);
+                    Cache::set($data['mch_id'],$data['status'],0);
                     Db::commit();
                 } catch (ValidateException $e) {
                     Db::rollback();

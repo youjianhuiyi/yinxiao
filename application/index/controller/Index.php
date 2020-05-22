@@ -97,10 +97,11 @@ class Index extends Frontend
 
     /**
      * 空方法
+     * @throws \think\Exception
      */
     public function index()
     {
-        die('此网站已经关闭～～～');
+        return $this->return500Error('此网站已经关闭～～');
     }
 
     /**
@@ -113,37 +114,31 @@ class Index extends Frontend
         //判断访问链接，如果有微信授权链接参数，直接放行到落地页面。如果没有则进行微信授权认证
         $params = $this->request->param();
         if (empty($params)) {
-            die("请使用正确的链接进行访问！！");
+            return $this->return500Error('请使用正确的链接进行访问！！');
         }
 
         if (!$this->verifyCheckCode($params)) {
             //表示验证失败，链接被篡改
-            die("请不要使用非法手段更改链接");
+            return $this->return500Error('请不要使用非法手段更改链接');
         }
         //判断访问链接是否属于正常状态
         $where = ['admin_id'=>$params['aid'],'team_id'=>$params['tid'],'production_id'=>$params['gid'],'check_code'=>$params['check_code']];
         $urlQrStatus = $this->urlModel->where($where)->find();
         if ($urlQrStatus['is_forbidden'] == 1) {
-            die("<h1>活动已经结束</h1>");
+            return $this->return500Error('活动已经结束!');
         }
 
         $userInfo = $this->adminModel->get($params['aid']);
-
         //获取团队推广商品数据
         $goodsData = $this->getSelectGoodsInfo($params['tid'],$params['gid']);
-
         //获取访问者IP
         $userIp  = $this->request->ip();
-
-        //TODO::这里直接取redis的值，因为刚刚403跳转前一秒，已经写入缓存了，直接取即可，不过这操作还是有点不稳当
-        if (Cache::get($userIp.'-'.$params['check_code'].'-pay_config') === false) {
-            $payInfo = Cache::get($userIp.'-'.$params['check_code'].'-xpay_config');
-        } else {
-            $payInfo = Cache::get($userIp.'-'.$params['check_code'].'-pay_config');
-        }
-        if (!$payInfo) {
+        $payInfo = Cache::get($userIp.'-'.$params['check_code'].'-pay_config');
+        //获取当前支付状态
+        $payStatus = $this->getCurrentPayStatus($payInfo['mch_id'],1);
+        if (!$payInfo || $payStatus == 0) {
             //表示支付全挂了。
-            die('请检查支付通道是否正常~~~');
+            return $this->return500Error('请检查支付通道是否正常~~');
         }
         //将本团队的商品数据缓存起来
         $data = [
@@ -203,40 +198,37 @@ class Index extends Frontend
     {
         $isWx = $this->isWx();
         if (!$isWx) {
-            die("请用微信打开页面~~");
+            return $this->return500Error('请用微信打开页面~~');
         }
         //判断访问链接，如果有微信授权链接参数，直接放行到落地页面。如果没有则进行微信授权认证
         $params = $this->request->param();
         if (empty($params)) {
-            die("请使用正确的链接进行访问！！");
+            return $this->return500Error('请使用正确的链接进行访问！！');
         }
 
         if (!$this->verifyCheckCode($params)) {
             //表示验证失败，链接被篡改
-            die("请不要使用非法手段更改链接");
+            return $this->return500Error('请不要使用非法手段更改链接');
         }
 
         //判断访问链接是否属于正常状态
         $where = ['admin_id'=>$params['aid'],'team_id'=>$params['tid'],'production_id'=>$params['gid'],'check_code'=>$params['check_code']];
         $urlQrStatus = $this->urlModel->where($where)->find();
         if ($urlQrStatus['is_forbidden'] == 1) {
-            die("<h1>活动已经结束</h1>");
+            return $this->return500Error('活动已经结束!');
         }
-
         $userInfo = $this->adminModel->get($params['aid']);
-
         //获取团队推广商品数据
         $goodsData = $this->getSelectGoodsInfo($params['tid'],$params['gid']);
-
         //获取访问者IP
         $userIp  = $this->request->ip();
-
-        //TODO::这里直接取redis的值，因为刚刚403跳转前一秒，已经写入缓存了，直接取即可，不过这操作还是有点不稳当,同一IP下如果有两个用户访问，就有可能获得不同的支付信息。不能用以下方式来获取
         //直接根据访问此方法的话，就确定支付方式为xpay
         $payInfo = Cache::get($userIp.'-'.$params['check_code'].'-xpay_config');
-        if (!$payInfo) {
+        //获取当前支付状态
+        $payStatus = $this->getCurrentPayStatus($payInfo['mch_id'],1);
+        if (!$payInfo || $payStatus == 0) {
             //表示支付全挂了。
-            die('请检查支付通道是否正常~~~');
+            return $this->return500Error('请检查支付通道是否正常~~~');
         }
         //将本团队的商品数据缓存起来
         $data = [
@@ -276,7 +268,6 @@ class Index extends Frontend
             'count'             => 1
         ];
         //如果今天已经存在访问链接 ，就不在记录
-        //TODO:: 访问记录这个数据暂时只是考虑落地一次记录访问次数，刷新或者重新打开不计算
         if (!Cache::has($visitIp)) {
             Cache::set($visitIp,$visitIp,$this->getDiscountTime());
             $this->urlModel->where(['admin_id'=>$params['aid'],'check_code'=>$params['check_code']])->setInc('count');
@@ -300,23 +291,19 @@ class Index extends Frontend
         //判断访问链接，如果有微信授权链接参数，直接放行到落地页面。如果没有则进行微信授权认证
         $params = $this->request->param();
         if (empty($params)) {
-            die("请使用正确的链接进行访问！！");
+            return $this->return500Error('请使用正确的链接进行访问！！');
         }
 
         if (!$this->verifyCheckCode($params)) {
             //表示验证失败，链接被篡改
-            die("请不要使用非法手段更改链接");
+            return $this->return500Error('请不要使用非法手段更改链接');
         }
 
         $userInfo = $this->adminModel->get($params['aid']);
-
         //获取团队推广商品数据
         $goodsData = $this->getSelectGoodsInfo($params['tid'],$params['gid']);
-
         //获取访问者IP
         $userIp  = $this->request->ip();
-
-        //TODO::这里直接取redis的值，因为刚刚403跳转前一秒，已经写入缓存了，直接取即可，不过这操作还是有点不稳当,同一IP下如果有两个用户访问，就有可能获得不同的支付信息。不能用以下方式来获取
         //直接根据访问此方法的话，就确定支付方式为rypay
         $payInfo = Cache::get($userIp.'-'.$params['check_code'].'-rypay_config');
         if (!$payInfo) {
@@ -480,27 +467,28 @@ class Index extends Frontend
 
     /**
      * 分享码落地展示页面
+     * @throws \think\Exception
      */
     public function share()
     {
         if (!$this->isWx()) {
-            die("请用微信打开页面~~");
+            return $this->return500Error('请用微信打开页面~~');
         }
         //判断访问链接，如果有微信授权链接参数，直接放行到落地页面。如果没有则进行微信授权认证
         $params = $this->request->param();
         if (empty($params)) {
-            die("请使用正确的链接进行访问！！");
+            return $this->return500Error('请使用正确的链接进行访问！！');
         }
         //aid=12&gid=5&tid=6&tp=shoes4&check_code=247740f159df08abc570a30c89e4e412c2hvcA==
         if (!$this->verifyShareCode($params)) {
             //表示验证失败，链接被篡改
-            die("请不要使用非法手段更改链接");
+            return $this->return500Error('请不要使用非法手段更改链接');
         }
         //判断访问链接是否属于正常状态
         $where = ['admin_id'=>$params['aid'],'team_id'=>$params['tid'],'production_id'=>$params['gid'],'check_code'=>$params['check_code']];
         $urlQrStatus = $this->urlModel->where($where)->find();
         if ($urlQrStatus['share_code_status'] == 1) {
-            die("<h1>活动已经结束</h1>");
+            return $this->return500Error('活动已经结束');
         }
         $userInfo = $this->adminModel->get($params['aid']);
         //获取团队推广商品数据
@@ -527,7 +515,6 @@ class Index extends Frontend
             $this->urlModel->where(['admin_id'=>$params['aid'],'share_code'=>$params['check_code']])->setInc('count');
             $this->visitModel->isUpdate(false)->save($urlData);
             //进行数据统计,分享有礼暂时不进行报表数据写入
-//            $this->doDataSummary($params['check_code'],['type'=>'visit','nums'=>1]);
         } else {
             $this->visitModel->where('url',$visitIp)->setInc('count');
         }

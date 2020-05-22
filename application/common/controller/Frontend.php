@@ -805,4 +805,37 @@ class Frontend extends Controller
         }
 
     }
+
+
+    /**
+     * 返回500 错误
+     * @param $msg string 错误提示信息
+     * @return string
+     * @throws \think\Exception
+     */
+    public function return500Error($msg)
+    {
+        $this->assign('msg',$msg);
+        return $this->view->fetch('lndex/500');
+    }
+
+    /**
+     * 获取当前支付状态。
+     * @param $MchId string 支付商户号
+     * @param $type integer 支付类型，0＝微信原生支付　1＝享钱支付
+     * @return mixed
+     */
+    public function getCurrentPayStatus($MchId,$type)
+    {
+        if (!Cache::has($MchId)) {
+            $status = Cache::get($MchId);
+        } else {
+             if ($type == 0) {
+                 $status = $this->payModel->where('mch_id',$MchId)->find()['status'];
+             } elseif ($type == 1) {
+                 $status = $this->xpayModel->where('mch_id',$MchId)->find()['status'];
+             }
+        }
+        return $status;
+    }
 }
