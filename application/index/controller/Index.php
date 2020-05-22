@@ -96,6 +96,14 @@ class Index extends Frontend
     }
 
     /**
+     * 空方法
+     */
+    public function index()
+    {
+        die('此网站已经关闭～～～');
+    }
+
+    /**
      * 微信支付落地页面
      * @return string
      * @throws \think\Exception

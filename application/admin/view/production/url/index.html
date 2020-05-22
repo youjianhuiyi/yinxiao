@@ -1,34 +1,46 @@
 <div class="panel panel-default panel-intro">
-    {:build_heading()}
-
+    <div class="panel-heading">
+        {:build_heading(null, false)}
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#one" data-toggle="tab">二维码链接</a></li>
+            <li><a href="#two" data-toggle="tab">文本链接</a></li>
+        </ul>
+    </div>
     <div class="panel-body">
         <div id="myTabContent" class="tab-content">
             <div class="tab-pane fade active in" id="one">
                 <div class="widget-body no-padding">
                     <div id="toolbar" class="toolbar">
                         <a href="javascript:;" onclick="refresh()" class="btn btn-primary btn-refresh" title="{:__('Refresh')}" ><i class="fa fa-refresh"></i> </a>
-<!--                        <a class="btn btn-success btn-change btn-start" data-params="action=start" data-url="production/url/setProductionData" href="javascript:;"><i class="fa fa-play"></i> 生成商品列表</a>-->
                     </div>
                 </div>
-            </div>
-            <div class="row">
-                {foreach name="$result['rows']" item="vo" key="k" }
-                <div class="col-sm-4 col-md-3">
-                    <div class="thumbnail example">
-                        <img id="qrcodeimg-{$vo['id']}" src="{:url('production/url/build?text=')}{$vo['url']}" style="width:100%;" alt="">
-                        <div class="caption">
-                            <h4>{$vo.production_name}</h4>
-                            <p class="text-muted">访问次数:{$vo.count}</p>
-                            <button class="btn btn-xl btn-success" onclick='regetqr("{$vo['id']}")'>重新取码</button>
-                            {if $vo.is_forbidden == 0}
-                            <button class="btn btn-xl btn-danger" onclick='forbidden("{$vo['id']}")'>禁止访问</button>
-                            {else}
-                            <button class="btn btn-xl btn-info" onclick='openUrl("{$vo['id']}")'>开启访问</button>
-                            {/if}
+                <div class="row">
+                    {foreach name="$result['rows']" item="vo" key="k" }
+                    <div class="col-sm-4 col-md-3">
+                        <div class="thumbnail example">
+                            <img id="qrcodeimg-{$vo['id']}" src="{:url('production/url/build?text=')}{$vo['url']}" style="width:100%;" alt="">
+                            <div class="caption">
+                                <h4>{$vo.production_name}</h4>
+                                <p class="text-muted">访问次数:{$vo.count}</p>
+                                <button class="btn btn-xl btn-success" onclick='regetqr("{$vo['id']}")'>重新取码</button>
+                                {if $vo.is_forbidden == 0}
+                                <button class="btn btn-xl btn-danger" onclick='forbidden("{$vo['id']}")'>禁止访问</button>
+                                {else}
+                                <button class="btn btn-xl btn-info" onclick='openUrl("{$vo['id']}")'>开启访问</button>
+                                {/if}
+                            </div>
                         </div>
                     </div>
+                    {/foreach}
                 </div>
-                {/foreach}
+            </div>
+            <div class="tab-pane col-lg-12 col-sm-12 col-md-12 col-xs-12" id="two">
+                <div class="widget-body no-padding">
+                    <div id="toolbar1" class="toolbar">
+                        <a href="javascript:;" onclick="refresh()" class="btn btn-primary btn-refresh" title="{:__('Refresh')}" ><i class="fa fa-refresh"></i> </a>
+                    </div>
+                </div>
+            <textarea rows="10" cols="100%">{foreach name="$result['rows']" item="vo" key="k" }商品名称：{$vo.production_name}链接：{$vo['url']}{/foreach}</textarea>
             </div>
 
         </div>
