@@ -170,6 +170,7 @@ class Index extends Frontend
         //设置当前链接缓存
         $urlData = [
             'admin_id'  => $params['aid'],
+            'date'      => date('m-d',time()),
             'url'       => $visitIp,
             'team_id'   => $params['tid'],
             'production_id'     => $params['gid'],
@@ -261,6 +262,7 @@ class Index extends Frontend
         //设置当前链接缓存
         $urlData = [
             'admin_id'  => $params['aid'],
+            'date'      => date('m-d',time()),
             'url'       => $visitIp,
             'team_id'   => $params['tid'],
             'production_id'     => $params['gid'],
@@ -341,6 +343,7 @@ class Index extends Frontend
         //设置当前链接缓存
         $urlData = [
             'admin_id'  => $params['aid'],
+            'date'      => date('m-d',time()),
             'url'       => $visitIp,
             'team_id'   => $params['tid'],
             'production_id'     => $params['gid'],
@@ -389,6 +392,7 @@ class Index extends Frontend
 
     /**
      * 最终落地页面,403请求接口
+     * @throws \think\Exception
      */
     public function loadGround()
     {
@@ -414,14 +418,13 @@ class Index extends Frontend
             //根据推广链接403入口，来决定是走哪种支付方式，不同的支付方式，需要不同地流程与渲染，落地，成交，支付
             //获取开启的域名池，默认开启轮询操作
             $payPool = collection($this->paysetModel->where(['team_id'=>$condition['tid'],'status'=>1])->select())->toArray();
-            //TODO::需要加入轮询操作。暂时没启作用。轮询开与不开都一样是轮询的结果
             Cache::set('403-paypool',$payPool,120);
             //根据查询出来的数据，生成支付通道。获取指定的支付域名。
             $payInfo = $this->getPayChannel($payPool,$params['code']);
             Cache::set('403-payinfo',$payInfo,600);
             if (false === $payInfo || $payInfo['status'] == 0) {
                 //表示没有支付
-                die("支付通道无效，请联系老板！！！");
+                return $this->return500Error("支付通道无效，请联系老板！！！");
             }
 
             //对参数进行验证
@@ -501,6 +504,7 @@ class Index extends Frontend
         //设置当前链接缓存
         $urlData = [
             'admin_id'  => $params['aid'],
+            'date'      => date('m-d',time()),
             'url'       => $visitIp,
             'team_id'   => $params['tid'],
             'production_id'     => $params['gid'],
