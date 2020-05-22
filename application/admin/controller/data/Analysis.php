@@ -26,6 +26,15 @@ class Analysis extends Backend
     }
 
     /**
+     * 首页
+     * @return \think\response\Json|void
+     */
+    public function index()
+    {
+        die('此功能已经转移！');
+    }
+
+    /**
      * 添加
      */
     public function add()

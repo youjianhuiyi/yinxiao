@@ -34,7 +34,9 @@ php think menu -c sysconfig/rypay
 php think menu -c sysconfig/payset
 php think menu -c sysconfig/record
 php think menu -c sysconfig/smsconfig
+php think menu -c sysconfig/ossconfig
 php think menu -c data/visit
 php think menu -c data/day
 php think menu -c data/summary
 php think menu -c data/analysis
+php think menu -c data/backup

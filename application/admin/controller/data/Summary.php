@@ -416,6 +416,7 @@ class Summary extends Backend
      */
     public function index()
     {
+        die('此功能暂停使用');
         $date = date('m-d',time());
         $dataSummary = collection($this->model->select())->toArray();
         //先将所有数据按日期分类
