@@ -9,6 +9,7 @@ use OSS\OssClient;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use think\Db;
+use app\admin\model\sysconfig\Ossconfig as OssConfigModel;
 
 /**
  * 订单管理
@@ -24,6 +25,7 @@ class Order extends Backend
      */
     protected $model = null;
     protected $adminModel = null;
+    protected $ossModel = null;
     protected $noNeedLogin = ['excelExport'];
     protected $noNeedRight = ['excelExport'];
 
@@ -32,6 +34,7 @@ class Order extends Backend
         parent::_initialize();
         $this->model = new \app\admin\model\order\Order;
         $this->adminModel = new AdminModel();
+        $this->ossModel = new OssConfigModel();
         $pid = $this->adminInfo['pid'];
 
         if ($pid == 0) {
@@ -175,7 +178,7 @@ class Order extends Backend
      */
     public function excelExport($headArr = [])
     {
-        $fileName =  date("Ymdhis", time()) . ".xls";
+        $fileName = date("Ymdhis", time());
         $arr =  Db::query("show COLUMNS FROM yin_order");
         foreach ($arr as $item) {
             $headArr[] = $item['Field'];
@@ -234,11 +237,20 @@ class Order extends Backend
             }
             $column++;
         }
-        header('Content-Type: application/vnd.ms-excel');
-        header('Content-Disposition: attachment;filename="' . $fileName . '.xlsx"');
-        header('Cache-Control: max-age=0');
+//        header('Content-Type: application/vnd.ms-excel');
+//        header('Content-Disposition: attachment;filename="' . $fileName . '.xlsx"');
+//        header('Cache-Control: max-age=0');
         $writer = new Xlsx($spreadsheet);
-        $writer->save('php://output');
+//        $writer->save('php://output');
+        if (!is_dir(ROOT_PATH.'public/uploads/backup')) {
+            mkdir(ROOT_PATH.'public/uploads/backup');
+        }
+        $writer->save(ROOT_PATH.'public/uploads/backup/'.$fileName . '.xlsx');
+        //写入数据操作准备调用上传
+        $this->upToOss(ROOT_PATH.'public/uploads/backup/'.$fileName . '.xlsx');
+        $data = [
+
+        ];
         //删除清空：
         $spreadsheet->disconnectWorksheets();
         unset($spreadsheet);
@@ -259,30 +271,39 @@ class Order extends Backend
 
     /**
      * 上传到oss空间
+     * @param $fileName string 绝对路径带文件名
      */
-    protected function upToOss()
+    protected function upToOss($fileName)
     {
+        //查询当前团队有没有专用OSS。
+        $ossData = $this->ossModel->where('team_id',$this->adminInfo['team_id'])->find();
+        if (!$ossData) {
+            //表示不存在团队专用OSS
+            $ossData = $this->ossModel->where('access_key_id','LTAI4G8Z9Ng91NPnu4sNMnmw')->find();
+        }
         // 阿里云主账号AccessKey拥有所有API的访问权限，风险很高。强烈建议您创建并使用RAM账号进行API访问或日常运维，请登录RAM控制台创建RAM账号。
-        $accessKeyId = "<yourAccessKeyId>";
-        $accessKeySecret = "<yourAccessKeySecret>";
+        $accessKeyId = $ossData['access_key_id'];
+        $accessKeySecret = $ossData['access_key_secret'];
         // Endpoint以杭州为例，其它Region请按实际情况填写。
-        $endpoint = "http://oss-cn-hangzhou.aliyuncs.com";
+        $endpoint = $ossData['endpoint'];
         // 设置存储空间名称。
-        $bucket = "<yourBucketName>";
+        $bucket = $ossData['bucket'];
         // 设置文件名称。
-        $object = "<yourObjectName>";
+        $tid = $this->adminInfo['team_id'] ? $this->adminInfo['team_id'] : 0;
+        $object = 'tid-'.$tid.'-'.date('YmdHis',time()).'.xlsx';
         // <yourLocalFile>由本地文件路径加文件名包括后缀组成，例如/users/local/myfile.txt。
-        $filePath = "<yourLocalFile>";
+        $filePath = $fileName;
 
         try {
             $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
-
             $ossClient->uploadFile($bucket, $object, $filePath);
         } catch (OssException $e) {
             printf(__FUNCTION__ . ": FAILED\n");
             printf($e->getMessage() . "\n");
             return;
         }
+        //表示上传成功
+
         print(__FUNCTION__ . ": OK" . "\n");
     }
 }
