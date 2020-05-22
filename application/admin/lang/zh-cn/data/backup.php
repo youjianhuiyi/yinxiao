@@ -5,7 +5,7 @@ return [
     'Admin_id'   => '操作员ID',
     'File_name'  => '文件名',
     'Data_count' => '数据量',
-    'Date'       => '清除日期',
+    'Date'       => '操作日期',
     'Status'     => '状态',
     'Createtime' => '增加时间',
     'Updatetime' => '更新时间',

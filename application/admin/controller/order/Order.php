@@ -10,6 +10,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use think\Db;
 use app\admin\model\sysconfig\Ossconfig as OssConfigModel;
+use app\admin\model\data\Backup as BackupRecordModel;
 
 /**
  * 订单管理
@@ -26,6 +27,7 @@ class Order extends Backend
     protected $model = null;
     protected $adminModel = null;
     protected $ossModel = null;
+    protected $backupModel = null;
     protected $noNeedLogin = ['excelExport'];
     protected $noNeedRight = ['excelExport'];
 
@@ -35,6 +37,7 @@ class Order extends Backend
         $this->model = new \app\admin\model\order\Order;
         $this->adminModel = new AdminModel();
         $this->ossModel = new OssConfigModel();
+        $this->backupModel = new BackupRecordModel();
         $pid = $this->adminInfo['pid'];
 
         if ($pid == 0) {
@@ -185,13 +188,14 @@ class Order extends Backend
         }
         //导出的数据是以当前开始的七天前所有的数据，然后再将7天前的所有数据清空
         $dateTime = $this->getSevenTime();
-        if ($this->adminInfo['id'] == 1) {
-            //平台级备份
-            $data = Db::name('order')->where('createtime','<',$dateTime[0])->select();
-        } else {
-            //老板级备份
-            $data = Db::name('order')->where('team_id',$this->adminInfo['team_id'])->where('createtime','<',$dateTime[0])->select();
-        }
+        $data = Db::name('order')->select();
+//        if ($this->adminInfo['id'] == 1) {
+//            //平台级备份
+//            $data = Db::name('order')->where('createtime','<',$dateTime[0])->select();
+//        } else {
+//            //老板级备份
+//            $data = Db::name('order')->where('team_id',$this->adminInfo['team_id'])->where('createtime','<',$dateTime[0])->select();
+//        }
         //如果没有数据表示数据已经被清除，并且备份已经上传
         if (count($data) == 0) {
             //表示没有7 天前的数据了，或者已经上传完成了。
@@ -237,20 +241,22 @@ class Order extends Backend
             }
             $column++;
         }
-//        header('Content-Type: application/vnd.ms-excel');
-//        header('Content-Disposition: attachment;filename="' . $fileName . '.xlsx"');
-//        header('Cache-Control: max-age=0');
         $writer = new Xlsx($spreadsheet);
-//        $writer->save('php://output');
         if (!is_dir(ROOT_PATH.'public/uploads/backup')) {
             mkdir(ROOT_PATH.'public/uploads/backup');
         }
         $writer->save(ROOT_PATH.'public/uploads/backup/'.$fileName . '.xlsx');
         //写入数据操作准备调用上传
-        $this->upToOss(ROOT_PATH.'public/uploads/backup/'.$fileName . '.xlsx');
-        $data = [
-
+        $recordData = [
+          'team_id'     => $this->adminInfo['team_id'],
+          'admin_id'    => $this->adminInfo['id'],
+          'file_name'   => $fileName.'.xlsx',
+          'data_count'  => count($data),
+          'date'        => date('m-d',time()),
+          'status'      => 0
         ];
+        $this->backupModel->isUpdate(false)->save($recordData);
+        $this->upToOss(ROOT_PATH.'public/uploads/backup/'.$fileName.'.xlsx',$this->backupModel->id);
         //删除清空：
         $spreadsheet->disconnectWorksheets();
         unset($spreadsheet);
@@ -272,8 +278,10 @@ class Order extends Backend
     /**
      * 上传到oss空间
      * @param $fileName string 绝对路径带文件名
+     * @param $backupId integer 上传记录表ID
+     * @return string|void
      */
-    protected function upToOss($fileName)
+    protected function upToOss($fileName,$backupId)
     {
         //查询当前团队有没有专用OSS。
         $ossData = $this->ossModel->where('team_id',$this->adminInfo['team_id'])->find();
@@ -303,7 +311,13 @@ class Order extends Backend
             return;
         }
         //表示上传成功
-
-        print(__FUNCTION__ . ": OK" . "\n");
+        $result = $this->backupModel->isUpdate(true)->save(['id'=>$backupId,'status'=>1]);
+        if ($result) {
+            //表示上传成功
+            return 'success';
+        } else {
+            //表示正在上传或者上传失败
+            return 'failure';
+        }
     }
 }
