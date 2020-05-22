@@ -30,7 +30,15 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                 search:false,
                 columns: [
                     [
-                        {field: 'id', title: 'ID',operate:false},
+                        {
+                            title:'序号',
+                            operate:false,
+                            sortable:false,
+                            formatter:function(value,row,index){
+                                return index+1;
+                            }
+                        },
+                        {field: 'id', title: 'ID',operate:false,visible: false},
                         {field: 'username', title: __('Username'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
                         {field: 'nickname', title: __('Nickname'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
                         {field: 'pid', title: __('Pid'),operate:false,visible:false},

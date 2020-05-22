@@ -37,7 +37,6 @@ class Sms extends Backend
      *  content	是	String	短信内容，超过 70 个字符，每 67 个字符计一条短信
      *  timeStamp	是	String	时间戳,格式 YYYYMMDDHHmmss,不能小于当前时间 3分钟
      */
-
     public function _initialize()
     {
         parent::_initialize();
@@ -55,7 +54,7 @@ class Sms extends Backend
         $result = $this->curlPostForm($data,$this->getSMSGetBalance);
         Cache::set('sms-res',$result,300);
         $data = json_decode($result,true);
-        $smsData = $this->model->order('createtime','desc')->limit(50)->select();
+        $smsData = $this->model->where('team_id',$this->adminInfo['team_id'])->order('createtime','desc')->limit(50)->select();
         $this->assign('data',$data);
         $this->assign('smsData',$smsData);
     }

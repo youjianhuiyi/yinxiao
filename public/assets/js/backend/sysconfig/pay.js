@@ -26,7 +26,15 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form','editable'], function 
                 columns: [
                     [
                         {checkbox: true},
-                        {field: 'id', title: __('Id'),operate:false},
+                        {
+                            title:'序号',
+                            operate:false,
+                            sortable:false,
+                            formatter:function(value,row,index){
+                                return index+1;
+                            }
+                        },
+                        {field: 'id', title: __('Id'),operate:false,visible: false},
                         {field: 'team_id', title: __('Team_id'),operate: false,visible:false},
                         {field: 'team_name', title: __('Team_name'),operate: false,visible:false},
                         {field: 'pay_name', title: __('Pay_name'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},

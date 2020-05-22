@@ -40,7 +40,7 @@
                         <a href="javascript:;" onclick="refresh()" class="btn btn-primary btn-refresh" title="{:__('Refresh')}" ><i class="fa fa-refresh"></i> </a>
                     </div>
                 </div>
-            <textarea rows="10" cols="100%">{foreach name="$result['rows']" item="vo" key="k" }商品名称：{$vo.production_name}链接：{$vo['url']}{/foreach}</textarea>
+            <textarea rows="30" style="width:100%;">{foreach name="$result['rows']" item="vo" key="k" }商品名称：{$vo.production_name}-链接：{$vo['url']}&#13;{/foreach}</textarea>
             </div>
 
         </div>

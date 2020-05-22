@@ -24,7 +24,15 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                 columns: [
                     [
                         {checkbox: true},
-                        {field: 'id', title: __('Id'),operate: false},
+                        {
+                            title:'序号',
+                            operate:false,
+                            sortable:false,
+                            formatter:function(value,row,index){
+                                return index+1;
+                            }
+                        },
+                        {field: 'id', title: __('Id'),operate: false,visible: false},
                         {field: 'order_id', title: __('Order_id'),operate:false},
                         {field: 'phone', title: __('Phone'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
                         {field: 'status', title: __('Status'),searchList:{0:"失败",1:"成功"},formatter:function(value,index,data){
