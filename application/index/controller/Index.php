@@ -77,12 +77,6 @@ class Index extends Frontend
      */
     public function test()
     {
-        $visitData = collection($this->visitModel->select())->toArray();
-        foreach ($visitData as $item) {
-            if (!$item['date']) {
-                $this->visitModel->where(['id'=>$item['id']])->update(['date'=>date('m-d',$item['createtime'])]);
-            }
-        }
     }
 
     /**

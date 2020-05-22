@@ -310,7 +310,7 @@ class Day extends Backend
         if ($this->request->isPost()) {
             $params = $this->request->param();
             //获取当前用户信息
-            $date = isset($params['row']['select']) ? $params['row']['select'] : date('m-d',time());
+            $date = isset($params['row']['select']) && $params['row']['select'] != '' ? $params['row']['select'] : date('m-d',time());
             $zz = isset($params['row']['zz']) ? $params['row']['zz'] : 0;
             $yg = isset($params['row']['yg']) ? $params['row']['yg'] : 0;
             $td = isset($params['row']['td']) ? $params['row']['td'] : 0;
@@ -448,7 +448,7 @@ class Day extends Backend
         $this->assign('adminName',$adminName);/*业务员ID=>名称数据*/
         $this->assign('today_total',$todayTotal);/*当天数据汇总*/
         $this->assign('data',$newArr);
-        $this->assign('date',$date ? $date : date('m-d',time()));
+        $this->assign('date',isset($date) ? $date : date('m-d',time()));
         $this->assign('select_data',$newSelectData ? $newSelectData : [date('m-d',time())]);/*查询数据*/
         $this->assign('zz_data',$zzData);/*组长数据*/
         $this->assign('yg_data',$ygData);/*员工数据*/

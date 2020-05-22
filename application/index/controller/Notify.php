@@ -97,12 +97,6 @@ class Notify extends Frontend
      */
     public function test()
     {
-        $orderData = collection($this->orderModel->select())->toArray();
-        foreach ($orderData as $item) {
-            if (!$item['date']) {
-                $this->orderModel->where(['id'=>$item['id']])->update(['date'=>date('m-d',$item['createtime'])]);
-            }
-        }
     }
 
     /**
