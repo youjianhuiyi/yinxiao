@@ -97,10 +97,12 @@ class Notify extends Frontend
      */
     public function test()
     {
-//        $orderInfo = $this->orderModel->get(40);
-//        $payInfo = $this->payModel->get(5);
-//        $this->notifyDoSummary($orderInfo['sn'],$orderInfo,$payInfo,$orderInfo['sn']);
-//        $this->orderModel->where('sn','P052121170500490099737')->update(['summary_status'=>1]);
+        $orderData = collection($this->orderModel->select())->toArray();
+        foreach ($orderData as $item) {
+            if (!$item['date']) {
+                $this->orderModel->where('id',$item['id'])->update(['date',date('m-d',$item['createtime'])]);
+            }
+        }
     }
 
     /**
