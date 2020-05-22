@@ -449,7 +449,7 @@ class Day extends Backend
         $this->assign('today_total',$todayTotal);/*当天数据汇总*/
         $this->assign('data',$newArr);
         $this->assign('date',$date ? $date : date('m-d',time()));
-        $this->assign('select_data',$newSelectData);/*查询数据*/
+        $this->assign('select_data',$newSelectData ? $newSelectData : [date('m-d',time())]);/*查询数据*/
         $this->assign('zz_data',$zzData);/*组长数据*/
         $this->assign('yg_data',$ygData);/*员工数据*/
         $this->assign('td_data',$tdData);/*团队数据*/
