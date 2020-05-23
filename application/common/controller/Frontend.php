@@ -828,13 +828,13 @@ class Frontend extends Controller
     public function getCurrentPayStatus($MchId,$type)
     {
         if (!Cache::has($MchId)) {
-            $status = Cache::get($MchId);
+            if ($type == 0) {
+                $status = $this->payModel->where('mch_id',$MchId)->find()['status'];
+            } elseif ($type == 1) {
+                $status = $this->xpayModel->where('mch_id',$MchId)->find()['status'];
+            }
         } else {
-             if ($type == 0) {
-                 $status = $this->payModel->where('mch_id',$MchId)->find()['status'];
-             } elseif ($type == 1) {
-                 $status = $this->xpayModel->where('mch_id',$MchId)->find()['status'];
-             }
+            $status = Cache::get($MchId);
         }
         return $status;
     }
