@@ -2,6 +2,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
 
     var show_column = Config.show_column;
     var admin_level = Config.admin_level;
+    var backup_result = Config.backup_result
     var Controller = {
         index: function () {
             // 初始化表格参数配置
@@ -12,6 +13,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                     edit_url: 'order/order/edit',
                     del_url: 'order/order/del',
                     multi_url: 'order/order/multi',
+                    backup:'order/order/excelExport',
                     table: 'order',
                 }
             });
@@ -258,6 +260,35 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
             }
             // 为表格绑定事件
             Table.api.bindevent(table);
+            //
+            $(document).on("click", ".btn-backup", function () {
+                window.location.href = 'order/excelExport';
+            });
+            //判断是否是老板号
+            if (admin_level == 0) {
+                if (backup_result) {
+                    Layer.open({
+                        type: 1
+                        ,title: '温馨提示' //不显示标题栏
+                        ,closeBtn: false
+                        ,area: '300px;'
+                        ,shade: 0.2
+                        ,id: 'LAY_layuipro' //设定一个id，防止重复弹出
+                        ,resize: false
+                        ,btn: ['前往备份']
+                        ,btnAlign: 'c'
+                        ,moveType: 1 //拖拽模式，0或者1
+                        ,content: '<div style="padding: 50px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;">已经有超过<span class="label bg-red">7</span>天以上的数据未备份了！</div>'
+                        ,success: function(layero){
+                            var btn = layero.find('.layui-layer-btn');
+                            btn.find('.layui-layer-btn0').attr({
+                                href: 'http://www.layui.com/'
+                                ,target: '_blank'
+                            });
+                        }
+                    });
+                }
+            }
         },
         add: function () {
             Controller.api.bindevent();

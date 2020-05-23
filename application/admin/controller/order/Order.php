@@ -11,6 +11,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use think\Db;
 use app\admin\model\sysconfig\Ossconfig as OssConfigModel;
 use app\admin\model\data\Backup as BackupRecordModel;
+use think\Env;
 
 /**
  * 订单管理
@@ -50,7 +51,22 @@ class Order extends Backend
             $this->assignconfig('admin_level',2);
         }
         $this->assignconfig('show_column',true);
-
+        //获取平台级别对应老板号的备份方式。查询当前数据库是否有7 天以上的数据未备份。则会提示对应老板号
+        $dateTime = $this->getSevenTime();
+        if (Env::get('app_debug')) {
+            $sevenData = Db::name('order')->select();
+        } else {
+            if ($this->adminInfo['id'] == 1) {
+                //平台级备份
+                $sevenData = Db::name('order')->where('createtime','<',$dateTime[0])->select();
+            } else {
+                //老板级备份
+                $sevenData = Db::name('order')->where('team_id',$this->adminInfo['team_id'])->where('createtime','<',$dateTime[0])->select();
+            }
+        }
+        $backupResult = count($sevenData) > 0;
+        $this->assignconfig('backup_result',$backupResult);
+        $this->assign('backup_result',$backupResult);
     }
 
     /**
@@ -138,7 +154,6 @@ class Order extends Backend
 
             $list = collection($list)->toArray();
             $result = array("total" => $total, "rows" => $list);
-
             return json($result);
         }
         return $this->view->fetch();
@@ -172,6 +187,7 @@ class Order extends Backend
     /**
      * excel表格导出
      * @param array $headArr 表头名称
+     * @return false|string
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      * @throws \think\db\exception\DataNotFoundException
@@ -181,6 +197,7 @@ class Order extends Backend
      */
     public function excelExport($headArr = [])
     {
+        ini_set("max_execution_time",  360);
         $fileName = date("Ymdhis", time());
         $arr =  Db::query("show COLUMNS FROM yin_order");
         foreach ($arr as $item) {
@@ -188,18 +205,21 @@ class Order extends Backend
         }
         //导出的数据是以当前开始的七天前所有的数据，然后再将7天前的所有数据清空
         $dateTime = $this->getSevenTime();
-        $data = Db::name('order')->select();
-//        if ($this->adminInfo['id'] == 1) {
-//            //平台级备份
-//            $data = Db::name('order')->where('createtime','<',$dateTime[0])->select();
-//        } else {
-//            //老板级备份
-//            $data = Db::name('order')->where('team_id',$this->adminInfo['team_id'])->where('createtime','<',$dateTime[0])->select();
-//        }
+        if (Env::get('app_debug')) {
+            $data = Db::name('order')->select();
+        } else {
+            if ($this->adminInfo['id'] == 1) {
+                //平台级备份
+                $data = Db::name('order')->where('createtime','<',$dateTime[0])->select();
+            } else {
+                //老板级备份
+                $data = Db::name('order')->where('team_id',$this->adminInfo['team_id'])->where('createtime','<',$dateTime[0])->select();
+            }
+        }
         //如果没有数据表示数据已经被清除，并且备份已经上传
         if (count($data) == 0) {
             //表示没有7 天前的数据了，或者已经上传完成了。
-            return json_encode(['msg'=>'你的数据已经上传成功']);
+            die('你的数据已经上传成功');
         }
         $spreadsheet    = new Spreadsheet();
         $objPHPExcel    = $spreadsheet->getActiveSheet();
@@ -241,26 +261,35 @@ class Order extends Backend
             }
             $column++;
         }
+        ob_clean();
+        //备份完成OSS后下载到本地
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="' . $fileName . '.xlsx"');
+        header('Cache-Control: max-age=0');
         $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
         if (!is_dir(ROOT_PATH.'public/uploads/backup')) {
             mkdir(ROOT_PATH.'public/uploads/backup');
         }
         $writer->save(ROOT_PATH.'public/uploads/backup/'.$fileName . '.xlsx');
         //写入数据操作准备调用上传
         $recordData = [
-          'team_id'     => $this->adminInfo['team_id'],
-          'admin_id'    => $this->adminInfo['id'],
-          'file_name'   => $fileName.'.xlsx',
-          'data_count'  => count($data),
-          'date'        => date('m-d',time()),
-          'status'      => 0
+            'team_id'     => $this->adminInfo['team_id'],
+            'admin_id'    => $this->adminInfo['id'],
+            'file_name'   => $fileName.'.xlsx',
+            'data_count'  => count($data),
+            'date'        => date('m-d',time()),
+            'status'      => 0
         ];
         $this->backupModel->isUpdate(false)->save($recordData);
-        $this->upToOss(ROOT_PATH.'public/uploads/backup/'.$fileName.'.xlsx',$this->backupModel->id);
+        $result = $this->upToOss(ROOT_PATH.'public/uploads/backup/'.$fileName.'.xlsx',$this->backupModel->id);
+        if ($result == 'success') {
+            //删除数据库数据
+            Db::name('order')->where('createtime','<',$dateTime[0])->delete();
+        }
         //删除清空：
         $spreadsheet->disconnectWorksheets();
         unset($spreadsheet);
-        exit;
     }
 
     /**
