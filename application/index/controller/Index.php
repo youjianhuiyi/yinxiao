@@ -134,7 +134,7 @@ class Index extends Frontend
         $userIp  = $this->request->ip();
         $payInfo = Cache::get($userIp.'-'.$params['check_code'].'-pay_config');
         //获取当前支付状态
-        $payStatus = $this->getCurrentPayStatus($payInfo['mch_id'],1);
+        $payStatus = $this->getCurrentPayStatus($payInfo['mch_id'],0);
         if (!$payInfo || $payStatus == 0) {
             //表示支付全挂了。
             return $this->return500Error('请检查支付通道是否正常~~');
