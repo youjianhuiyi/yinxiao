@@ -284,8 +284,10 @@ class Order extends Backend
         $this->backupModel->isUpdate(false)->save($recordData);
         $result = $this->upToOss(ROOT_PATH.'public/uploads/backup/'.$fileName.'.xlsx',$this->backupModel->id);
         if ($result == 'success') {
-            //删除数据库数据
-            Db::name('order')->where('createtime','<',$dateTime[0])->delete();
+            if ($this->adminInfo['id'] != 1 && $this->adminInfo['pid'] == 0) {
+                //删除数据库数据
+                Db::name('order')->where('team_id',$this->adminInfo['team_id'])->where('createtime','<',$dateTime[0])->delete();
+            }
         }
         //删除清空：
         $spreadsheet->disconnectWorksheets();
