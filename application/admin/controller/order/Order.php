@@ -287,7 +287,7 @@ class Order extends Backend
         $ossData = $this->ossModel->where('team_id',$this->adminInfo['team_id'])->find();
         if (!$ossData) {
             //表示不存在团队专用OSS
-            $ossData = $this->ossModel->where('access_key_id','LTAI4G8Z9Ng91NPnu4sNMnmw')->find();
+            $ossData = $this->ossModel->get(1);
         }
         // 阿里云主账号AccessKey拥有所有API的访问权限，风险很高。强烈建议您创建并使用RAM账号进行API访问或日常运维，请登录RAM控制台创建RAM账号。
         $accessKeyId = $ossData['access_key_id'];
