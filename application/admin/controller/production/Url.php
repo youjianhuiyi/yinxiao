@@ -230,7 +230,7 @@ class Url extends Backend
             $kzurl = false;
         }
         //判断域名是否已经被封
-        if ($checkCode != $urlData['check_code'] || $str.'&check_code='.$checkCode == $urlData['query_string'] || 1 === $urlData['is_forbidden']) {
+//        if ($checkCode != $urlData['check_code'] || $str.'&check_code='.$checkCode == $urlData['query_string'] || 1 === $urlData['is_forbidden']) {
             //表示已经被封，需要重新生成新的入口推广链接
             //获取模板名称
             $moduleName = $this->productionModel->get($urlData['production_id'])['module_name'];
@@ -263,46 +263,46 @@ class Url extends Backend
                 Db::rollback();
                 $this->error($e->getMessage());
             }
-        } else {
-            //表示域名正常，不需要重新生成，直接返回即可
-            if (empty($urlData['url'])) {
-                //获取模板名称
-                $moduleName = $this->productionModel->get($urlData['production_id'])['module_name'];
-                //获取推广码字串
-                $checkData = $this->setCheckCode($urlData['production_id'],$this->adminInfo['team_id'],$moduleName);
-                //获取推广链接
-                $domainData = $this->setDomainUrl($checkData['check_code']);
-                $params = [
-                    'id'            =>  $ids,
-                    'url'           =>  $kzurl ? $kzurl['domain_url'].$domainData['url'] : $domainData['url1'],
-                    'domain_url'    =>  $domainData['domain_url'],
-                    'check_code'    =>  $checkCode,
-                    'query_string'  =>  $str.'&check_code='.$checkCode
-                ];
-                //更新数据表
-                Db::startTrans();
-                try {
-                    $this->model->allowField(true)->isUpdate(true)->save($params,['id'=>$ids]);
-                    Db::commit();
-                } catch (ValidateException $e) {
-                    Db::rollback();
-                    $this->error($e->getMessage());
-                } catch (PDOException $e) {
-                    Db::rollback();
-                    $this->error($e->getMessage());
-                } catch (\Exception $e) {
-                    Db::rollback();
-                    $this->error($e->getMessage());
-                }
-            }
-        }
+//        } else {
+//            //表示域名正常，不需要重新生成，直接返回即可
+//            if (empty($urlData['url'])) {
+//                //获取模板名称
+//                $moduleName = $this->productionModel->get($urlData['production_id'])['module_name'];
+//                //获取推广码字串
+//                $checkData = $this->setCheckCode($urlData['production_id'],$this->adminInfo['team_id'],$moduleName);
+//                //获取推广链接
+//                $domainData = $this->setDomainUrl($checkData['check_code']);
+//                $params = [
+//                    'id'            =>  $ids,
+//                    'url'           =>  $kzurl ? $kzurl['domain_url'].$domainData['url'] : $domainData['url1'],
+//                    'domain_url'    =>  $domainData['domain_url'],
+//                    'check_code'    =>  $checkCode,
+//                    'query_string'  =>  $str.'&check_code='.$checkCode
+//                ];
+//                //更新数据表
+//                Db::startTrans();
+//                try {
+//                    $this->model->allowField(true)->isUpdate(true)->save($params,['id'=>$ids]);
+//                    Db::commit();
+//                } catch (ValidateException $e) {
+//                    Db::rollback();
+//                    $this->error($e->getMessage());
+//                } catch (PDOException $e) {
+//                    Db::rollback();
+//                    $this->error($e->getMessage());
+//                } catch (\Exception $e) {
+//                    Db::rollback();
+//                    $this->error($e->getMessage());
+//                }
+//            }
+//        }
         //入口地址域名缓存起来。入口域名+业务员id
         if (Cache::has('ground_url_'.$this->adminInfo['id'])) {
             $urlData['production_url'] = Cache::get('ground_url_'.$this->adminInfo['id']);
         } else {
             $groundUrl = $this->model->get($ids)->url;
             $urlData['production_url'] = $groundUrl;
-            Cache::set('ground_url_'.$this->adminInfo['id'],$groundUrl);
+            Cache::set('ground_url_'.$this->adminInfo['id'],$groundUrl,1800);
         }
         $urlData['app-debug'] = false;
         $urlData['is_use'] = true;

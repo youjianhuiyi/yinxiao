@@ -175,7 +175,7 @@ class Share extends Backend
             $kzurl = false;
         }
         //TODO::需要根据真实情况，目前此条件没有实际意义
-        if (1 === $urlData['share_code_status']) {
+//        if (1 === $urlData['share_code_status']) {
             //缓存好当前入口链接
             $domainData = $this->setDomainUrl($urlData['share_code']);
             $params = [
@@ -198,31 +198,31 @@ class Share extends Backend
                 Db::rollback();
                 $this->error($e->getMessage());
             }
-        } else {
-            //表示域名正常，不需要重新生成，直接返回即可
-            if (empty($urlData['share_url'])) {
-                $domainData = $this->setDomainUrl($urlData['share_code']);
-                $params = [
-                    'id'            =>  $ids,
-                    'share_url'     =>  $kzurl ? $kzurl['domain_url'].$domainData['url'] : $domainData['url1'],
-                ];
-                //更新数据表
-                Db::startTrans();
-                try {
-                    $this->model->isUpdate(true)->save($params);
-                    Db::commit();
-                } catch (ValidateException $e) {
-                    Db::rollback();
-                    $this->error($e->getMessage());
-                } catch (PDOException $e) {
-                    Db::rollback();
-                    $this->error($e->getMessage());
-                } catch (\Exception $e) {
-                    Db::rollback();
-                    $this->error($e->getMessage());
-                }
-            }
-        }
+//        } else {
+//            //表示域名正常，不需要重新生成，直接返回即可
+//            if (empty($urlData['share_url'])) {
+//                $domainData = $this->setDomainUrl($urlData['share_code']);
+//                $params = [
+//                    'id'            =>  $ids,
+//                    'share_url'     =>  $kzurl ? $kzurl['domain_url'].$domainData['url'] : $domainData['url1'],
+//                ];
+//                //更新数据表
+//                Db::startTrans();
+//                try {
+//                    $this->model->isUpdate(true)->save($params);
+//                    Db::commit();
+//                } catch (ValidateException $e) {
+//                    Db::rollback();
+//                    $this->error($e->getMessage());
+//                } catch (PDOException $e) {
+//                    Db::rollback();
+//                    $this->error($e->getMessage());
+//                } catch (\Exception $e) {
+//                    Db::rollback();
+//                    $this->error($e->getMessage());
+//                }
+//            }
+//        }
         //入口地址域名缓存起来。入口域名+业务员id
         if (Cache::has('ground_url_'.$this->adminInfo['id'])) {
             $urlData['production_url'] = Cache::get('ground_url_'.$this->adminInfo['id']);
