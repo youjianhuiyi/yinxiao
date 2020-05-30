@@ -10,6 +10,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                     edit_url: 'customers/customers/edit',
                     del_url: 'customers/customers/del',
                     multi_url: 'customers/customers/multi',
+                    import_url: 'customers/customers/import',
                     table: 'customers',
                 }
             });
@@ -29,7 +30,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {checkbox: true},
                         {field: 'id', title: __('Id'),operate: false},
                         {field: 'team_id', title: __('Team_id'),operate: false,visible:false},
-                        {field: 'team_name_text', title: __('Team_name'),operate:false,visible:false},
+                        {field: 'team_id_text', title:'团队名称',operate:false,visible:false},
                         {field: 'admin_id', title: __('Admin_id'),operate:false,visible: false},
                         {field: 'name', title: __('Name'),operate: 'LIKE %...%', placeholder: '模糊搜索，*表示任意字符'},
                         {field: 'type', title: __('Type'),operate: false,visible: false},

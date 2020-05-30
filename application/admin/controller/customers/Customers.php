@@ -135,10 +135,9 @@ class Customers extends Backend
         } else {
             $reader = new Xlsx();
         }
-
         //导入文件首行类型,默认是注释,如果需要使用字段名称请使用name
         $importHeadType = isset($this->importHeadType) ? $this->importHeadType : 'comment';
-
+//        dump($importHeadType);die;
         $table = $this->model->getQuery()->getTable();
         $database = \think\Config::get('database.database');
         $fieldArr = [];
@@ -212,18 +211,10 @@ class Customers extends Backend
             }
 
             foreach ($insert as $key => &$value) {
-                if ($value['order_sn'] == '') {
-                    unset($insert[$key]);
-                } else {
-                    $value['team_id'] = $this->adminInfo['team_id'];
-                    $value['team_name'] = $this->adminInfo['team_name'];
-                    $value['express_no'] = (string)$value['express_no'];
-                    $value['order_id'] = $this->orderModel->where(['sn'=>$value['order_sn']])->find()['id'] ? : 0;
-                }
-
+                $value['team_id'] = $this->adminInfo['team_id'];
+                $value['admin_id'] = $this->adminInfo['id'];
             }
 //            dump($insert);die;
-            $this->setExpressToOrder($insert);
             $this->model->saveAll($insert);
         } catch (PDOException $exception) {
             $msg = $exception->getMessage();
