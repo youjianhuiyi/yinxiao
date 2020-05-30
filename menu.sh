@@ -40,3 +40,4 @@ php think menu -c data/day
 php think menu -c data/summary
 php think menu -c data/analysis
 php think menu -c data/backup
+php think menu -c customers/customers

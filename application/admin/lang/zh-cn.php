@@ -190,5 +190,6 @@ return [
     'count'                                                 => '数量',
     'sysconfig'                                             => '系统设置',
     'data'                                                  => '数据管理',
+    'customers'                                             => '客户管理',
 
 ];
