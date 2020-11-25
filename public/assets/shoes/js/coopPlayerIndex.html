@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title></title>
+    <script type="text/javascript" src="https://static-other.artgeek.com.cn/Shop/Shoes_2/js/online_enjoy.js"></script>
+    <script type="text/javascript" src="https://static-other.artgeek.com.cn/Shop/Shoes_2/js/pcw.enjoy.js"></script>
+    <style type="text/css">
+        html{
+            width: 100%;
+            height: 100%;
+        }
+        body {
+            margin:0;
+            padding:0;
+            border:0;
+            outline:0;
+            background-color: #000;
+            color: #000;
+            min-width: 100px;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+
+</head>
+<body>
+
+<span data-widget-flashplayerparam="public" data-flashplayerparam-flashurl data-flashplayerparam-flashvars style="display:none;" id="flashParam"> </span>
+<input type="hidden" id="appKey" value>
+<input type="hidden" id="appid" value>
+<input type="hidden" id="queryStr" value="vid=ebbb79d60e3f592a0f0f0eb0add7d261&amp;tvId=15073453500&amp;accessToken=2.f22860a2479ad60d8da7697274de9346&amp;appKey=3955c3425820435e86d0f4cdfe56f5e7&amp;appId=1368&amp;height=100%&amp;width=100%">
+<div id="videoArea" style="overflow:hidden;zoom:1;position:relative;height:100%;">
+    <div data-player-cycleplay="false" data-player-ismember="false" data-player-autoplay="true" data-player-videoid data-player-tvid data-player-qiyiProduced="1" data-widget-player="flash" id="flashbox" style="height:100%;">
+    </div>
+</div>
+<script type="text/javascript">
+    var _isArray = Array.isArray || function(arg){
+        return Object.prototype.toString.call(arg) == '[object Array]';
+    }
+    var queryToJson = function (url) {
+        var query   = url.substr(url.lastIndexOf('?') + 1),
+            params  = query.split('&'),
+            len     = params.length,
+            result  = {},
+            i       = 0,
+            key, value, item, param;
+
+        for (; i < len; i++) {
+            if(!params[i]){
+                continue;
+            }
+            param   = params[i].split('=');
+            key     = param.shift();
+            value   = param.join('=');
+
+            item = result[key];
+            if ('undefined' == typeof item) {
+                result[key] = value;
+            }
+            else if (_isArray(item)) {
+                item.push(value);
+            }
+            else {
+                result[key] = [item, value];
+            }
+        }
+        return result;
+    };
+    var _ua = navigator.userAgent.toLowerCase();
+    var trident = _ua.match(/trident/);
+    var _iPhone = /iphone os/.test(_ua) && !trident; //iphone 的检测
+    var _android = /android/.test(_ua); //android 的检测
+    var _WP = /windows phone/.test(_ua);
+    var _iPad = /ipad/.test(_ua) && !trident; // ipad的检测
+    var _lePad = /lepad_hls/.test(_ua); //联想lePad检测
+    var _CHROME = /chrome/.test(_ua);
+    var _ff = /firefox/.test(_ua);
+    //url中的参数
+    var queryStrVal=document.getElementById("queryStr").value;
+    var paramJson = queryToJson(queryStrVal);
+    var appKey = paramJson.appKey;
+    var video = _iPad || _iPhone || _android || _lePad || _WP;
+    var flag=(appKey=="2fbdb5a8178e40afa4443b31a4712b10" && (_CHROME || _ff));
+    
+    if (video ||flag) {
+        var h5Url = "//m.iqiyi.com/openplay.html?save_type=1";
+        //过滤掉宽高
+        for(var p in paramJson){
+            if(p!="width" && p!="height"){
+                h5Url +="&"+p+"="+paramJson[p];
+            }
+        }
+        location.href = h5Url;
+    }else{
+    
+        var tvId = paramJson.tvId;
+        var vid = paramJson.vid;
+        var appId = paramJson.appId;
+        //flash播放器名单,记得上线时删1130
+        var whiteUser=[69,754,1130,2109,2769,3724,7085,7166,7430,8161,8519,3027];
+        var isFlash=false;
+        for(var i=0;i<whiteUser.length;i++){
+            if(appId==whiteUser[i]){
+                isFlash=true;
+                break;
+            }
+        }
+        var flashurl = "//dispatcher.video.qiyi.com/disp/shareplayer.swf?";
+        flashurl += queryStrVal;
+        flashurl += "&bd=1&accessType=1";
+        if(isFlash){
+            flashurl += "&__playertype__=flash";
+        }
+        var flashParamObj=document.getElementById("flashParam");
+        flashParamObj.setAttribute("data-flashplayerparam-flashurl", flashurl);
+        var flashboxObj=document.getElementById("flashbox");
+        flashboxObj.setAttribute("data-player-videoid", vid);
+        flashboxObj.setAttribute("data-player-tvid", tvId);
+        document.getElementById("appid").value=appId;
+        document.getElementById("appKey").value=appKey;
+        
+        QiyiPlayerLoader.ready(function(manager) {
+            var param = {};
+            param['parentId'] = 'flashbox'; // 容器id
+            // param['h5P2PUrl'] = "//static.iqiyi.com/https://static-other.artgeek.com.cn/Shop/Shoes_2/js/player_v1/res/20170825/17032a1b82aa.js";
+            // param['h5adsrc'] = "//static.iqiyi.com/https://static-other.artgeek.com.cn/Shop/Shoes_2/js/common/ares3.min.js";
+            for(var p in paramJson){
+                if(p!="width" && p!="height"){
+                  param[p] =paramJson[p];
+                }
+            }
+            if(isFlash){
+                param["playerType"] ="flash_VOD";
+            }
+            var player = manager.createPlayer(param);
+        });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+/**
+ * 技术信息：请求参数
+ * 请参考: https://yya.gs/faq
+*/
+{
+    "directory": "hiofhidv-cn-745483fd",
+    "options": {
+        "url": "http://hiofhidv.cn/sgqtdaacnefta/tbsxvmlbsuwjww/t6/a2/s135/akzzhghbsmnksgx/whdduwemzlaowntsfay.html?okksjhrqv=ehvfxfwew&xvzxjiihamkyww=1586797821",
+        "domain": "hiofhidv.cn",
+        "request": {
+            "headers": {
+                "Accept": "text/html,*/*",
+                "Accept-language": "zh-CN,zh;q=0.9,en;q=0.8",
+                "Cache-control": "no-cache",
+                "upgrade-insecure-requests": "1",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36",
+                "X-Scraper-WebSite": "https://yya.gs/",
+                "cookie": "PHPSESSID=j30416jr204hmqna13kro1kbc1"
+            }
+        },
+        "response": {
+            "statusCode": 200,
+            "headers": {
+                "date": "Mon, 13 Apr 2020 17:17:13 GMT",
+                "server": "Apache/2.4.18 (Win32) OpenSSL/1.0.2e PHP/5.3.29",
+                "x-powered-by": "ThinkPHP",
+                "expires": "Thu, 19 Nov 1981 08:52:00 GMT",
+                "cache-control": "private",
+                "pragma": "no-cache",
+                "keep-alive": "timeout=5, max=100",
+                "connection": "Keep-Alive",
+                "transfer-encoding": "chunked",
+                "content-type": "text/html; charset=utf-8"
+            }
+        }
+    },
+    "formatter": {
+        "css": false,
+        "html": false,
+        "javascript": false,
+        "saveOriginal": true
+    },
+    "user": {
+        "isWhite": false
+    },
+    "time": {
+        "start": 1586798232015,
+        "end": 1586798239686,
+        "spend": "7.671s"
+    }
+}
